@@ -214,6 +214,20 @@ button {
   gap: 1rem;
   align-items: center;
 }
+.entry-input {
+  background: rgba(30, 144, 255, 0.2); /* light blue with some transparency */
+  border: 1px solid rgba(30, 144, 255, 0.5);
+  border-radius: 5px;
+  padding: 0.5rem;
+  color: #fff;
+  outline: none;
+  transition: background 0.3s ease;
+}
+
+.entry-input:focus {
+  background: rgba(30, 144, 255, 0.35);
+}
+
 .entry-section input {
   flex: 0 0 150px;
   padding: 0.5rem;
