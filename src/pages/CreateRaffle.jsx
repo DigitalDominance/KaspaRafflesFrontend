@@ -21,12 +21,11 @@ const CreateRaffle = ({ wallet }) => {
   const treasuryWallet = process.env.REACT_APP_TREASURY_WALLET;
 
   // Check the host's balance before initiating the prize transaction.
-  // For both KAS and KRC20, we compare values in sompi.
   const checkPrizeBalance = async () => {
     if (prizeType === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        // Multiply prizeAmount (in plain KAS) by 1e8 to get the required sompi.
+        // Multiply prizeAmount (in plain KAS) by 1e8 to get required sompi.
         const required = parseFloat(prizeAmount) * 1e8;
         if (balance.total < required) {
           setConfirmError('Insufficient KAS balance in your wallet.');
@@ -64,16 +63,14 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   // Handle form submission.
-  // We add an extra check to ensure that the raffle's end time is at least 24 hours from now.
+  // Also ensure the raffle end time is at least 24 hours in the future.
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Check if the timeFrame is at least 24 hours in the future.
     const minTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
     if (new Date(timeFrame) < minTime) {
       setConfirmError("Raffle must last at least 24 hours from now.");
       return;
     }
-
     const isoDate = new Date(timeFrame).toISOString();
     if (!timeFrame || !creditConversion || !prizeAmount) {
       setConfirmError('Please fill all required fields.');
@@ -91,16 +88,14 @@ const CreateRaffle = ({ wallet }) => {
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
 
-    // Clear any previous errors and show the confirmation modal.
     setConfirmError('');
     setShowConfirmModal(true);
   };
 
   // Handle prize confirmation using KasWare.
-  // Only if a valid TXID is returned will the raffle be created.
+  // Only if a valid TXID is returned, create the raffle.
   const handleConfirmPrize = async () => {
     setConfirmError('');
-    // Check funds again before sending prize.
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
     
@@ -118,11 +113,7 @@ const CreateRaffle = ({ wallet }) => {
           amt: (parseFloat(prizeAmount) * 1e8).toString(),
           to: treasuryWallet,
         });
-        txid = await window.kasware.signKRC20Transaction(
-          transferJson,
-          4,
-          treasuryWallet
-        );
+        txid = await window.kasware.signKRC20Transaction(transferJson, 4, treasuryWallet);
       }
       // If the transaction is cancelled or fails, txid will be falsy.
       if (!txid) {
@@ -168,7 +159,7 @@ const CreateRaffle = ({ wallet }) => {
 
   return (
     <div className="create-raffle-page page-container">
-      {/* Global heading is centered on pages using the global-heading class */}
+      {/* Centered main heading using the global-heading class */}
       <h1 className="global-heading">Create a Raffle</h1>
       <form onSubmit={handleSubmit} className="frosted-form">
         <div>
@@ -264,11 +255,19 @@ const CreateRaffle = ({ wallet }) => {
         <button type="submit">Create Raffle</button>
       </form>
 
-      {/* Inline error message (outside the modal) */}
+      {/* Inline error message */}
       {confirmError && !showConfirmModal && (
-        <div className="error-message" style={{ marginTop: '1rem', color: 'red', textAlign: 'center' }}>
+        <div className="message error" style={{ marginTop: '1rem', textAlign: 'center' }}>
           {confirmError}
           <button className="close-button" onClick={() => setConfirmError('')} style={{ marginLeft: '1rem' }}>×</button>
+        </div>
+      )}
+
+      {/* Inline success message */}
+      {successMessage && (
+        <div className="message success" style={{ marginTop: '1rem', textAlign: 'center' }}>
+          {successMessage}
+          <button className="close-button" onClick={() => setSuccessMessage('')} style={{ marginLeft: '1rem' }}>×</button>
         </div>
       )}
 
@@ -279,7 +278,7 @@ const CreateRaffle = ({ wallet }) => {
           </div>
           {confirmError ? (
             <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-              <p style={{ color: 'red' }}>{confirmError}</p>
+              <p className="message error" style={{ color: 'red' }}>{confirmError}</p>
               <button className="close-button" onClick={handleCloseModal}>×</button>
             </div>
           ) : (
