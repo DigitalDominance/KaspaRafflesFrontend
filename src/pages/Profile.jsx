@@ -3,15 +3,30 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-const Profile = ({ wallet }) => {
+const Profile = () => {
   const [myRaffles, setMyRaffles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const rafflesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+  // Fetch the currently connected Kaspa address using KasWare
+  const getConnectedAddress = async () => {
+    try {
+      const accounts = await window.kasware.getAccounts();
+      return accounts[0];
+    } catch (error) {
+      console.error('Error fetching connected account:', error);
+      return null;
+    }
+  };
+
+  // Fetch raffles for the connected account.
   const fetchMyRaffles = async () => {
     try {
-      const res = await axios.get(`${apiUrl}/raffles?creator=${wallet.address}`);
+      const currentAddress = await getConnectedAddress();
+      if (!currentAddress) return;
+      
+      const res = await axios.get(`${apiUrl}/raffles?creator=${currentAddress}`);
       if (res.data.success) {
         // Separate live and completed raffles.
         const live = res.data.raffles.filter(r => r.status === 'live');
@@ -33,8 +48,9 @@ const Profile = ({ wallet }) => {
   };
 
   useEffect(() => {
+    // Re-check the connected account and fetch raffles every time the page loads.
     fetchMyRaffles();
-  }, [wallet.address, apiUrl]);
+  }, [apiUrl]);
 
   // Pagination calculations.
   const indexOfLast = currentPage * rafflesPerPage;
@@ -44,7 +60,7 @@ const Profile = ({ wallet }) => {
 
   return (
     <div className="profile-page page-container">
-      {/* Use global-heading to center the main heading */}
+      {/* Global heading is centered using the global-heading class */}
       <h1 className="global-heading">My Raffles</h1>
       {myRaffles.length === 0 ? (
         <p>You haven't created any raffles yet.</p>
