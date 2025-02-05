@@ -1,3 +1,4 @@
+// frontend/src/pages/CreateRaffle.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -8,33 +9,22 @@ const CreateRaffle = ({ wallet }) => {
   const [timeFrame, setTimeFrame] = useState('');
   const [creditConversion, setCreditConversion] = useState('');
   const [prizeType, setPrizeType] = useState('KAS');
-  const [prizeTicker, setPrizeTicker] = useState(''); // For KRC20 prize
+  const [prizeTicker, setPrizeTicker] = useState(''); // for KRC20 prize
   const [prizeAmount, setPrizeAmount] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const navigate = useNavigate();
 
-  // Treasury wallet from environment variable
+  // Treasury wallet from env variable
   const treasuryWallet = process.env.REACT_APP_TREASURY_WALLET;
 
-  // When the form is submitted, create the raffle (but prize not yet confirmed)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isoDate = new Date(timeFrame).toISOString();
-    console.log("Submitting raffle with:", {
-      raffleType,
-      tokenTicker,
-      isoDate,
-      creditConversion,
-      prizeType,
-      prizeAmount,
-      prizeTicker,
-    });
     if (!timeFrame || !creditConversion || !prizeAmount) {
       alert('Please fill all required fields');
       return;
     }
-    // For KRC20 raffles, require a token ticker for both the raffle and the prize.
     if (raffleType === 'KRC20' && !tokenTicker) {
       alert('Please provide a token ticker for the raffle deposit.');
       return;
@@ -53,38 +43,33 @@ const CreateRaffle = ({ wallet }) => {
       creator: wallet.address,
       treasuryAddress: treasuryWallet,
       tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
+      prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
     };
     try {
       const res = await axios.post(`${apiUrl}/raffles/create`, payload);
-      console.log("API response:", res.data);
       if (res.data.success) {
-        // Now show the prize confirmation modal
+        // Instead of a browser prompt, show a custom modal for prize confirmation.
         setShowConfirmModal(true);
-        // Store the newly created raffle ID in state for later confirmation.
-        // (You could also use a context or pass it as a prop.)
         localStorage.setItem('newRaffleId', res.data.raffleId);
       }
     } catch (err) {
-      console.error("Error in raffle creation:", err.response ? err.response.data : err.message);
+      console.error("Error creating raffle:", err.response ? err.response.data : err.message);
       alert('Error creating raffle: ' + (err.response?.data.error || err.message));
     }
   };
 
-  // Function to handle the prize confirmation step
   const handleConfirmPrize = async () => {
     setConfirming(true);
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     let txid;
     try {
       if (prizeType === 'KAS') {
-        // Use KasWare to send KAS from the host's wallet to the treasury
         txid = await window.kasware.sendKaspa(treasuryWallet, prizeAmount * 1e8);
       } else if (prizeType === 'KRC20') {
-        // Use KasWare to send KRC20 tokens from the host's wallet to the treasury
         const transferJson = JSON.stringify({
           p: "KRC-20",
           op: "transfer",
-          tick: prizeTicker.trim().toUpperCase(),
+          tick: prizeTicker,
           amt: (prizeAmount * 1e8).toString(),
           to: treasuryWallet,
         });
@@ -94,8 +79,7 @@ const CreateRaffle = ({ wallet }) => {
           treasuryWallet
         );
       }
-      console.log("Prize transaction sent, txid:", txid);
-      // Now call the backend to confirm the prize
+      // Now confirm the prize with the backend
       const raffleId = localStorage.getItem('newRaffleId');
       const confirmRes = await axios.post(`${apiUrl}/raffles/${raffleId}/confirmPrize`, { txid });
       if (confirmRes.data.success) {
