@@ -20,11 +20,15 @@ const WalletConnectLanding = ({ onConnect }) => {
 
   return (
     <div className="landing-container">
-      <h1 className="landing-heading">KASPA RAFFLES</h1>
-      <h3 className="landing-subheading">Connect wallet to login</h3>
-      <button className="landing-button" onClick={handleConnect}>
-        Connect Wallet
-      </button>
+      <div className="landing-top">
+        <h1 className="landing-heading">KASPA RAFFLES</h1>
+        <h3 className="landing-subheading">Connect wallet to login</h3>
+      </div>
+      <div className="landing-middle">
+        <button className="landing-button" onClick={handleConnect}>
+          Connect Wallet
+        </button>
+      </div>
       <Footer />
     </div>
   );
