@@ -11,7 +11,6 @@ const RaffleDetail = ({ wallet }) => {
   const [entryAmount, setEntryAmount] = useState('');
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // Fetch raffle details and set up polling
   const fetchRaffle = async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}`);
@@ -62,7 +61,7 @@ const RaffleDetail = ({ wallet }) => {
         );
       }
       alert(`Transaction sent: ${txid}`);
-      // Trigger backend processing (the scheduler also runs every minute)
+      // Trigger backend processing
       await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/process`);
     } catch (e) {
       console.error(e);
@@ -101,6 +100,7 @@ const RaffleDetail = ({ wallet }) => {
           placeholder={`Min ${raffle.creditConversion} tokens`}
           value={entryAmount}
           onChange={(e) => setEntryAmount(e.target.value)}
+          style={{ maxWidth: '150px' }} // Make input shorter
         />
         <button onClick={handleEnterRaffle}>Enter Raffle</button>
       </div>
