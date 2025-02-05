@@ -8,20 +8,20 @@ body {
   color: #fff;
 }
 
-/* Container for all pages */
+/* Container for entire app */
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Main content container to push footer to the bottom */
+/* Content container pushes footer to the bottom */
 .content-container {
   flex: 1;
   padding: 2rem;
 }
 
-/* Navbar with frosted glass styling */
+/* Navbar styling with frosted glass effect */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -69,7 +69,7 @@ body {
 }
 
 .modal.modal-centered {
-  /* additional styling if needed */
+  /* Ensures content is centered */
 }
 
 .modal-content {
@@ -93,7 +93,7 @@ body {
   cursor: pointer;
 }
 
-/* General page container */
+/* Page container for consistent layout */
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -158,6 +158,12 @@ body {
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.frosted-form button:hover {
+  transform: scale(1.05);
+  background: #65d3e0;
 }
 
 /* Footer styling */
