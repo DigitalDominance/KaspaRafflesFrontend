@@ -12,33 +12,36 @@ const CreateRaffle = ({ wallet }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting raffle with:", { raffleType, tokenTicker, timeFrame, creditConversion, prize });
     if (!timeFrame || !creditConversion) {
       alert('Please fill all required fields');
       return;
     }
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     const payload = {
       type: raffleType,
       timeFrame,
       creditConversion,
       prize,
       tokenTicker: raffleType === 'KRC20' ? tokenTicker : undefined,
-      creator: wallet.address, // <-- pass the wallet address
+      creator: wallet.address,
     };
 
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/raffles/create`, payload);
+      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
+      console.log("API response:", res.data);
       if (res.data.success) {
         alert(`Raffle created! ID: ${res.data.raffleId}`);
         navigate(`/raffle/${res.data.raffleId}`);
       }
     } catch (err) {
-      console.error(err);
-      alert('Error creating raffle: ' + (err.response.data.error || err.message));
+      console.error("Error in raffle creation:", err.response ? err.response.data : err.message);
+      alert('Error creating raffle: ' + (err.response?.data.error || err.message));
     }
   };
 
   return (
-    <div className="create-raffle-page">
+    <div className="create-raffle-page page-container">
       <h1>Create a Raffle</h1>
       <form onSubmit={handleSubmit} className="frosted-form">
         <div>
@@ -79,9 +82,7 @@ const CreateRaffle = ({ wallet }) => {
           <input type="datetime-local" value={timeFrame} onChange={(e) => setTimeFrame(e.target.value)} />
         </div>
         <div>
-          <label>
-            Credit Conversion (tokens per entry – also the minimum deposit):
-          </label>
+          <label>Credit Conversion (tokens per entry – minimum deposit):</label>
           <input type="number" value={creditConversion} onChange={(e) => setCreditConversion(e.target.value)} />
         </div>
         <div>
