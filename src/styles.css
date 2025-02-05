@@ -3,11 +3,25 @@
 body {
   margin: 0;
   font-family: 'Roboto Mono', monospace;
-  background: #121212;
+  background: url('/assets/kasperbg.png') no-repeat center center fixed;
+  background-size: cover;
   color: #fff;
 }
 
-/* Navbar with a frosted glass look */
+/* Container for all pages */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main content container to push footer to the bottom */
+.content-container {
+  flex: 1;
+  padding: 2rem;
+}
+
+/* Navbar with frosted glass styling */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -45,20 +59,33 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  right:0;
+  bottom:0;
   background: rgba(0,0,0,0.8);
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.modal h2 {
+.modal.modal-centered {
+  /* additional styling if needed */
+}
+
+.modal-content {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(138,212,217,0.2);
+  border: 2px solid #7bf8f9;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.modal-content h2 {
   margin-bottom: 1rem;
 }
 
-.modal button {
+.modal-content button {
   padding: 0.5rem 1rem;
   background: #7bf8f9;
   border: none;
@@ -66,9 +93,10 @@ body {
   cursor: pointer;
 }
 
-/* General page layout */
-.home, .create-raffle-page, .raffle-detail, .profile-page {
-  padding: 1rem;
+/* General page container */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Grid layout for raffles */
@@ -78,7 +106,7 @@ body {
   gap: 1rem;
 }
 
-/* Raffle card style */
+/* Raffle card styling */
 .raffle-card {
   padding: 1rem;
   background: rgba(138,212,217,0.2);
@@ -99,7 +127,7 @@ body {
 /* Frosted form styling */
 .frosted-form {
   background: rgba(138,212,217,0.2);
-  padding: 1rem;
+  padding: 2rem;
   border: 2px solid #7bf8f9;
   border-radius: 12px;
   backdrop-filter: blur(10px);
@@ -130,4 +158,22 @@ body {
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+}
+
+/* Footer styling */
+.app-footer {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.footer-logo {
+  max-width: 150px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.footer-logo:hover {
+  transform: scale(1.05);
 }
