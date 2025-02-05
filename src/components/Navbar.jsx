@@ -1,16 +1,29 @@
+// frontend/src/components/Navbar.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles.css';
 
 const Navbar = ({ wallet, onDisconnect }) => {
+  const handleDisconnect = async () => {
+    try {
+      const origin = window.location.origin;
+      await window.kasware.disconnect(origin);
+      onDisconnect();
+      console.log('Wallet disconnected');
+    } catch (e) {
+      console.error('Error disconnecting wallet:', e);
+    }
+  };
+
   return (
     <nav className="navbar">
-      <div className="navbar-left">
-        <Link to="/">Kaspa Raffles</Link>
+      <div>
+        <Link to="/">KASPA RAFFLES</Link>
       </div>
-      <div className="navbar-right">
+      <div>
         <Link to="/profile">My Raffles</Link>
         <Link to="/create">Create Raffle</Link>
-        <button onClick={onDisconnect}>Disconnect</button>
+        <button onClick={handleDisconnect}>Disconnect Wallet</button>
       </div>
     </nav>
   );
