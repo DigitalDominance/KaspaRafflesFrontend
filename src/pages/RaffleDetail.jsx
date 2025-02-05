@@ -30,7 +30,7 @@ const RaffleDetail = ({ wallet }) => {
 
   useEffect(() => {
     fetchRaffle();
-    const interval = setInterval(fetchRaffle, 5000);
+    const interval = setInterval(fetchRaffle, 1000);
     return () => clearInterval(interval);
   }, [raffleId, apiUrl]);
 
