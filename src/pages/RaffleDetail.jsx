@@ -83,7 +83,7 @@ const RaffleDetail = ({ wallet }) => {
 
   return (
     <div className="raffle-detail page-container">
-      <h1>{raffle.prize || 'Raffle Prize'}</h1>
+      <h1>{raffle.prizeDisplay}</h1>
       <div className="raffle-detail-container">
         {raffle.status === "live" ? (
           <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
@@ -128,7 +128,7 @@ const RaffleDetail = ({ wallet }) => {
             .slice(0, 10)
             .map(([walletAddress, totalCredits], index) => (
               <div key={index} className="leaderboard-entry">
-                <span>{walletAddress}</span>: <span>{totalCredits.toFixed(2)} entries</span>
+                <span style={{ wordWrap: 'break-word' }}>{walletAddress}</span>: <span>{totalCredits.toFixed(2)} entries</span>
               </div>
             ))
         ) : (
