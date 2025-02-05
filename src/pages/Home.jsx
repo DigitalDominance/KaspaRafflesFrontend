@@ -5,14 +5,17 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [raffles, setRaffles] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rafflesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   const fetchRaffles = async () => {
     try {
-      // Fetch raffles that are live or completed within the last 12 hours.
       const res = await axios.get(`${apiUrl}/raffles`);
       if (res.data.success) {
-        setRaffles(res.data.raffles);
+        // Sort raffles by currentEntries descending.
+        const sorted = res.data.raffles.sort((a, b) => b.currentEntries - a.currentEntries);
+        setRaffles(sorted);
       }
     } catch (err) {
       console.error('Error fetching raffles:', err);
@@ -21,11 +24,17 @@ const Home = () => {
 
   useEffect(() => {
     fetchRaffles();
-    const interval = setInterval(fetchRaffles, 1000);
+    const interval = setInterval(fetchRaffles, 5000);
     return () => clearInterval(interval);
   }, [apiUrl]);
 
-  // Calculate countdown timer.
+  // Pagination calculations
+  const indexOfLastRaffle = currentPage * rafflesPerPage;
+  const indexOfFirstRaffle = indexOfLastRaffle - rafflesPerPage;
+  const currentRaffles = raffles.slice(indexOfFirstRaffle, indexOfLastRaffle);
+  const totalPages = Math.ceil(raffles.length / rafflesPerPage);
+
+  // Countdown timer
   const getTimeLeft = (timeFrame, status) => {
     if (status === "completed") return "Completed";
     const diff = new Date(timeFrame) - new Date();
@@ -40,24 +49,40 @@ const Home = () => {
     <div className="home page-container">
       <h1>Popular Raffles</h1>
       <div className="raffles-grid">
-        {raffles.sort((a, b) => b.currentEntries - a.currentEntries)
-          .map((raffle) => (
-            <Link
-              key={raffle.raffleId}
-              to={`/raffle/${raffle.raffleId}`}
-              className={`home-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
-            >
-              <h3>{raffle.prize || 'Raffle Prize'}</h3>
-              <p>{raffle.status === "live" ? getTimeLeft(raffle.timeFrame, raffle.status) : "Completed"}</p>
-              <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
-              {raffle.status === "completed" && raffle.winner ? (
-                <p>Winner: {raffle.winner}</p>
-              ) : (
-                <p>No Entries</p>
-              )}
-            </Link>
+        {currentRaffles.map((raffle) => (
+          <Link
+            key={raffle.raffleId}
+            to={`/raffle/${raffle.raffleId}`}
+            className={`home-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
+          >
+            <h3>{raffle.prize || 'Raffle Prize'}</h3>
+            <p>{raffle.status === "live" ? getTimeLeft(raffle.timeFrame, raffle.status) : "Completed"}</p>
+            <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
+            {raffle.status === "completed" && raffle.winner && (
+              <p>Winner: {raffle.winner}</p>
+            )}
+          </Link>
         ))}
       </div>
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
