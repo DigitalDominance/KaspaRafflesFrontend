@@ -5,64 +5,50 @@ import { useParams } from 'react-router-dom';
 const RaffleDetail = ({ wallet }) => {
   const { raffleId } = useParams();
   const [raffle, setRaffle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [entryAmount, setEntryAmount] = useState('');
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
     const fetchRaffle = async () => {
       try {
-        const res = await axios.get(`/api/raffles/${raffleId}`);
+        const res = await axios.get(`${apiUrl}/raffles/${raffleId}`);
+        console.log("Raffle response:", res.data);
         if (res.data.success) {
           setRaffle(res.data.raffle);
+        } else {
+          setError('Raffle not found');
         }
       } catch (err) {
         console.error('Error fetching raffle details:', err);
+        setError('Error loading raffle details.');
+      } finally {
+        setLoading(false);
       }
     };
     fetchRaffle();
-  }, [raffleId]);
+  }, [raffleId, apiUrl]);
 
   const handleEnterRaffle = async () => {
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
       alert(`Minimum entry is ${raffle.creditConversion}`);
       return;
     }
-    // Initiate a transaction via KasWare Wallet.
-    if (window.kasware) {
-      try {
-        if (raffle.type === 'KAS') {
-          const txid = await window.kasware.sendKaspa(
-            raffle.wallet.receivingAddress,
-            entryAmount * 1e8
-          );
-          alert(`Transaction sent: ${txid}`);
-        } else if (raffle.type === 'KRC20') {
-          const transferJson = JSON.stringify({
-            p: "KRC-20",
-            op: "transfer",
-            tick: raffle.tokenTicker,
-            amt: (entryAmount * 1e8).toString(),
-            to: raffle.wallet.receivingAddress,
-          });
-          const txid = await window.kasware.signKRC20Transaction(
-            transferJson,
-            4,
-            raffle.wallet.receivingAddress
-          );
-          alert(`Transaction sent: ${txid}`);
-        }
-      } catch (err) {
-        console.error('Error sending transaction:', err);
-        alert('Transaction failed');
-      }
-    } else {
-      alert('KasWare Wallet not available');
-    }
+    // Implement your transaction code here using KasWare
+    alert("Transaction would be initiated here.");
   };
 
-  if (!raffle) return <div>Loading raffle details...</div>;
+  if (loading) {
+    return <div className="page-container"><p>Loading raffle...</p></div>;
+  }
+
+  if (error) {
+    return <div className="page-container"><p>{error}</p></div>;
+  }
 
   return (
-    <div className="raffle-detail">
+    <div className="raffle-detail page-container">
       <h1>{raffle.prize || 'Raffle Prize'}</h1>
       <p>Type: {raffle.type}</p>
       <p>Total Entries: {raffle.totalEntries}</p>
