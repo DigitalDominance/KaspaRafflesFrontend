@@ -9,7 +9,7 @@ const Profile = () => {
   const rafflesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // Fetch the currently connected Kaspa address using KasWare
+  // Fetch the currently connected Kaspa address using KasWare.
   const getConnectedAddress = async () => {
     try {
       const accounts = await window.kasware.getAccounts();
