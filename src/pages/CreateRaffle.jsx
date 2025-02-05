@@ -22,10 +22,11 @@ const CreateRaffle = ({ wallet }) => {
       creditConversion,
       prize,
       tokenTicker: raffleType === 'KRC20' ? tokenTicker : undefined,
+      creator: wallet.address, // <-- pass the wallet address
     };
 
     try {
-      const res = await axios.post('/api/raffles/create', payload);
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/raffles/create`, payload);
       if (res.data.success) {
         alert(`Raffle created! ID: ${res.data.raffleId}`);
         navigate(`/raffle/${res.data.raffleId}`);
