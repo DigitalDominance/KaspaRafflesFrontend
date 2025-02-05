@@ -133,6 +133,7 @@ button {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
+  max-width: 90vw;
 }
 .home-raffle-card {
   background-color: #8a2be2 !important;  /* more vibrant blue */
