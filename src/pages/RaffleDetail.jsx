@@ -44,7 +44,7 @@ const RaffleDetail = ({ wallet }) => {
       if (raffle.type === 'KAS') {
         txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
-          entryAmount * 1e8  // converting to sompi
+          entryAmount * 1e8
         );
       } else if (raffle.type === 'KRC20') {
         const transferJson = JSON.stringify({
@@ -61,7 +61,6 @@ const RaffleDetail = ({ wallet }) => {
         );
       }
       alert(`Transaction sent: ${txid}`);
-      // Trigger backend processing
       await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/process`);
     } catch (e) {
       console.error(e);
@@ -85,25 +84,33 @@ const RaffleDetail = ({ wallet }) => {
     <div className="raffle-detail page-container">
       <h1>{raffle.prize || 'Raffle Prize'}</h1>
       <div className="raffle-info">
-        {raffle.type === 'KAS' ? (
-          <p>Conversion: {raffle.creditConversion} KAS = 1 Entry</p>
+        {raffle.status === "live" ? (
+          <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
         ) : (
-          <p>Conversion: {raffle.creditConversion} {raffle.tokenTicker} = 1 Entry</p>
+          <>
+            <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
+            <p><strong>Winner: {raffle.winner}</strong></p>
+          </>
         )}
-        <p>Total Entries: {raffle.totalEntries}</p>
-        <p>Current Entries: {raffle.currentEntries}</p>
-        <p>Time Remaining: {new Date(raffle.timeFrame).toLocaleString()}</p>
+        <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
+        <p>Current Entries: {raffle.currentEntries.toFixed(2)}</p>
+        <p>
+          {raffle.status === "live"
+            ? `Time Remaining: ${new Date(raffle.timeFrame).toLocaleString()}`
+            : "Completed"}
+        </p>
       </div>
-      <div className="entry-section">
-        <input
-          type="number"
-          placeholder={`Min ${raffle.creditConversion} tokens`}
-          value={entryAmount}
-          onChange={(e) => setEntryAmount(e.target.value)}
-          style={{ maxWidth: '150px' }} // Make input shorter
-        />
-        <button onClick={handleEnterRaffle}>Enter Raffle</button>
-      </div>
+      {raffle.status === "live" && (
+        <div className="entry-section">
+          <input
+            type="number"
+            placeholder={`Min ${raffle.creditConversion} tokens`}
+            value={entryAmount}
+            onChange={(e) => setEntryAmount(e.target.value)}
+          />
+          <button onClick={handleEnterRaffle}>Enter Raffle</button>
+        </div>
+      )}
       {processing && (
         <div className="processing-modal">
           <div className="spinner"></div>
@@ -112,13 +119,22 @@ const RaffleDetail = ({ wallet }) => {
         </div>
       )}
       <div className="leaderboard">
-        <h3>Leaderboard (Top 10 entries)</h3>
+        <h3>Leaderboard (Top 10 wallets by entries)</h3>
         {raffle.entries && raffle.entries.length > 0 ? (
-          raffle.entries.slice(0, 10).map((entry, index) => (
-            <div key={index} className="leaderboard-entry">
-              <span>{entry.walletAddress}</span>: <span>{entry.amount}</span>
-            </div>
-          ))
+          // Aggregate entries by wallet and sort descending by total credits added
+          Object.entries(
+            raffle.entries.reduce((acc, entry) => {
+              acc[entry.walletAddress] = (acc[entry.walletAddress] || 0) + entry.creditsAdded;
+              return acc;
+            }, {})
+          )
+            .sort(([, aCredits], [, bCredits]) => bCredits - aCredits)
+            .slice(0, 10)
+            .map(([walletAddress, totalCredits], index) => (
+              <div key={index} className="leaderboard-entry">
+                <span>{walletAddress}</span>: <span>{totalCredits.toFixed(2)} entries</span>
+              </div>
+            ))
         ) : (
           <p>No entries yet.</p>
         )}
