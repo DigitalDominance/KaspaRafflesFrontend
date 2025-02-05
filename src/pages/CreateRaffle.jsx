@@ -20,13 +20,14 @@ const CreateRaffle = ({ wallet }) => {
   const treasuryWallet = process.env.REACT_APP_TREASURY_WALLET;
 
   // Check the host's balance before initiating the prize transaction.
+  // For both KAS and KRC20, we compare sompi values.
   const checkPrizeBalance = async () => {
     if (prizeType === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        // Convert sompi to KAS
-        const confirmedKas = balance.confirmed / 1e8;
-        if (confirmedKas < parseFloat(prizeAmount)) {
+        // Multiply prizeAmount (plain KAS) by 1e8 to convert to sompi.
+        const required = parseFloat(prizeAmount) * 1e8;
+        if (balance.confirmed < required) {
           setConfirmError('Insufficient KAS balance in your wallet.');
           return false;
         }
@@ -47,7 +48,7 @@ const CreateRaffle = ({ wallet }) => {
           return false;
         }
         const dec = parseInt(tokenObj.dec, 10);
-        const required = prizeAmount * Math.pow(10, dec);
+        const required = parseFloat(prizeAmount) * Math.pow(10, dec);
         if (parseInt(tokenObj.balance, 10) < required) {
           setConfirmError('Insufficient token balance in your wallet.');
           return false;
@@ -61,8 +62,7 @@ const CreateRaffle = ({ wallet }) => {
     }
   };
 
-  // When the form is submitted, only validate input and check balance.
-  // Do NOT create the raffle yet.
+  // Handle form submission.
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isoDate = new Date(timeFrame).toISOString();
@@ -82,18 +82,41 @@ const CreateRaffle = ({ wallet }) => {
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
 
-    // If all validations pass, show the confirmation modal.
-    setConfirmError('');
-    setShowConfirmModal(true);
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    const payload = {
+      type: raffleType,
+      timeFrame: isoDate,
+      creditConversion,
+      prizeType,
+      prizeAmount,
+      creator: wallet.address,
+      treasuryAddress: treasuryWallet, // Use the defined variable here.
+      tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
+      prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
+    };
+    try {
+      // We do not create the raffle until the prize transaction is confirmed.
+      // So this endpoint might be used later for confirmation.
+      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
+      if (res.data.success) {
+        setShowConfirmModal(true);
+        localStorage.setItem('newRaffleId', res.data.raffleId);
+        setConfirmError('');
+      }
+    } catch (err) {
+      console.error("Error creating raffle:", err.response ? err.response.data : err.message);
+      setConfirmError('Error creating raffle: ' + (err.response?.data.error || err.message));
+    }
   };
 
-  // Handle prize confirmation using KasWare, then create the raffle.
+  // Handle prize confirmation using KasWare. Only if a valid TXID is returned do we consider it successful.
   const handleConfirmPrize = async () => {
     setConfirmError('');
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
     
     setConfirming(true);
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     let txid;
     try {
       if (prizeType === 'KAS') {
@@ -119,26 +142,11 @@ const CreateRaffle = ({ wallet }) => {
         return;
       }
       console.log("Prize transaction sent, txid:", txid);
-
-      // Now create the raffle on the backend only if the prize transaction succeeded.
-      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-      const isoDate = new Date(timeFrame).toISOString(); // recalc if needed
-      const payload = {
-        type: raffleType,
-        timeFrame: isoDate,
-        creditConversion,
-        prizeType,
-        prizeAmount,
-        creator: wallet.address,
-        treasuryAddress: treasuryWallet,
-        tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
-        prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
-        prizeTransactionId: txid
-      };
-      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
-      if (res.data.success) {
+      const raffleId = localStorage.getItem('newRaffleId');
+      const confirmRes = await axios.post(`${apiUrl}/raffles/${raffleId}/confirmPrize`, { txid });
+      if (confirmRes.data.success) {
         setShowConfirmModal(false);
-        navigate(`/raffle/${res.data.raffleId}`);
+        navigate(`/raffle/${raffleId}`);
       } else {
         setConfirmError("Prize confirmation failed.");
       }
