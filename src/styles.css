@@ -8,17 +8,52 @@ body {
   color: #fff;
 }
 
-/* Container for entire app */
+/* Global container */
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Content container pushes footer to the bottom */
+/* Content container to push footer to the bottom */
 .content-container {
   flex: 1;
   padding: 2rem;
+}
+
+/* Landing page (wallet connect) styling */
+.landing-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: rgba(0,0,0,0.6);
+}
+
+.landing-heading {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.landing-subheading {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.landing-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+  background: #7bf8f9;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.landing-button:hover {
+  transform: scale(1.05);
 }
 
 /* Navbar styling with frosted glass effect */
@@ -52,45 +87,6 @@ body {
 .navbar button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(123, 248, 249, 0.7);
-}
-
-/* Modal styling */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right:0;
-  bottom:0;
-  background: rgba(0,0,0,0.8);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal.modal-centered {
-  /* Ensures content is centered */
-}
-
-.modal-content {
-  text-align: center;
-  padding: 2rem;
-  background: rgba(138,212,217,0.2);
-  border: 2px solid #7bf8f9;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-}
-
-.modal-content h2 {
-  margin-bottom: 1rem;
-}
-
-.modal-content button {
-  padding: 0.5rem 1rem;
-  background: #7bf8f9;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
 /* Page container for consistent layout */
