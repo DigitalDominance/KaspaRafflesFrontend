@@ -15,13 +15,13 @@ body {
   flex-direction: column;
 }
 
-/* Content container to push footer to the bottom */
+/* Content container pushes footer to the bottom */
 .content-container {
   flex: 1;
   padding: 2rem;
 }
 
-/* Landing page (wallet connect) styling */
+/* Landing page styling */
 .landing-container {
   height: 100vh;
   display: flex;
@@ -29,7 +29,7 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .landing-heading {
@@ -56,7 +56,7 @@ body {
   transform: scale(1.05);
 }
 
-/* Navbar styling with frosted glass effect */
+/* Navbar styling */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -95,13 +95,6 @@ body {
   margin: 0 auto;
 }
 
-/* Grid layout for raffles */
-.raffles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
 /* Raffle card styling */
 .raffle-card {
   padding: 1rem;
@@ -113,11 +106,81 @@ body {
   text-decoration: none;
   color: #fff;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 1rem;
 }
 
 .raffle-card:hover {
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(255,105,180,0.7);
+}
+
+/* Leaderboard styling */
+.leaderboard {
+  margin-top: 2rem;
+}
+
+.leaderboard-entry {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Entry section styling */
+.entry-section {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.entry-section input {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 5px;
+}
+
+.entry-section button {
+  padding: 0.5rem 1rem;
+  background: #7bf8f9;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.entry-section button:hover {
+  transform: scale(1.05);
+  background: #65d3e0;
+}
+
+/* Processing modal styling */
+.processing-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right:0;
+  bottom:0;
+  background: rgba(0,0,0,0.8);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  border: 8px solid rgba(255, 255, 255, 0.3);
+  border-top: 8px solid #7bf8f9;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Frosted form styling */
