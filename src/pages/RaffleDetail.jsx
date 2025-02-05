@@ -1,4 +1,3 @@
-// frontend/src/pages/RaffleDetail.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -36,21 +35,14 @@ const RaffleDetail = ({ wallet }) => {
       alert(`Minimum entry is ${raffle.creditConversion}`);
       return;
     }
-    // Here you would integrate with KasWare's functions for sending a transaction.
-    // For example, if it's a KAS raffle:
-    if (raffle.type === 'KAS') {
-      try {
-        const txid = await window.kasware.sendKaspa(
+    let txid;
+    try {
+      if (raffle.type === 'KAS') {
+        txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
           entryAmount * 1e8  // converting to sompi
         );
-        alert(`Transaction sent: ${txid}`);
-      } catch (e) {
-        console.error(e);
-        alert('Transaction failed');
-      }
-    } else if (raffle.type === 'KRC20') {
-      try {
+      } else if (raffle.type === 'KRC20') {
         const transferJson = JSON.stringify({
           p: "KRC-20",
           op: "transfer",
@@ -58,16 +50,23 @@ const RaffleDetail = ({ wallet }) => {
           amt: (entryAmount * 1e8).toString(),
           to: raffle.wallet.receivingAddress,
         });
-        const txid = await window.kasware.signKRC20Transaction(
+        txid = await window.kasware.signKRC20Transaction(
           transferJson,
           4,
           raffle.wallet.receivingAddress
         );
-        alert(`Transaction sent: ${txid}`);
-      } catch (e) {
-        console.error(e);
-        alert('Transaction failed');
       }
+      alert(`Transaction sent: ${txid}`);
+      // Call the backend process endpoint to simulate scanning for the transaction.
+      await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/process`);
+      // Refetch raffle details to update the leaderboard/entries.
+      const res = await axios.get(`${apiUrl}/raffles/${raffle.raffleId}`);
+      if (res.data.success) {
+        setRaffle(res.data.raffle);
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Transaction failed');
     }
   };
 
