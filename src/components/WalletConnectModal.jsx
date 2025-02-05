@@ -1,8 +1,7 @@
-// frontend/src/components/WalletConnectModal.jsx
 import React from 'react';
 import '../styles.css';
 
-const WalletConnectModal = ({ onConnect }) => {
+const WalletConnectLanding = ({ onConnect }) => {
   const handleConnect = async () => {
     if (window.kasware) {
       try {
@@ -18,14 +17,14 @@ const WalletConnectModal = ({ onConnect }) => {
   };
 
   return (
-    <div className="modal modal-centered">
-      <div className="modal-content">
-        <h1>KASPA RAFFLES</h1>
-        <h3>Connect wallet to login</h3>
-        <button onClick={handleConnect}>Connect Wallet</button>
-      </div>
+    <div className="landing-container">
+      <h1 className="landing-heading">KASPA RAFFLES</h1>
+      <h3 className="landing-subheading">Connect wallet to login</h3>
+      <button className="landing-button" onClick={handleConnect}>
+        Connect Wallet
+      </button>
     </div>
   );
 };
 
-export default WalletConnectModal;
+export default WalletConnectLanding;
