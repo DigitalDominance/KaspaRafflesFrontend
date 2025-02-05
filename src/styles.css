@@ -32,7 +32,7 @@ button {
 .app-footer {
   text-align: center;
   padding: 0.75rem;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(10px);
 }
 .footer-logo {
@@ -69,13 +69,14 @@ button {
 .landing-middle {
   justify-self: center;
   align-self: center;
-  background: rgba(30, 90, 120, 0.8);
+  /* Vibrant blue frosted container with less transparency */
+  background: rgba(30, 90, 120, 0.95);
   border: 2px solid rgba(30, 90, 120, 1);
   border-radius: 16px;
   padding: 1.5rem;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 .landing-button {
   padding: 1rem 2rem;
@@ -96,7 +97,7 @@ button {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1.5rem;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(10px);
 }
 .navbar a {
@@ -106,7 +107,7 @@ button {
   font-weight: bold;
 }
 .navbar button {
-  background: linear-gradient(135deg, rgba(138,212,217,0.2), rgba(138,212,217,0.4));
+  background: linear-gradient(135deg, rgba(138, 212, 217, 0.2), rgba(138, 212, 217, 0.4));
   border: 2px solid #7bf8f9;
   padding: 0.5rem 1rem;
   border-radius: 12px;
@@ -117,7 +118,7 @@ button {
 }
 .navbar button:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(123,248,249,0.7);
+  box-shadow: 0 0 15px rgba(123, 248, 249, 0.7);
 }
 
 /* --- Page Container --- */
@@ -134,7 +135,7 @@ button {
   gap: 1rem;
 }
 .home-raffle-card {
-  background-color: rgba(30, 90, 120, 0.8) !important;
+  background-color: rgba(30, 90, 120, 0.95) !important;  /* more vibrant blue */
   border: 2px solid rgba(30, 90, 120, 1) !important;
   border-radius: 16px;
   padding: 1.5rem;
@@ -142,21 +143,22 @@ button {
   color: #fff;
   text-decoration: none;
   margin: 0.75rem 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .home-raffle-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
+/* Completed: neon purple, fully opaque */
 .home-raffle-card.completed {
-  background-color: #8a2be2 !important; /* neon purple */
+  background-color: #8a2be2 !important;
   border: 2px solid #8a2be2 !important;
 }
 
 /* --- My Raffles (Profile) Cards --- */
 .profile-raffle-card {
-  background-color: rgba(30, 90, 120, 0.8) !important;
+  background-color: rgba(30, 90, 120, 0.95) !important;
   border: 2px solid rgba(30, 90, 120, 1) !important;
   border-radius: 16px;
   padding: 1.5rem;
@@ -164,28 +166,31 @@ button {
   color: #fff;
   text-decoration: none;
   margin: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .profile-raffle-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 .profile-raffle-card.completed {
-  background-color: #8a2be2 !important; /* neon purple */
+  background-color: #8a2be2 !important;
   border: 2px solid #8a2be2 !important;
+  /* Ensure long wallet addresses break correctly */
+  word-break: break-all;
 }
 
 /* --- Leaderboard --- */
 .leaderboard {
   margin-top: 2rem;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   padding: 1rem;
   border-radius: 8px;
 }
 .leaderboard-entry {
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  word-break: break-all;
 }
 
 /* --- Entry Section --- */
@@ -230,7 +235,7 @@ button {
   align-items: center;
 }
 .spinner {
-  border: 8px solid rgba(255,255,255,0.3);
+  border: 8px solid rgba(255, 255, 255, 0.3);
   border-top: 8px solid #7bf8f9;
   border-radius: 50%;
   width: 60px;
@@ -244,7 +249,7 @@ button {
 
 /* --- Raffle Detail Container --- */
 .raffle-detail-container {
-  background: rgba(30, 90, 120, 0.8);
+  background: rgba(30, 90, 120, 0.95);
   border: 2px solid rgba(30, 90, 120, 1);
   border-radius: 16px;
   padding: 1.5rem;
