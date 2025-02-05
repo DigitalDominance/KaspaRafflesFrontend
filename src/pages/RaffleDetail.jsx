@@ -11,7 +11,6 @@ const RaffleDetail = ({ wallet }) => {
   const [error, setError] = useState(null);
   const [entryAmount, setEntryAmount] = useState('');
   const [entryError, setEntryError] = useState('');
-  // Pagination for leaderboard entries
   const [entryPage, setEntryPage] = useState(1);
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -39,7 +38,7 @@ const RaffleDetail = ({ wallet }) => {
     return () => clearInterval(interval);
   }, [raffleId, apiUrl]);
 
-  // Check if user has sufficient balance for an entry
+  // Check if the user has sufficient balance for the entry
   const checkEntryBalance = async () => {
     if (!entryAmount || !raffle) return false;
     if (raffle.type === 'KAS') {
@@ -58,7 +57,7 @@ const RaffleDetail = ({ wallet }) => {
     } else { // KRC20
       try {
         const tokenBalances = await window.kasware.getKRC20Balance();
-        // Use raffle.tokenTicker for entry tokens
+        // Use raffle.tokenTicker for the entry token
         const tokenObj = tokenBalances.find(
           (token) => token.tick.toUpperCase() === raffle.tokenTicker.toUpperCase()
         );
@@ -83,13 +82,11 @@ const RaffleDetail = ({ wallet }) => {
 
   // Handle user entry submission
   const handleEnterRaffle = async () => {
-    // Clear previous error
     setEntryError('');
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
       alert(`Minimum entry is ${raffle.creditConversion}`);
       return;
     }
-    // Check wallet balance for entry
     const hasFunds = await checkEntryBalance();
     if (!hasFunds) return;
     
@@ -137,7 +134,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // Pagination for leaderboard: sort entries by confirmedAt descending
+  // Sorting and Pagination for Leaderboard entries.
   const sortedEntries = raffle && raffle.entries && raffle.entries.length > 0
     ? [...raffle.entries].sort((a, b) => new Date(b.confirmedAt) - new Date(a.confirmedAt))
     : [];
@@ -154,7 +151,7 @@ const RaffleDetail = ({ wallet }) => {
 
   return (
     <div className="raffle-detail page-container">
-      <h1>{raffle.prizeDisplay}</h1>
+      <h1 style={{ textAlign: 'center' }}>{raffle.prizeDisplay}</h1>
       <div className="raffle-detail-container">
         {raffle.status === "live" ? (
           <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
@@ -171,6 +168,7 @@ const RaffleDetail = ({ wallet }) => {
       {raffle.status === "live" && (
         <div className="entry-section">
           <input
+            className="entry-input"
             type="number"
             placeholder={`Min ${raffle.creditConversion} tokens`}
             value={entryAmount}
@@ -193,7 +191,7 @@ const RaffleDetail = ({ wallet }) => {
         </div>
       )}
       <div className="leaderboard">
-        <h3>Leaderboard (Entries)</h3>
+        <h3 style={{ textAlign: 'center' }}>Leaderboard (Entries)</h3>
         {displayedEntries.length > 0 ? (
           displayedEntries.map((entry, index) => (
             <div key={index} className="leaderboard-entry">
