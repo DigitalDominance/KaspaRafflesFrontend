@@ -15,17 +15,17 @@ body {
   flex-direction: column;
 }
 
-/* Content container for main pages */
+/* Content container */
 .content-container {
   flex: 1;
   padding: 2rem;
 }
 
-/* Footer always at the bottom */
+/* Footer */
 .app-footer {
   text-align: center;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(10px);
 }
 .footer-logo {
@@ -37,7 +37,7 @@ body {
   transform: scale(1.05);
 }
 
-/* Landing page (full page connect wallet) */
+/* Landing page styling */
 .landing-container {
   height: 100vh;
   display: flex;
@@ -99,15 +99,22 @@ body {
   box-shadow: 0 0 15px rgba(123,248,249,0.7);
 }
 
-/* Home page cards for popular raffles */
+/* Page container */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Home Page Cards */
 .home-raffle-card {
-  background: rgba(20, 60, 80, 0.6);  /* A nice blue frosted background */
+  background: rgba(20, 60, 80, 0.7);
   border: 2px solid #7bf8f9;
   border-radius: 12px;
   padding: 1rem;
   text-align: center;
-  text-decoration: none;
   color: #fff;
+  text-decoration: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   margin-bottom: 1rem;
 }
@@ -115,23 +122,21 @@ body {
   transform: scale(1.03);
   box-shadow: 0 0 15px rgba(123,248,249,0.7);
 }
-
-/* Completed raffles get a different color */
 .home-raffle-card.completed {
-  background: rgba(80, 80, 80, 0.7);
+  background: rgba(80,80,80,0.8);
   border: 2px solid #aaa;
 }
 
-/* My Raffles page cards */
+/* Profile (My Raffles) Cards */
 .profile-raffle-card {
-  background: rgba(20, 60, 80, 0.6);
+  background: rgba(20, 60, 80, 0.7);
   border: 2px solid #7bf8f9;
   border-radius: 12px;
   padding: 1rem;
   text-align: center;
   color: #fff;
   text-decoration: none;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   margin: 0.5rem;
 }
 .profile-raffle-card:hover {
@@ -139,14 +144,14 @@ body {
   box-shadow: 0 0 15px rgba(123,248,249,0.7);
 }
 .profile-raffle-card.completed {
-  background: rgba(80,80,80,0.7);
+  background: rgba(80,80,80,0.8);
   border: 2px solid #aaa;
 }
 
 /* Leaderboard styling */
 .leaderboard {
   margin-top: 2rem;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.65);
   padding: 1rem;
   border-radius: 8px;
 }
@@ -155,7 +160,7 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.3);
 }
 
-/* Entry section styling */
+/* Entry Section */
 .entry-section {
   margin-top: 1.5rem;
   display: flex;
@@ -182,7 +187,7 @@ body {
   background: #65d3e0;
 }
 
-/* Processing modal styling */
+/* Processing modal */
 .processing-modal {
   position: fixed;
   top: 0;
@@ -209,16 +214,16 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Raffle detail page container */
+/* Raffle detail container */
 .raffle-detail-container {
-  background: rgba(20, 60, 80, 0.6);
+  background: rgba(20, 60, 80, 0.7);
   border: 2px solid #7bf8f9;
   border-radius: 12px;
   padding: 1rem;
   margin-bottom: 1rem;
 }
 
-/* Frosted form styling */
+/* Frosted form */
 .frosted-form {
   background: rgba(138,212,217,0.2);
   padding: 2rem;
@@ -254,4 +259,29 @@ body {
 .frosted-form button:hover {
   transform: scale(1.05);
   background: #65d3e0;
+}
+
+/* Pagination styling */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.pagination button {
+  padding: 0.5rem 1rem;
+  background: #7bf8f9;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.pagination button:hover {
+  transform: scale(1.05);
+  background: #65d3e0;
+}
+.pagination span {
+  font-size: 1rem;
 }
