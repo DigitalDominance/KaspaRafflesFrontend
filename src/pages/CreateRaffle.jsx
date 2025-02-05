@@ -61,7 +61,8 @@ const CreateRaffle = ({ wallet }) => {
     }
   };
 
-  // Handle form submission.
+  // When the form is submitted, only validate input and check balance.
+  // Do NOT create the raffle yet.
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isoDate = new Date(timeFrame).toISOString();
@@ -81,39 +82,18 @@ const CreateRaffle = ({ wallet }) => {
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
 
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-    const payload = {
-      type: raffleType,
-      timeFrame: isoDate,
-      creditConversion,
-      prizeType,
-      prizeAmount,
-      creator: wallet.address,
-      treasuryAddress: treasuryWallet, // Use the defined variable here.
-      tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
-      prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
-    };
-    try {
-      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
-      if (res.data.success) {
-        setShowConfirmModal(true);
-        localStorage.setItem('newRaffleId', res.data.raffleId);
-        setConfirmError('');
-      }
-    } catch (err) {
-      console.error("Error creating raffle:", err.response ? err.response.data : err.message);
-      setConfirmError('Error creating raffle: ' + (err.response?.data.error || err.message));
-    }
+    // If all validations pass, show the confirmation modal.
+    setConfirmError('');
+    setShowConfirmModal(true);
   };
 
-  // Handle prize confirmation using KasWare.
+  // Handle prize confirmation using KasWare, then create the raffle.
   const handleConfirmPrize = async () => {
     setConfirmError('');
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
     
     setConfirming(true);
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     let txid;
     try {
       if (prizeType === 'KAS') {
@@ -132,12 +112,33 @@ const CreateRaffle = ({ wallet }) => {
           treasuryWallet
         );
       }
+      // If the transaction is cancelled or fails, txid should be falsy.
+      if (!txid) {
+        setConfirmError("Transaction was cancelled or failed. Raffle not created.");
+        setConfirming(false);
+        return;
+      }
       console.log("Prize transaction sent, txid:", txid);
-      const raffleId = localStorage.getItem('newRaffleId');
-      const confirmRes = await axios.post(`${apiUrl}/raffles/${raffleId}/confirmPrize`, { txid });
-      if (confirmRes.data.success) {
+
+      // Now create the raffle on the backend only if the prize transaction succeeded.
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+      const isoDate = new Date(timeFrame).toISOString(); // recalc if needed
+      const payload = {
+        type: raffleType,
+        timeFrame: isoDate,
+        creditConversion,
+        prizeType,
+        prizeAmount,
+        creator: wallet.address,
+        treasuryAddress: treasuryWallet,
+        tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
+        prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
+        prizeTransactionId: txid
+      };
+      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
+      if (res.data.success) {
         setShowConfirmModal(false);
-        navigate(`/raffle/${raffleId}`);
+        navigate(`/raffle/${res.data.raffleId}`);
       } else {
         setConfirmError("Prize confirmation failed.");
       }
