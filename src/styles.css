@@ -157,8 +157,8 @@ button {
 }
 /* Completed: neon purple for completed raffles on Home page */
 .home-raffle-card.completed {
-  background: rgba(30, 90, 120, 0.95); /* vibrant blue, less transparent */
-  border: 2px solid rgba(30, 90, 120, 1);
+  background: rgba(30, 90, 120, 0.95) !important; /* vibrant blue, less transparent */
+  border: 2px solid rgba(30, 90, 120, 1) !important;
 }
 
 /* --- My Raffles (Profile) Cards --- */
@@ -188,8 +188,8 @@ button {
 }
 /* Completed: neon purple for Profile cards */
 .profile-raffle-card.completed {
-  background: rgba(30, 90, 120, 0.95); /* vibrant blue, less transparent */
-  border: 2px solid rgba(30, 90, 120, 1);
+  background: rgba(30, 90, 120, 0.95) !important; /* vibrant blue, less transparent */
+  border: 2px solid rgba(30, 90, 120, 1) !important;
 }
 
 /* --- Leaderboard --- */
