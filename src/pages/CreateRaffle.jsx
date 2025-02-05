@@ -12,7 +12,7 @@ const CreateRaffle = ({ wallet }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Convert local datetime-local string to an ISO string
+    // Convert the datetime-local value to ISO string
     const localDate = new Date(timeFrame);
     const isoDate = localDate.toISOString();
     console.log("Submitting raffle with:", { raffleType, tokenTicker, isoDate, creditConversion, prize });
@@ -76,7 +76,7 @@ const CreateRaffle = ({ wallet }) => {
             <input
               type="text"
               value={tokenTicker}
-              onChange={(e) => setTokenTicker(e.target.value.toUpperCase())}
+              onChange={(e) => setTokenTicker(e.target.value)}
             />
           </div>
         )}
