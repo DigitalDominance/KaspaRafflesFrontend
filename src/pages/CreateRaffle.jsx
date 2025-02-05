@@ -24,7 +24,9 @@ const CreateRaffle = ({ wallet }) => {
     if (prizeType === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        if (balance.confirmed < prizeAmount * 1e8) {
+        // Convert sompi to KAS
+        const confirmedKas = balance.confirmed / 1e8;
+        if (confirmedKas < parseFloat(prizeAmount)) {
           setConfirmError('Insufficient KAS balance in your wallet.');
           return false;
         }
@@ -52,7 +54,7 @@ const CreateRaffle = ({ wallet }) => {
         }
         return true;
       } catch (err) {
-        console.error('Error checking KRC20 balance:', err);
+        console.error('Error checking token balance:', err);
         setConfirmError('Error checking token balance.');
         return false;
       }
@@ -155,7 +157,7 @@ const CreateRaffle = ({ wallet }) => {
 
   return (
     <div className="create-raffle-page page-container">
-      {/* Centered global heading */}
+      {/* Centered main heading using the global-heading class */}
       <h1 className="global-heading">Create a Raffle</h1>
       <form onSubmit={handleSubmit} className="frosted-form">
         <div>
