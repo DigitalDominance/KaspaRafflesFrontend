@@ -11,7 +11,7 @@ const RaffleDetail = ({ wallet }) => {
   const [entryAmount, setEntryAmount] = useState('');
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // Function to fetch raffle details
+  // Fetch raffle details and set up polling
   const fetchRaffle = async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}`);
@@ -28,13 +28,11 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // Initial fetch on mount
   useEffect(() => {
     fetchRaffle();
-    // Set up polling every 5 seconds to update raffle data
     const interval = setInterval(fetchRaffle, 5000);
     return () => clearInterval(interval);
-  }, [raffleId]);
+  }, [raffleId, apiUrl]);
 
   const handleEnterRaffle = async () => {
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
@@ -64,7 +62,7 @@ const RaffleDetail = ({ wallet }) => {
         );
       }
       alert(`Transaction sent: ${txid}`);
-      // Trigger backend processing (optional, since scheduler runs every minute)
+      // Trigger backend processing (the scheduler also runs every minute)
       await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/process`);
     } catch (e) {
       console.error(e);
@@ -72,7 +70,6 @@ const RaffleDetail = ({ wallet }) => {
     } finally {
       setProcessing(false);
       setEntryAmount('');
-      // fetch updated raffle details
       fetchRaffle();
     }
   };
@@ -89,9 +86,11 @@ const RaffleDetail = ({ wallet }) => {
     <div className="raffle-detail page-container">
       <h1>{raffle.prize || 'Raffle Prize'}</h1>
       <div className="raffle-info">
-        <p>
-          Conversion: {raffle.creditConversion} {raffle.type} = 1 Entry
-        </p>
+        {raffle.type === 'KAS' ? (
+          <p>Conversion: {raffle.creditConversion} KAS = 1 Entry</p>
+        ) : (
+          <p>Conversion: {raffle.creditConversion} {raffle.tokenTicker} = 1 Entry</p>
+        )}
         <p>Total Entries: {raffle.totalEntries}</p>
         <p>Current Entries: {raffle.currentEntries}</p>
         <p>Time Remaining: {new Date(raffle.timeFrame).toLocaleString()}</p>
