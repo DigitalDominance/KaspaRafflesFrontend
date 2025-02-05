@@ -6,17 +6,18 @@ const Profile = ({ wallet }) => {
   const [myRaffles, setMyRaffles] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  useEffect(() => {
-    const fetchMyRaffles = async () => {
-      try {
-        const res = await axios.get(`${apiUrl}/raffles?creator=${wallet.address}`);
-        if (res.data.success) {
-          setMyRaffles(res.data.raffles);
-        }
-      } catch (err) {
-        console.error('Error fetching user raffles:', err);
+  const fetchMyRaffles = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/raffles?creator=${wallet.address}`);
+      if (res.data.success) {
+        setMyRaffles(res.data.raffles);
       }
-    };
+    } catch (err) {
+      console.error('Error fetching user raffles:', err);
+    }
+  };
+
+  useEffect(() => {
     fetchMyRaffles();
   }, [wallet.address, apiUrl]);
 
@@ -28,10 +29,14 @@ const Profile = ({ wallet }) => {
       ) : (
         <div className="raffles-list">
           {myRaffles.map((raffle) => (
-            <Link key={raffle.raffleId} to={`/raffle/${raffle.raffleId}`} className="raffle-card">
+            <Link key={raffle.raffleId} to={`/raffle/${raffle.raffleId}`} className={`raffle-card ${raffle.status === "completed" ? "completed-raffle" : ""}`}>
               <h3>{raffle.prize || 'Raffle Prize'}</h3>
-              <p>Entries: {raffle.currentEntries}</p>
-              <p>Time Remaining: {new Date(raffle.timeFrame).toLocaleString()}</p>
+              <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
+              <p>
+                {raffle.status === "live"
+                  ? `Time Left: ${new Date(raffle.timeFrame).toLocaleString()}`
+                  : "Completed"}
+              </p>
             </Link>
           ))}
         </div>
