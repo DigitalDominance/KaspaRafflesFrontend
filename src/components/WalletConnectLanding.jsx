@@ -1,5 +1,7 @@
+// frontend/src/components/WalletConnectLanding.jsx
 import React from 'react';
 import '../styles.css';
+import Footer from './Footer';
 
 const WalletConnectLanding = ({ onConnect }) => {
   const handleConnect = async () => {
@@ -23,6 +25,7 @@ const WalletConnectLanding = ({ onConnect }) => {
       <button className="landing-button" onClick={handleConnect}>
         Connect Wallet
       </button>
+      <Footer />
     </div>
   );
 };
