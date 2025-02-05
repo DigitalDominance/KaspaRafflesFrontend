@@ -22,21 +22,24 @@ function App() {
 
   return (
     <Router>
-      {!wallet && <WalletConnectModal onConnect={handleWalletConnect} />}
-      {wallet && (
-        <div className="app-container">
-          <Navbar wallet={wallet} onDisconnect={handleWalletDisconnect} />
-          <div className="content-container">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/create" element={<CreateRaffle wallet={wallet} />} />
-              <Route path="/raffle/:raffleId" element={<RaffleDetail wallet={wallet} />} />
-              <Route path="/profile" element={<Profile wallet={wallet} />} />
-            </Routes>
-          </div>
-          <Footer />
-        </div>
-      )}
+      <div className="app-container">
+        {!wallet ? (
+          <WalletConnectModal onConnect={handleWalletConnect} />
+        ) : (
+          <>
+            <Navbar wallet={wallet} onDisconnect={handleWalletDisconnect} />
+            <div className="content-container">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/create" element={<CreateRaffle wallet={wallet} />} />
+                <Route path="/raffle/:raffleId" element={<RaffleDetail wallet={wallet} />} />
+                <Route path="/profile" element={<Profile wallet={wallet} />} />
+              </Routes>
+            </div>
+            <Footer />
+          </>
+        )}
+      </div>
     </Router>
   );
 }
