@@ -53,9 +53,10 @@ const RaffleDetail = ({ wallet }) => {
     if (raffle.type === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        // Convert sompi to KAS.
-        const confirmedKas = balance.confirmed / 1e8;
-        if (confirmedKas < parseFloat(entryAmount)) {
+        // Multiply entryAmount (in plain KAS) by 1e8 to get required sompi.
+        const required = parseFloat(entryAmount) * 1e8;
+        // Use the total balance from KasWare.
+        if (balance.total < required) {
           setEntryError('Insufficient KAS balance for entry.');
           return false;
         }
@@ -76,7 +77,7 @@ const RaffleDetail = ({ wallet }) => {
           return false;
         }
         const dec = parseInt(tokenObj.dec, 10);
-        const required = entryAmount * Math.pow(10, dec);
+        const required = parseFloat(entryAmount) * Math.pow(10, dec);
         if (parseInt(tokenObj.balance, 10) < required) {
           setEntryError('Insufficient token balance for entry.');
           return false;
@@ -105,14 +106,14 @@ const RaffleDetail = ({ wallet }) => {
       if (raffle.type === 'KAS') {
         txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
-          entryAmount * 1e8  // converting to sompi
+          parseFloat(entryAmount) * 1e8  // converting to sompi
         );
       } else if (raffle.type === 'KRC20') {
         const transferJson = JSON.stringify({
           p: "KRC-20",
           op: "transfer",
           tick: raffle.tokenTicker,
-          amt: (entryAmount * 1e8).toString(),
+          amt: (parseFloat(entryAmount) * 1e8).toString(),
           to: raffle.wallet.receivingAddress,
         });
         txid = await window.kasware.signKRC20Transaction(
@@ -121,7 +122,7 @@ const RaffleDetail = ({ wallet }) => {
           raffle.wallet.receivingAddress
         );
       }
-      // If txid is falsy, assume the transaction was cancelled/failed.
+      // If txid is falsy, assume the transaction was cancelled or failed.
       if (!txid) {
         setEntryError("Transaction was cancelled or failed. Entry not recorded.");
         setProcessing(false);
