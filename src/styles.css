@@ -15,14 +15,14 @@ button {
   font-family: 'Roboto Mono', monospace;
 }
 
-/* Global Container */
+/* Global container */
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Content Container */
+/* Content container */
 .content-container {
   flex: 1;
   padding: 1rem;
@@ -55,11 +55,10 @@ button {
   text-align: center;
 }
 
-/* Top section: header & subheading */
+/* Header section: spacing added */
 .landing-header {
-  justify-self: center;
-  align-self: start;
-  margin-top: 1rem;
+  width: 100%;
+  margin-bottom: 2rem;  /* increased space below header */
 }
 .landing-heading {
   font-size: 3rem;
@@ -70,11 +69,10 @@ button {
   margin: 0.5rem 0 0;
 }
 
-/* Middle section: connect button */
+/* Middle section: connect button in a frosted-blue container */
 .landing-middle {
   justify-self: center;
   align-self: center;
-  /* Use a frosted blue container for the button area */
   background: rgba(30, 90, 120, 0.8);
   border: 2px solid #7bf8f9;
   border-radius: 16px;
@@ -123,7 +121,7 @@ button {
 }
 .navbar button:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(123, 248, 249, 0.7);
+  box-shadow: 0 0 15px rgba(123,248,249,0.7);
 }
 
 /* --- Page Container --- */
@@ -134,59 +132,63 @@ button {
 }
 
 /* --- Home Page Cards (Popular Raffles) --- */
+.raffles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
 .home-raffle-card {
-  background: rgba(30, 90, 120, 0.8);
+  background: rgba(30,90,120,0.8);
   border: 2px solid #7bf8f9;
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
   color: #fff;
   text-decoration: none;
-  margin: 0.75rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .home-raffle-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 .home-raffle-card.completed {
-  background: rgba(80, 80, 80, 0.9);
+  background: rgba(80,80,80,0.9);
   border: 2px solid #aaa;
 }
 
 /* --- My Raffles (Profile) Cards --- */
 .profile-raffle-card {
-  background: rgba(30, 90, 120, 0.8);
+  background: rgba(30,90,120,0.8);
   border: 2px solid #7bf8f9;
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
   color: #fff;
   text-decoration: none;
-  margin: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 0.5rem;
 }
 .profile-raffle-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 .profile-raffle-card.completed {
-  background: rgba(80, 80, 80, 0.9);
+  background: rgba(80,80,80,0.9);
   border: 2px solid #aaa;
 }
 
 /* --- Leaderboard --- */
 .leaderboard {
   margin-top: 2rem;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0,0,0,0.65);
   padding: 1rem;
   border-radius: 8px;
 }
 .leaderboard-entry {
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255,255,255,0.3);
 }
 
 /* --- Entry Section --- */
@@ -223,7 +225,7 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0,0,0,0.85);
   z-index: 2000;
   display: flex;
   flex-direction: column;
@@ -231,7 +233,7 @@ button {
   align-items: center;
 }
 .spinner {
-  border: 8px solid rgba(255, 255, 255, 0.3);
+  border: 8px solid rgba(255,255,255,0.3);
   border-top: 8px solid #7bf8f9;
   border-radius: 50%;
   width: 60px;
@@ -245,7 +247,7 @@ button {
 
 /* --- Raffle Detail Container --- */
 .raffle-detail-container {
-  background: rgba(30, 90, 120, 0.8);
+  background: rgba(30,90,120,0.8);
   border: 2px solid #7bf8f9;
   border-radius: 16px;
   padding: 1.5rem;
@@ -254,7 +256,7 @@ button {
 
 /* --- Frosted Form --- */
 .frosted-form {
-  background: rgba(138, 212, 217, 0.2);
+  background: rgba(138,212,217,0.2);
   padding: 2rem;
   border: 2px solid #7bf8f9;
   border-radius: 16px;
