@@ -10,8 +10,13 @@ const RaffleDetail = ({ wallet }) => {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [entryAmount, setEntryAmount] = useState('');
+  const [entryError, setEntryError] = useState('');
+  // Pagination for leaderboard entries
+  const [entryPage, setEntryPage] = useState(1);
+  const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+  // Fetch raffle details from backend
   const fetchRaffle = async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}`);
@@ -34,55 +39,110 @@ const RaffleDetail = ({ wallet }) => {
     return () => clearInterval(interval);
   }, [raffleId, apiUrl]);
 
-  const handleEnterRaffle = async () => {
-  if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
-    alert(`Minimum entry is ${raffle.creditConversion}`);
-    return;
-  }
-  setProcessing(true);
-  try {
-    let txid;
+  // Check if user has sufficient balance for an entry
+  const checkEntryBalance = async () => {
+    if (!entryAmount || !raffle) return false;
     if (raffle.type === 'KAS') {
-      txid = await window.kasware.sendKaspa(
-        raffle.wallet.receivingAddress,
-        entryAmount * 1e8  // converting to sompi
-      );
-    } else if (raffle.type === 'KRC20') {
-      const transferJson = JSON.stringify({
-        p: "KRC-20",
-        op: "transfer",
-        tick: raffle.tokenTicker,
-        amt: (entryAmount * 1e8).toString(),
-        to: raffle.wallet.receivingAddress,
+      try {
+        const balance = await window.kasware.getBalance();
+        if (balance.confirmed < entryAmount * 1e8) {
+          setEntryError('Insufficient KAS balance for entry.');
+          return false;
+        }
+        return true;
+      } catch (err) {
+        console.error('Error checking KAS balance:', err);
+        setEntryError('Error checking KAS balance.');
+        return false;
+      }
+    } else { // KRC20
+      try {
+        const tokenBalances = await window.kasware.getKRC20Balance();
+        // Use raffle.tokenTicker for entry tokens
+        const tokenObj = tokenBalances.find(
+          (token) => token.tick.toUpperCase() === raffle.tokenTicker.toUpperCase()
+        );
+        if (!tokenObj) {
+          setEntryError(`Token ${raffle.tokenTicker.toUpperCase()} not found in your wallet.`);
+          return false;
+        }
+        const dec = parseInt(tokenObj.dec, 10);
+        const required = entryAmount * Math.pow(10, dec);
+        if (parseInt(tokenObj.balance, 10) < required) {
+          setEntryError('Insufficient token balance for entry.');
+          return false;
+        }
+        return true;
+      } catch (err) {
+        console.error('Error checking KRC20 balance:', err);
+        setEntryError('Error checking token balance.');
+        return false;
+      }
+    }
+  };
+
+  // Handle user entry submission
+  const handleEnterRaffle = async () => {
+    // Clear previous error
+    setEntryError('');
+    if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
+      alert(`Minimum entry is ${raffle.creditConversion}`);
+      return;
+    }
+    // Check wallet balance for entry
+    const hasFunds = await checkEntryBalance();
+    if (!hasFunds) return;
+    
+    setProcessing(true);
+    try {
+      let txid;
+      if (raffle.type === 'KAS') {
+        txid = await window.kasware.sendKaspa(
+          raffle.wallet.receivingAddress,
+          entryAmount * 1e8  // converting to sompi
+        );
+      } else if (raffle.type === 'KRC20') {
+        const transferJson = JSON.stringify({
+          p: "KRC-20",
+          op: "transfer",
+          tick: raffle.tokenTicker,
+          amt: (entryAmount * 1e8).toString(),
+          to: raffle.wallet.receivingAddress,
+        });
+        txid = await window.kasware.signKRC20Transaction(
+          transferJson,
+          4,
+          raffle.wallet.receivingAddress
+        );
+      }
+      console.log("Transaction sent, txid:", txid);
+      // Post the TXID along with entry details to our backend.
+      const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
+        txid,
+        walletAddress: wallet.address,
+        amount: parseFloat(entryAmount)
       });
-      txid = await window.kasware.signKRC20Transaction(
-        transferJson,
-        4,
-        raffle.wallet.receivingAddress
-      );
+      if (resEntry.data.success) {
+        alert("Entry recorded successfully.");
+      } else {
+        alert("Entry recording failed.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Transaction failed");
+    } finally {
+      setProcessing(false);
+      setEntryAmount('');
+      fetchRaffle();
     }
-    console.log("Transaction sent, txid:", txid);
-    // Now, post the TXID to our new endpoint.
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-    const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
-      txid,
-      walletAddress: wallet.address,
-      amount: parseFloat(entryAmount)
-    });
-    if (resEntry.data.success) {
-      alert("Entry recorded successfully.");
-    } else {
-      alert("Entry recording failed.");
-    }
-  } catch (e) {
-    console.error(e);
-    alert("Transaction failed");
-  } finally {
-    setProcessing(false);
-    setEntryAmount('');
-    fetchRaffle();
-  }
-};
+  };
+
+  // Pagination for leaderboard: sort entries by confirmedAt descending
+  const sortedEntries = raffle && raffle.entries && raffle.entries.length > 0
+    ? [...raffle.entries].sort((a, b) => new Date(b.confirmedAt) - new Date(a.confirmedAt))
+    : [];
+  const totalEntryPages = Math.ceil(sortedEntries.length / entriesPerPage);
+  const displayedEntries = sortedEntries.slice((entryPage - 1) * entriesPerPage, entryPage * entriesPerPage);
 
   if (loading) {
     return <div className="page-container"><p>Loading raffle...</p></div>;
@@ -119,31 +179,40 @@ const RaffleDetail = ({ wallet }) => {
           <button onClick={handleEnterRaffle}>Enter Raffle</button>
         </div>
       )}
+      {entryError && (
+        <div className="error-message" style={{ marginTop: '1rem', color: 'red', textAlign: 'center' }}>
+          {entryError}
+          <button className="close-button" onClick={() => setEntryError('')} style={{ marginLeft: '1rem' }}>×</button>
+        </div>
+      )}
       {processing && (
         <div className="processing-modal">
           <div className="spinner"></div>
           <p>Your entry is being processed and will be counted soon...</p>
-          <button onClick={() => setProcessing(false)}>Close</button>
+          <button className="close-button" onClick={() => setProcessing(false)}>×</button>
         </div>
       )}
       <div className="leaderboard">
-        <h3>Leaderboard (Top 10 wallets by entries)</h3>
-        {raffle.entries && raffle.entries.length > 0 ? (
-          Object.entries(
-            raffle.entries.reduce((acc, entry) => {
-              acc[entry.walletAddress] = (acc[entry.walletAddress] || 0) + entry.creditsAdded;
-              return acc;
-            }, {})
-          )
-            .sort(([, aCredits], [, bCredits]) => bCredits - aCredits)
-            .slice(0, 10)
-            .map(([walletAddress, totalCredits], index) => (
-              <div key={index} className="leaderboard-entry">
-                <span style={{ wordWrap: 'break-word' }}>{walletAddress}</span>: <span>{totalCredits.toFixed(2)} entries</span>
-              </div>
-            ))
+        <h3>Leaderboard (Entries)</h3>
+        {displayedEntries.length > 0 ? (
+          displayedEntries.map((entry, index) => (
+            <div key={index} className="leaderboard-entry">
+              <span>{entry.walletAddress}</span>: <span>{entry.creditsAdded.toFixed(2)} entries</span>
+            </div>
+          ))
         ) : (
           <p>No entries yet.</p>
+        )}
+        {totalEntryPages > 1 && (
+          <div className="pagination">
+            <button onClick={() => setEntryPage(prev => Math.max(prev - 1, 1))} disabled={entryPage === 1}>
+              Previous
+            </button>
+            <span>Page {entryPage} of {totalEntryPages}</span>
+            <button onClick={() => setEntryPage(prev => Math.min(prev + 1, totalEntryPages))} disabled={entryPage === totalEntryPages}>
+              Next
+            </button>
+          </div>
         )}
       </div>
     </div>
