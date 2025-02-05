@@ -93,6 +93,7 @@ body {
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 1rem;
 }
 
 /* Raffle card styling */
@@ -115,6 +116,15 @@ body {
 }
 
 /* Leaderboard styling */
+.leaderboard {
+  margin-top: 2rem;
+}
+
+.leaderboard-entry {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 /* Entry section styling */
 .entry-section {
   margin-top: 1.5rem;
@@ -125,6 +135,7 @@ body {
 
 .entry-section input {
   flex: 1;
+  max-width: 150px;  /* Limit input width */
   padding: 0.5rem;
   border: none;
   border-radius: 5px;
@@ -173,17 +184,6 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
-/* Leaderboard styling */
-.leaderboard {
-  margin-top: 2rem;
-}
-
-.leaderboard-entry {
-  padding: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-}
-
 
 /* Frosted form styling */
 .frosted-form {
