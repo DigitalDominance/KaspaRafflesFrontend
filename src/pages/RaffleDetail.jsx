@@ -15,7 +15,7 @@ const RaffleDetail = ({ wallet }) => {
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // Live countdown helper.
+  // Helper: Live countdown.
   const getTimeLeft = (endTime) => {
     const diff = new Date(endTime) - new Date();
     if (diff <= 0) return 'Completed';
@@ -53,7 +53,7 @@ const RaffleDetail = ({ wallet }) => {
     if (raffle.type === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        // Convert sompi to KAS
+        // Convert sompi to KAS.
         const confirmedKas = balance.confirmed / 1e8;
         if (confirmedKas < parseFloat(entryAmount)) {
           setEntryError('Insufficient KAS balance for entry.');
@@ -120,6 +120,12 @@ const RaffleDetail = ({ wallet }) => {
           4,
           raffle.wallet.receivingAddress
         );
+      }
+      // If txid is falsy, assume the transaction was cancelled/failed.
+      if (!txid) {
+        setEntryError("Transaction was cancelled or failed. Entry not recorded.");
+        setProcessing(false);
+        return;
       }
       console.log("Transaction sent, txid:", txid);
       // Post the TXID along with entry details to our backend.
