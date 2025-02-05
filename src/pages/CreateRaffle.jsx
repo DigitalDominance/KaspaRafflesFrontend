@@ -14,12 +14,14 @@ const CreateRaffle = ({ wallet }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   // Treasury wallet from environment variable
   const treasuryWallet = process.env.REACT_APP_TREASURY_WALLET;
 
   // Check the host's balance before initiating the prize transaction.
+  // For both KAS and KRC20, we compare values in sompi.
   const checkPrizeBalance = async () => {
     if (prizeType === 'KAS') {
       try {
@@ -62,9 +64,16 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   // Handle form submission.
-  // (Note: The raffle is not created here; we only validate inputs and check funds.)
+  // We add an extra check to ensure that the raffle's end time is at least 24 hours from now.
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Check if the timeFrame is at least 24 hours in the future.
+    const minTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    if (new Date(timeFrame) < minTime) {
+      setConfirmError("Raffle must last at least 24 hours from now.");
+      return;
+    }
+
     const isoDate = new Date(timeFrame).toISOString();
     if (!timeFrame || !creditConversion || !prizeAmount) {
       setConfirmError('Please fill all required fields.');
@@ -82,15 +91,16 @@ const CreateRaffle = ({ wallet }) => {
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
 
-    // If validations pass, show the confirmation modal.
+    // Clear any previous errors and show the confirmation modal.
     setConfirmError('');
     setShowConfirmModal(true);
   };
 
   // Handle prize confirmation using KasWare.
-  // Only if a valid TXID is returned, create the raffle.
+  // Only if a valid TXID is returned will the raffle be created.
   const handleConfirmPrize = async () => {
     setConfirmError('');
+    // Check funds again before sending prize.
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
     
@@ -137,6 +147,7 @@ const CreateRaffle = ({ wallet }) => {
       const res = await axios.post(`${apiUrl}/raffles/create`, payload);
       if (res.data.success) {
         setShowConfirmModal(false);
+        setSuccessMessage("Raffle created successfully!");
         navigate(`/raffle/${res.data.raffleId}`);
       } else {
         setConfirmError("Prize confirmation failed.");
@@ -157,7 +168,7 @@ const CreateRaffle = ({ wallet }) => {
 
   return (
     <div className="create-raffle-page page-container">
-      {/* Global heading is centered on pages that use the global-heading class */}
+      {/* Global heading is centered on pages using the global-heading class */}
       <h1 className="global-heading">Create a Raffle</h1>
       <form onSubmit={handleSubmit} className="frosted-form">
         <div>
