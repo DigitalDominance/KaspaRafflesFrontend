@@ -1,37 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto Mono', monospace;
   background: #121212;
   color: #fff;
 }
 
+/* Navbar with a frosted glass look */
 .navbar {
   display: flex;
   justify-content: space-between;
-  padding: 1rem;
-  background: rgba(0,0,0,0.5);
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
 }
 
 .navbar a {
   color: #7bf8f9;
   margin-right: 1rem;
   text-decoration: none;
+  font-weight: bold;
 }
 
 .navbar button {
-  background: #ff69b4;
-  border: none;
+  background: linear-gradient(135deg, rgba(138,212,217,0.2) 0%, rgba(138,212,217,0.4) 50%, rgba(138,212,217,0.2) 100%);
+  border: 2px solid #7bf8f9;
   padding: 0.5rem 1rem;
-  border-radius: 5px;
+  border-radius: 12px;
   cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.navbar button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(123, 248, 249, 0.7);
+}
+
+/* Modal styling */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  right:0;
-  bottom:0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,16 +66,19 @@ body {
   cursor: pointer;
 }
 
+/* General page layout */
 .home, .create-raffle-page, .raffle-detail, .profile-page {
   padding: 1rem;
 }
 
+/* Grid layout for raffles */
 .raffles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
 }
 
+/* Raffle card style */
 .raffle-card {
   padding: 1rem;
   background: rgba(138,212,217,0.2);
@@ -78,6 +96,7 @@ body {
   box-shadow: 0 0 15px rgba(255,105,180,0.7);
 }
 
+/* Frosted form styling */
 .frosted-form {
   background: rgba(138,212,217,0.2);
   padding: 1rem;
@@ -85,7 +104,7 @@ body {
   border-radius: 12px;
   backdrop-filter: blur(10px);
   max-width: 500px;
-  margin: 0 auto;
+  margin: 2rem auto;
 }
 
 .frosted-form label {
@@ -110,4 +129,5 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
 }
