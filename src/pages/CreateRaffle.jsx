@@ -186,8 +186,7 @@ const CreateRaffle = ({ wallet }) => {
           <div className="spinner"></div>
           <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
             <p>
-              Please send {prizeAmount} {prizeType === "KAS" ? "KAS" : prizeTicker.trim().toUpperCase()} to our treasury wallet:
-              <br /><strong>{treasuryWallet}</strong>
+              Please send {prizeAmount} {prizeType === "KAS" ? "KAS" : prizeTicker.trim().toUpperCase()} to begin the raffle:
             </p>
             <p style={{ fontSize: '0.9rem', fontStyle: 'italic' }}>
               Note: KASPER takes 5% of the generated tokens.
