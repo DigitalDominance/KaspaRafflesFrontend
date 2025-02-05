@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [raffles, setRaffles] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     const fetchRaffles = async () => {
       try {
         const res = await axios.get(`${apiUrl}/raffles`);
@@ -18,7 +18,7 @@ const Home = () => {
       }
     };
     fetchRaffles();
-  }, []);
+  }, [apiUrl]);
 
   return (
     <div className="home page-container">
