@@ -23,7 +23,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchRaffles();
-    const interval = setInterval(fetchRaffles, 1000);
+    const interval = setInterval(fetchRaffles, 5000);
     return () => clearInterval(interval);
   }, [apiUrl]);
 
@@ -52,11 +52,11 @@ const Home = () => {
             to={`/raffle/${raffle.raffleId}`}
             className={`home-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
           >
-            <h3>{raffle.prize || 'Raffle Prize'}</h3>
+            <h3>{raffle.prizeDisplay}</h3>
             <p>{raffle.status === "live" ? getTimeLeft(raffle.timeFrame, raffle.status) : "Completed"}</p>
             <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
             {raffle.status === "completed" && raffle.winner && (
-              <p>Winner: {raffle.winner}</p>
+              <p style={{ wordWrap: 'break-word' }}>Winner: {raffle.winner}</p>
             )}
           </Link>
         ))}
