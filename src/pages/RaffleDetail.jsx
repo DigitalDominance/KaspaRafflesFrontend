@@ -1,3 +1,4 @@
+// frontend/src/pages/RaffleDetail.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -83,22 +84,18 @@ const RaffleDetail = ({ wallet }) => {
   return (
     <div className="raffle-detail page-container">
       <h1>{raffle.prize || 'Raffle Prize'}</h1>
-      <div className="raffle-info">
+      <div className="raffle-detail-container">
         {raffle.status === "live" ? (
           <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
         ) : (
           <>
             <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
-            <p><strong>Winner: {raffle.winner}</strong></p>
+            <p><strong>Winner: {raffle.winner ? raffle.winner : "No Entries"}</strong></p>
           </>
         )}
         <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
         <p>Current Entries: {raffle.currentEntries.toFixed(2)}</p>
-        <p>
-          {raffle.status === "live"
-            ? `Time Remaining: ${new Date(raffle.timeFrame).toLocaleString()}`
-            : "Completed"}
-        </p>
+        <p>{raffle.status === "live" ? `Time Remaining: ${new Date(raffle.timeFrame).toLocaleString()}` : "Completed"}</p>
       </div>
       {raffle.status === "live" && (
         <div className="entry-section">
@@ -121,7 +118,6 @@ const RaffleDetail = ({ wallet }) => {
       <div className="leaderboard">
         <h3>Leaderboard (Top 10 wallets by entries)</h3>
         {raffle.entries && raffle.entries.length > 0 ? (
-          // Aggregate entries by wallet and sort descending by total credits added
           Object.entries(
             raffle.entries.reduce((acc, entry) => {
               acc[entry.walletAddress] = (acc[entry.walletAddress] || 0) + entry.creditsAdded;
