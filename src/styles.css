@@ -133,7 +133,9 @@ button {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
-  max-width: 90vw;
+  width: 100%;
+  max-width: 90vw;  /* restrict the grid to 90% of viewport width */
+  margin: 0 auto;
 }
 .home-raffle-card {
   background-color: #8a2be2 !important;  /* more vibrant blue */
