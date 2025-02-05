@@ -35,43 +35,54 @@ const RaffleDetail = ({ wallet }) => {
   }, [raffleId, apiUrl]);
 
   const handleEnterRaffle = async () => {
-    if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
-      alert(`Minimum entry is ${raffle.creditConversion}`);
-      return;
+  if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
+    alert(`Minimum entry is ${raffle.creditConversion}`);
+    return;
+  }
+  setProcessing(true);
+  try {
+    let txid;
+    if (raffle.type === 'KAS') {
+      txid = await window.kasware.sendKaspa(
+        raffle.wallet.receivingAddress,
+        entryAmount * 1e8  // converting to sompi
+      );
+    } else if (raffle.type === 'KRC20') {
+      const transferJson = JSON.stringify({
+        p: "KRC-20",
+        op: "transfer",
+        tick: raffle.tokenTicker,
+        amt: (entryAmount * 1e8).toString(),
+        to: raffle.wallet.receivingAddress,
+      });
+      txid = await window.kasware.signKRC20Transaction(
+        transferJson,
+        4,
+        raffle.wallet.receivingAddress
+      );
     }
-    setProcessing(true);
-    try {
-      let txid;
-      if (raffle.type === 'KAS') {
-        txid = await window.kasware.sendKaspa(
-          raffle.wallet.receivingAddress,
-          entryAmount * 1e8
-        );
-      } else if (raffle.type === 'KRC20') {
-        const transferJson = JSON.stringify({
-          p: "KRC-20",
-          op: "transfer",
-          tick: raffle.tokenTicker,
-          amt: (entryAmount * 1e8).toString(),
-          to: raffle.wallet.receivingAddress,
-        });
-        txid = await window.kasware.signKRC20Transaction(
-          transferJson,
-          4,
-          raffle.wallet.receivingAddress
-        );
-      }
-      alert(`Transaction sent: ${txid}`);
-      await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/process`);
-    } catch (e) {
-      console.error(e);
-      alert('Transaction failed');
-    } finally {
-      setProcessing(false);
-      setEntryAmount('');
-      fetchRaffle();
+    console.log("Transaction sent, txid:", txid);
+    // Now, post the TXID to our new endpoint.
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
+      txid,
+      walletAddress: wallet.address,
+      amount: parseFloat(entryAmount)
+    });
+    if (resEntry.data.success) {
+      alert("Entry recorded successfully.");
+    } else {
+      alert("Entry recording failed.");
     }
-  };
+  } catch (e) {
+    console.error(e);
+    alert("Transaction failed");
+  } finally {
+    setProcessing(false);
+    setEntryAmount('');
+    fetchRaffle();
+  }
+};
 
   if (loading) {
     return <div className="page-container"><p>Loading raffle...</p></div>;
