@@ -115,6 +115,12 @@ body {
   box-shadow: 0 0 15px rgba(255,105,180,0.7);
 }
 
+/* Additional styling for completed raffles */
+.completed-raffle {
+  background: rgba(100, 100, 100, 0.5) !important;
+  border: 2px solid #ccc !important;
+}
+
 /* Leaderboard styling */
 .leaderboard {
   margin-top: 2rem;
@@ -134,8 +140,7 @@ body {
 }
 
 .entry-section input {
-  flex: 1;
-  max-width: 150px;  /* Limit input width */
+  flex: 0 0 150px;
   padding: 0.5rem;
   border: none;
   border-radius: 5px;
