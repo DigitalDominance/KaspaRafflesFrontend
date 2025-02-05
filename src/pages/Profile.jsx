@@ -1,3 +1,4 @@
+// frontend/src/pages/Profile.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -12,17 +13,17 @@ const Profile = ({ wallet }) => {
     try {
       const res = await axios.get(`${apiUrl}/raffles?creator=${wallet.address}`);
       if (res.data.success) {
-        // Separate live and completed raffles
+        // Separate live and completed raffles.
         const live = res.data.raffles.filter(r => r.status === 'live');
         const completed = res.data.raffles.filter(r => r.status !== 'live');
 
-        // Sort live raffles: those ending soonest first (lowest timeFrame value)
+        // Sort live raffles: ending soonest first.
         live.sort((a, b) => new Date(a.timeFrame) - new Date(b.timeFrame));
 
-        // Sort completed raffles: most recently completed first
+        // Sort completed raffles: most recently completed first.
         completed.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
 
-        // Merge arrays: live ones first, then completed
+        // Merge arrays: live ones first, then completed.
         const sortedRaffles = [...live, ...completed];
         setMyRaffles(sortedRaffles);
       }
@@ -35,7 +36,7 @@ const Profile = ({ wallet }) => {
     fetchMyRaffles();
   }, [wallet.address, apiUrl]);
 
-  // Pagination calculations
+  // Pagination calculations.
   const indexOfLast = currentPage * rafflesPerPage;
   const indexOfFirst = indexOfLast - rafflesPerPage;
   const currentRaffles = myRaffles.slice(indexOfFirst, indexOfLast);
@@ -43,7 +44,8 @@ const Profile = ({ wallet }) => {
 
   return (
     <div className="profile-page page-container">
-      <h1>My Raffles</h1>
+      {/* Use global-heading to center the main heading */}
+      <h1 className="global-heading">My Raffles</h1>
       {myRaffles.length === 0 ? (
         <p>You haven't created any raffles yet.</p>
       ) : (
