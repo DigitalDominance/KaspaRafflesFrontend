@@ -48,7 +48,6 @@ const CreateRaffle = ({ wallet }) => {
     try {
       const res = await axios.post(`${apiUrl}/raffles/create`, payload);
       if (res.data.success) {
-        // Instead of a browser prompt, show a custom modal for prize confirmation.
         setShowConfirmModal(true);
         localStorage.setItem('newRaffleId', res.data.raffleId);
       }
@@ -79,7 +78,7 @@ const CreateRaffle = ({ wallet }) => {
           treasuryWallet
         );
       }
-      // Now confirm the prize with the backend
+      console.log("Prize transaction sent, txid:", txid);
       const raffleId = localStorage.getItem('newRaffleId');
       const confirmRes = await axios.post(`${apiUrl}/raffles/${raffleId}/confirmPrize`, { txid });
       if (confirmRes.data.success) {
