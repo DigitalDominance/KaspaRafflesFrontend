@@ -143,7 +143,6 @@ button {
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
-  color: #fff;
   text-decoration: none;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -164,7 +163,6 @@ button {
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
-  color: #fff;
   text-decoration: none;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
