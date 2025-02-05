@@ -13,49 +13,47 @@ const CreateRaffle = ({ wallet }) => {
   const [prizeAmount, setPrizeAmount] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState('');
   const navigate = useNavigate();
 
   // Treasury wallet from environment variable
   const treasuryWallet = process.env.REACT_APP_TREASURY_WALLET;
 
-  // Check host balance before initiating prize transaction
+  // Check the host's balance before initiating the prize transaction.
   const checkPrizeBalance = async () => {
     if (prizeType === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        // Convert prize amount to sompi (1 KAS = 1e8 sompi)
         if (balance.confirmed < prizeAmount * 1e8) {
-          alert('Insufficient KAS balance in your wallet.');
+          setConfirmError('Insufficient KAS balance in your wallet.');
           return false;
         }
         return true;
       } catch (err) {
         console.error('Error checking KAS balance:', err);
-        alert('Error checking KAS balance.');
+        setConfirmError('Error checking KAS balance.');
         return false;
       }
     } else {
       try {
         const tokenBalances = await window.kasware.getKRC20Balance();
-        // Find the token with matching ticker (case-insensitive)
         const tokenObj = tokenBalances.find(
           (token) => token.tick.toUpperCase() === prizeTicker.trim().toUpperCase()
         );
         if (!tokenObj) {
-          alert(`Token ${prizeTicker.trim().toUpperCase()} not found in your wallet.`);
+          setConfirmError(`Token ${prizeTicker.trim().toUpperCase()} not found in your wallet.`);
           return false;
         }
-        // prizeAmount is in whole tokens; convert using the token's decimal
         const dec = parseInt(tokenObj.dec, 10);
         const required = prizeAmount * Math.pow(10, dec);
         if (parseInt(tokenObj.balance, 10) < required) {
-          alert('Insufficient token balance in your wallet.');
+          setConfirmError('Insufficient token balance in your wallet.');
           return false;
         }
         return true;
       } catch (err) {
         console.error('Error checking KRC20 balance:', err);
-        alert('Error checking token balance.');
+        setConfirmError('Error checking token balance.');
         return false;
       }
     }
@@ -65,15 +63,15 @@ const CreateRaffle = ({ wallet }) => {
     e.preventDefault();
     const isoDate = new Date(timeFrame).toISOString();
     if (!timeFrame || !creditConversion || !prizeAmount) {
-      alert('Please fill all required fields');
+      // You can also set a form-level error here if desired.
       return;
     }
     if (raffleType === 'KRC20' && !tokenTicker) {
-      alert('Please provide a token ticker for the raffle deposit.');
+      setConfirmError('Please provide a token ticker for the raffle deposit.');
       return;
     }
     if (prizeType === 'KRC20' && !prizeTicker) {
-      alert('Please provide a token ticker for the prize.');
+      setConfirmError('Please provide a token ticker for the prize.');
       return;
     }
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -93,18 +91,19 @@ const CreateRaffle = ({ wallet }) => {
       if (res.data.success) {
         setShowConfirmModal(true);
         localStorage.setItem('newRaffleId', res.data.raffleId);
+        setConfirmError(''); // clear any previous errors
       }
     } catch (err) {
       console.error("Error creating raffle:", err.response ? err.response.data : err.message);
-      alert('Error creating raffle: ' + (err.response?.data.error || err.message));
+      setConfirmError('Error creating raffle: ' + (err.response?.data.error || err.message));
     }
   };
 
   const handleConfirmPrize = async () => {
-    // Before initiating the prize transaction, check balance:
+    setConfirmError(''); // clear previous error before starting
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
-
+    
     setConfirming(true);
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     let txid;
@@ -129,15 +128,14 @@ const CreateRaffle = ({ wallet }) => {
       const raffleId = localStorage.getItem('newRaffleId');
       const confirmRes = await axios.post(`${apiUrl}/raffles/${raffleId}/confirmPrize`, { txid });
       if (confirmRes.data.success) {
-        alert("Prize confirmed! Raffle created successfully.");
         setShowConfirmModal(false);
         navigate(`/raffle/${raffleId}`);
       } else {
-        alert("Prize confirmation failed.");
+        setConfirmError("Prize confirmation failed.");
       }
     } catch (e) {
       console.error(e);
-      alert("Transaction failed. Please try again.");
+      setConfirmError("Transaction failed. Please try again.");
     } finally {
       setConfirming(false);
     }
@@ -228,20 +226,37 @@ const CreateRaffle = ({ wallet }) => {
         <button type="submit">Create Raffle</button>
       </form>
 
+      {confirmError && (
+        <div className="error-message" style={{ marginTop: '1rem', color: 'red', textAlign: 'center' }}>
+          {confirmError}
+          <button onClick={() => setConfirmError('')} style={{ marginLeft: '1rem' }}>X</button>
+        </div>
+      )}
+
       {showConfirmModal && (
         <div className="processing-modal">
-          <div className="spinner"></div>
-          <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            <p>
-              Please send {prizeAmount} {prizeType === "KAS" ? "KAS" : prizeTicker.trim().toUpperCase()} to begin the raffle:
-            </p>
-            <p style={{ fontSize: '0.9rem', fontStyle: 'italic' }}>
-              Note: KASPER takes 5% of the generated tokens.
-            </p>
-          </div>
-          <button onClick={handleConfirmPrize} disabled={confirming}>
-            {confirming ? "Confirming..." : "Confirm Prize"}
-          </button>
+          {confirmError ? (
+            // If there's an error, show an "X" icon or message instead of spinner.
+            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <p style={{ color: 'red' }}>{confirmError}</p>
+              <button onClick={() => setConfirmError('')}>Close</button>
+            </div>
+          ) : (
+            <>
+              <div className="spinner"></div>
+              <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                <p>
+                  Please send {prizeAmount} {prizeType === "KAS" ? "KAS" : prizeTicker.trim().toUpperCase()} to begin the raffle:
+                </p>
+                <p style={{ fontSize: '0.9rem', fontStyle: 'italic' }}>
+                  Note: KASPER takes 5% of the generated tokens.
+                </p>
+              </div>
+              <button onClick={handleConfirmPrize} disabled={confirming}>
+                {confirming ? "Confirming..." : "Confirm Prize"}
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
