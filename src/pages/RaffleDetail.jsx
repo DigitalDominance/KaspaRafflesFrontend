@@ -15,7 +15,7 @@ const RaffleDetail = ({ wallet }) => {
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // Live countdown helper
+  // Live countdown helper.
   const getTimeLeft = (endTime) => {
     const diff = new Date(endTime) - new Date();
     if (diff <= 0) return 'Completed';
@@ -47,13 +47,15 @@ const RaffleDetail = ({ wallet }) => {
     return () => clearInterval(interval);
   }, [raffleId, apiUrl]);
 
-  // Check if the user has sufficient balance for the entry
+  // Check if the user has sufficient balance for the entry.
   const checkEntryBalance = async () => {
     if (!entryAmount || !raffle) return false;
     if (raffle.type === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        if (balance.confirmed < entryAmount * 1e8) {
+        // Convert sompi to KAS
+        const confirmedKas = balance.confirmed / 1e8;
+        if (confirmedKas < parseFloat(entryAmount)) {
           setEntryError('Insufficient KAS balance for entry.');
           return false;
         }
@@ -81,7 +83,7 @@ const RaffleDetail = ({ wallet }) => {
         }
         return true;
       } catch (err) {
-        console.error('Error checking KRC20 balance:', err);
+        console.error('Error checking token balance:', err);
         setEntryError('Error checking token balance.');
         return false;
       }
@@ -141,7 +143,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // Pagination for leaderboard: sort entries by confirmedAt descending
+  // Pagination for leaderboard: sort entries by confirmedAt descending.
   const sortedEntries = raffle && raffle.entries && raffle.entries.length > 0
     ? [...raffle.entries].sort((a, b) => new Date(b.confirmedAt) - new Date(a.confirmedAt))
     : [];
@@ -158,7 +160,7 @@ const RaffleDetail = ({ wallet }) => {
 
   return (
     <div className="raffle-detail page-container">
-      {/* Main heading left-aligned for Raffle Detail */}
+      {/* Main heading for raffle detail remains left-aligned */}
       <h1>{raffle.prizeDisplay}</h1>
       <div className="raffle-detail-container">
         {raffle.status === "live" ? (
