@@ -15,8 +15,51 @@ const CreateRaffle = ({ wallet }) => {
   const [confirming, setConfirming] = useState(false);
   const navigate = useNavigate();
 
-  // Treasury wallet from env variable
+  // Treasury wallet from environment variable
   const treasuryWallet = process.env.REACT_APP_TREASURY_WALLET;
+
+  // Check host balance before initiating prize transaction
+  const checkPrizeBalance = async () => {
+    if (prizeType === 'KAS') {
+      try {
+        const balance = await window.kasware.getBalance();
+        // Convert prize amount to sompi (1 KAS = 1e8 sompi)
+        if (balance.confirmed < prizeAmount * 1e8) {
+          alert('Insufficient KAS balance in your wallet.');
+          return false;
+        }
+        return true;
+      } catch (err) {
+        console.error('Error checking KAS balance:', err);
+        alert('Error checking KAS balance.');
+        return false;
+      }
+    } else {
+      try {
+        const tokenBalances = await window.kasware.getKRC20Balance();
+        // Find the token with matching ticker (case-insensitive)
+        const tokenObj = tokenBalances.find(
+          (token) => token.tick.toUpperCase() === prizeTicker.trim().toUpperCase()
+        );
+        if (!tokenObj) {
+          alert(`Token ${prizeTicker.trim().toUpperCase()} not found in your wallet.`);
+          return false;
+        }
+        // prizeAmount is in whole tokens; convert using the token's decimal
+        const dec = parseInt(tokenObj.dec, 10);
+        const required = prizeAmount * Math.pow(10, dec);
+        if (parseInt(tokenObj.balance, 10) < required) {
+          alert('Insufficient token balance in your wallet.');
+          return false;
+        }
+        return true;
+      } catch (err) {
+        console.error('Error checking KRC20 balance:', err);
+        alert('Error checking token balance.');
+        return false;
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,6 +101,10 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   const handleConfirmPrize = async () => {
+    // Before initiating the prize transaction, check balance:
+    const hasFunds = await checkPrizeBalance();
+    if (!hasFunds) return;
+
     setConfirming(true);
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     let txid;
@@ -68,7 +115,7 @@ const CreateRaffle = ({ wallet }) => {
         const transferJson = JSON.stringify({
           p: "KRC-20",
           op: "transfer",
-          tick: prizeTicker,
+          tick: prizeTicker.trim().toUpperCase(),
           amt: (prizeAmount * 1e8).toString(),
           to: treasuryWallet,
         });
