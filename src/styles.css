@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
 
+/* Global Styles */
 body {
   margin: 0;
   font-family: 'Roboto Mono', monospace;
@@ -14,14 +15,14 @@ button {
   font-family: 'Roboto Mono', monospace;
 }
 
-/* Global container */
+/* Global Container */
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Content container */
+/* Content Container */
 .content-container {
   flex: 1;
   padding: 1rem;
@@ -55,7 +56,8 @@ button {
 }
 .landing-header {
   width: 100%;
-  margin-bottom: 2rem;  /* increased space below header */
+  margin-bottom: 1.5rem; /* moderate spacing */
+  text-align: center;
 }
 .landing-heading {
   font-size: 3rem;
@@ -68,7 +70,7 @@ button {
 .landing-middle {
   justify-self: center;
   align-self: center;
-  /* Use a frosted blue container for the button area */
+  /* Frosted-blue container for the connect button */
   background: rgba(30, 90, 120, 0.8);
   border: 2px solid rgba(30, 90, 120, 1);
   border-radius: 16px;
@@ -134,7 +136,7 @@ button {
   gap: 1rem;
 }
 .home-raffle-card {
-  background: rgba(30, 90, 120, 0.8) !important;
+  background-color: rgba(30, 90, 120, 0.8) !important;
   border: 2px solid rgba(30, 90, 120, 1) !important;
   border-radius: 16px;
   padding: 1.5rem;
@@ -150,13 +152,13 @@ button {
   box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 .home-raffle-card.completed {
-  background: rgba(80,80,80,0.9) !important;
-  border: 2px solid rgba(80,80,80,1) !important;
+  background-color: #8a2be2 !important;  /* neon purple */
+  border: 2px solid #8a2be2 !important;
 }
 
 /* --- My Raffles (Profile) Cards --- */
 .profile-raffle-card {
-  background: rgba(30, 90, 120, 0.8) !important;
+  background-color: rgba(30, 90, 120, 0.8) !important;
   border: 2px solid rgba(30, 90, 120, 1) !important;
   border-radius: 16px;
   padding: 1.5rem;
@@ -172,8 +174,8 @@ button {
   box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 .profile-raffle-card.completed {
-  background: rgba(80,80,80,0.9) !important;
-  border: 2px solid rgba(80,80,80,1) !important;
+  background-color: #8a2be2 !important;  /* neon purple */
+  border: 2px solid #8a2be2 !important;
 }
 
 /* --- Leaderboard --- */
