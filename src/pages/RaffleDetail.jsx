@@ -15,7 +15,16 @@ const RaffleDetail = ({ wallet }) => {
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // Fetch raffle details from backend
+  // Live countdown helper
+  const getTimeLeft = (endTime) => {
+    const diff = new Date(endTime) - new Date();
+    if (diff <= 0) return 'Completed';
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
+
   const fetchRaffle = async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}`);
@@ -54,10 +63,9 @@ const RaffleDetail = ({ wallet }) => {
         setEntryError('Error checking KAS balance.');
         return false;
       }
-    } else { // KRC20
+    } else {
       try {
         const tokenBalances = await window.kasware.getKRC20Balance();
-        // Use raffle.tokenTicker for the entry token
         const tokenObj = tokenBalances.find(
           (token) => token.tick.toUpperCase() === raffle.tokenTicker.toUpperCase()
         );
@@ -80,7 +88,6 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // Handle user entry submission
   const handleEnterRaffle = async () => {
     setEntryError('');
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
@@ -134,7 +141,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // Sorting and Pagination for Leaderboard entries.
+  // Pagination for leaderboard: sort entries by confirmedAt descending
   const sortedEntries = raffle && raffle.entries && raffle.entries.length > 0
     ? [...raffle.entries].sort((a, b) => new Date(b.confirmedAt) - new Date(a.confirmedAt))
     : [];
@@ -151,7 +158,8 @@ const RaffleDetail = ({ wallet }) => {
 
   return (
     <div className="raffle-detail page-container">
-      <h1 style={{ textAlign: 'center' }}>{raffle.prizeDisplay}</h1>
+      {/* Main heading left-aligned for Raffle Detail */}
+      <h1>{raffle.prizeDisplay}</h1>
       <div className="raffle-detail-container">
         {raffle.status === "live" ? (
           <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
@@ -163,7 +171,11 @@ const RaffleDetail = ({ wallet }) => {
         )}
         <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
         <p>Current Entries: {raffle.currentEntries.toFixed(2)}</p>
-        <p>{raffle.status === "live" ? `Time Remaining: ${new Date(raffle.timeFrame).toLocaleString()}` : "Completed"}</p>
+        <p>
+          {raffle.status === "live"
+            ? `Time Remaining: ${getTimeLeft(raffle.timeFrame)}`
+            : "Completed"}
+        </p>
       </div>
       {raffle.status === "live" && (
         <div className="entry-section">
@@ -191,7 +203,7 @@ const RaffleDetail = ({ wallet }) => {
         </div>
       )}
       <div className="leaderboard">
-        <h3 style={{ textAlign: 'center' }}>Leaderboard (Entries)</h3>
+        <h3>Leaderboard (Entries)</h3>
         {displayedEntries.length > 0 ? (
           displayedEntries.map((entry, index) => (
             <div key={index} className="leaderboard-entry">
