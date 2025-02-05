@@ -13,7 +13,6 @@ const Home = () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles`);
       if (res.data.success) {
-        // Sort raffles by currentEntries descending.
         const sorted = res.data.raffles.sort((a, b) => b.currentEntries - a.currentEntries);
         setRaffles(sorted);
       }
@@ -28,13 +27,11 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [apiUrl]);
 
-  // Pagination calculations
-  const indexOfLastRaffle = currentPage * rafflesPerPage;
-  const indexOfFirstRaffle = indexOfLastRaffle - rafflesPerPage;
-  const currentRaffles = raffles.slice(indexOfFirstRaffle, indexOfLastRaffle);
+  const indexOfLast = currentPage * rafflesPerPage;
+  const indexOfFirst = indexOfLast - rafflesPerPage;
+  const currentRaffles = raffles.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(raffles.length / rafflesPerPage);
 
-  // Countdown timer
   const getTimeLeft = (timeFrame, status) => {
     if (status === "completed") return "Completed";
     const diff = new Date(timeFrame) - new Date();
@@ -66,21 +63,11 @@ const Home = () => {
       </div>
       {totalPages > 1 && (
         <div className="pagination">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+          <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}>Previous</button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}>Next</button>
         </div>
       )}
     </div>
