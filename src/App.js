@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import WalletConnectModal from './components/WalletConnectModal';
+import WalletConnectLanding from './components/WalletConnectLanding';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import CreateRaffle from './pages/CreateRaffle';
@@ -24,7 +24,7 @@ function App() {
     <Router>
       <div className="app-container">
         {!wallet ? (
-          <WalletConnectModal onConnect={handleWalletConnect} />
+          <WalletConnectLanding onConnect={handleWalletConnect} />
         ) : (
           <>
             <Navbar wallet={wallet} onDisconnect={handleWalletDisconnect} />
