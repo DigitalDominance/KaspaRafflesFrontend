@@ -157,8 +157,8 @@ button {
 }
 /* Completed: neon purple for completed raffles on Home page */
 .home-raffle-card.completed {
-  background-color: #8a2be2 !important; /* Use the neon purple as your vibrant color */
-  border: 2px solid #8a2be2 !important;
+  background: rgba(30, 90, 120, 0.95); /* vibrant blue, less transparent */
+  border: 2px solid rgba(30, 90, 120, 1);
 }
 
 /* --- My Raffles (Profile) Cards --- */
@@ -188,8 +188,8 @@ button {
 }
 /* Completed: neon purple for Profile cards */
 .profile-raffle-card.completed {
-  background-color: #8a2be2 !important;
-  border: 2px solid #8a2be2 !important;
+  background: rgba(30, 90, 120, 0.95); /* vibrant blue, less transparent */
+  border: 2px solid rgba(30, 90, 120, 1);
 }
 
 /* --- Leaderboard --- */
