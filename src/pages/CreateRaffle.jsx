@@ -4,13 +4,19 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const CreateRaffle = ({ wallet }) => {
-  const [raffleType, setRaffleType] = useState('KAS');
-  const [tokenTicker, setTokenTicker] = useState('');
-  const [timeFrame, setTimeFrame] = useState('');
-  const [creditConversion, setCreditConversion] = useState('');
-  const [prizeType, setPrizeType] = useState('KAS');
-  const [prizeTicker, setPrizeTicker] = useState(''); // for KRC20 prize
-  const [prizeAmount, setPrizeAmount] = useState('');
+  // Form data state
+  const [formData, setFormData] = useState({
+    raffleType: 'KAS',
+    tokenTicker: '',
+    timeFrame: '',
+    creditConversion: '',
+    prizeType: 'KAS',
+    prizeTicker: '',
+    prizeAmount: ''
+  });
+  const { raffleType, tokenTicker, timeFrame, creditConversion, prizeType, prizeTicker, prizeAmount } = formData;
+  
+  // Other state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState('');
@@ -59,9 +65,10 @@ const CreateRaffle = ({ wallet }) => {
     }
   };
 
+  // When the form is submitted, validate input and check balance.
+  // If sufficient funds exist, store form data in state and show the confirm modal.
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const isoDate = new Date(timeFrame).toISOString();
     if (!timeFrame || !creditConversion || !prizeAmount) {
       setConfirmError('Please fill all required fields.');
       return;
@@ -74,39 +81,19 @@ const CreateRaffle = ({ wallet }) => {
       setConfirmError('Please provide a token ticker for the prize.');
       return;
     }
-    
-    // Check prize balance BEFORE creating the raffle.
+    // Check balance before even showing the modal
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
 
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-    const payload = {
-      type: raffleType,
-      timeFrame: isoDate,
-      creditConversion,
-      prizeType,
-      prizeAmount,
-      creator: wallet.address,
-      treasuryAddress: treasuryWallet,
-      tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
-      prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
-    };
-    try {
-      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
-      if (res.data.success) {
-        setShowConfirmModal(true);
-        localStorage.setItem('newRaffleId', res.data.raffleId);
-        setConfirmError('');
-      }
-    } catch (err) {
-      console.error("Error creating raffle:", err.response ? err.response.data : err.message);
-      setConfirmError('Error creating raffle: ' + (err.response?.data.error || err.message));
-    }
+    // Save form data (it is already in formData state) and show modal.
+    setConfirmError('');
+    setShowConfirmModal(true);
   };
 
+  // When the user confirms, call KasWare to perform the prize transaction,
+  // then create the raffle on the backend with the TXID.
   const handleConfirmPrize = async () => {
     setConfirmError('');
-    // Balance already checked in handleSubmit, but you can re-check here if desired.
     setConfirming(true);
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     let txid;
@@ -128,11 +115,24 @@ const CreateRaffle = ({ wallet }) => {
         );
       }
       console.log("Prize transaction sent, txid:", txid);
-      const raffleId = localStorage.getItem('newRaffleId');
-      const confirmRes = await axios.post(`${apiUrl}/raffles/${raffleId}/confirmPrize`, { txid });
-      if (confirmRes.data.success) {
+      
+      // Now create the raffle on the backend with the TXID included
+      const payload = {
+        type: raffleType,
+        timeFrame,
+        creditConversion,
+        prizeType,
+        prizeAmount,
+        creator: wallet.address,
+        treasuryAddress,
+        tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
+        prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
+        prizeTransactionId: txid
+      };
+      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
+      if (res.data.success) {
         setShowConfirmModal(false);
-        navigate(`/raffle/${raffleId}`);
+        navigate(`/raffle/${res.data.raffleId}`);
       } else {
         setConfirmError("Prize confirmation failed.");
       }
@@ -144,6 +144,7 @@ const CreateRaffle = ({ wallet }) => {
     }
   };
 
+  // Handler to close/cancel the confirm modal
   const handleCloseModal = () => {
     setShowConfirmModal(false);
     setConfirmError('');
@@ -161,7 +162,7 @@ const CreateRaffle = ({ wallet }) => {
                 type="radio"
                 value="KAS"
                 checked={raffleType === 'KAS'}
-                onChange={() => setRaffleType('KAS')}
+                onChange={() => setFormData({ ...formData, raffleType: 'KAS' })}
               />
               KAS
             </label>
@@ -170,7 +171,7 @@ const CreateRaffle = ({ wallet }) => {
                 type="radio"
                 value="KRC20"
                 checked={raffleType === 'KRC20'}
-                onChange={() => setRaffleType('KRC20')}
+                onChange={() => setFormData({ ...formData, raffleType: 'KRC20' })}
               />
               KRC20
             </label>
@@ -182,7 +183,7 @@ const CreateRaffle = ({ wallet }) => {
             <input
               type="text"
               value={tokenTicker}
-              onChange={(e) => setTokenTicker(e.target.value)}
+              onChange={(e) => setFormData({ ...formData, tokenTicker: e.target.value })}
             />
           </div>
         )}
@@ -191,7 +192,7 @@ const CreateRaffle = ({ wallet }) => {
           <input
             type="datetime-local"
             value={timeFrame}
-            onChange={(e) => setTimeFrame(e.target.value)}
+            onChange={(e) => setFormData({ ...formData, timeFrame: e.target.value })}
           />
         </div>
         <div>
@@ -199,7 +200,7 @@ const CreateRaffle = ({ wallet }) => {
           <input
             type="number"
             value={creditConversion}
-            onChange={(e) => setCreditConversion(e.target.value)}
+            onChange={(e) => setFormData({ ...formData, creditConversion: e.target.value })}
           />
         </div>
         <div>
@@ -210,7 +211,7 @@ const CreateRaffle = ({ wallet }) => {
                 type="radio"
                 value="KAS"
                 checked={prizeType === 'KAS'}
-                onChange={() => setPrizeType('KAS')}
+                onChange={() => setFormData({ ...formData, prizeType: 'KAS' })}
               />
               KAS
             </label>
@@ -219,7 +220,7 @@ const CreateRaffle = ({ wallet }) => {
                 type="radio"
                 value="KRC20"
                 checked={prizeType === 'KRC20'}
-                onChange={() => setPrizeType('KRC20')}
+                onChange={() => setFormData({ ...formData, prizeType: 'KRC20' })}
               />
               KRC20
             </label>
@@ -231,7 +232,7 @@ const CreateRaffle = ({ wallet }) => {
             <input
               type="text"
               value={prizeTicker}
-              onChange={(e) => setPrizeTicker(e.target.value)}
+              onChange={(e) => setFormData({ ...formData, prizeTicker: e.target.value })}
             />
           </div>
         )}
@@ -240,7 +241,7 @@ const CreateRaffle = ({ wallet }) => {
           <input
             type="number"
             value={prizeAmount}
-            onChange={(e) => setPrizeAmount(e.target.value)}
+            onChange={(e) => setFormData({ ...formData, prizeAmount: e.target.value })}
           />
         </div>
         <button type="submit">Create Raffle</button>
