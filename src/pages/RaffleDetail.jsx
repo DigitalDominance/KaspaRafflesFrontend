@@ -55,7 +55,6 @@ const RaffleDetail = ({ wallet }) => {
         const balance = await window.kasware.getBalance();
         // Multiply entryAmount (in plain KAS) by 1e8 to get required sompi.
         const required = parseFloat(entryAmount) * 1e8;
-        // Use the total balance from KasWare.
         if (balance.total < required) {
           setEntryError('Insufficient KAS balance for entry.');
           return false;
@@ -106,7 +105,7 @@ const RaffleDetail = ({ wallet }) => {
       if (raffle.type === 'KAS') {
         txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
-          parseFloat(entryAmount) * 1e8  // converting to sompi
+          parseFloat(entryAmount) * 1e8
         );
       } else if (raffle.type === 'KRC20') {
         const transferJson = JSON.stringify({
@@ -122,20 +121,19 @@ const RaffleDetail = ({ wallet }) => {
           raffle.wallet.receivingAddress
         );
       }
-      // If txid is falsy, assume the transaction was cancelled or failed.
       if (!txid) {
         setEntryError("Transaction was cancelled or failed. Entry not recorded.");
         setProcessing(false);
         return;
       }
       console.log("Transaction sent, txid:", txid);
-      // Post the TXID along with entry details to our backend.
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
         txid,
         walletAddress: wallet.address,
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
+        // Instead of alert, you could set a success message if desired.
         alert("Entry recorded successfully.");
       } else {
         alert("Entry recording failed.");
@@ -167,7 +165,6 @@ const RaffleDetail = ({ wallet }) => {
 
   return (
     <div className="raffle-detail page-container">
-      {/* Main heading for raffle detail remains left-aligned */}
       <h1>{raffle.prizeDisplay}</h1>
       <div className="raffle-detail-container">
         {raffle.status === "live" ? (
@@ -199,7 +196,7 @@ const RaffleDetail = ({ wallet }) => {
         </div>
       )}
       {entryError && (
-        <div className="error-message" style={{ marginTop: '1rem', color: 'red', textAlign: 'center' }}>
+        <div className="message error" style={{ marginTop: '1rem', textAlign: 'center' }}>
           {entryError}
           <button className="close-button" onClick={() => setEntryError('')} style={{ marginLeft: '1rem' }}>×</button>
         </div>
