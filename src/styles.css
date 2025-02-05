@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
 
-/* Global Styles */
 body {
   margin: 0;
   font-family: 'Roboto Mono', monospace;
@@ -54,8 +53,6 @@ button {
   box-sizing: border-box;
   text-align: center;
 }
-
-/* Header section: spacing added */
 .landing-header {
   width: 100%;
   margin-bottom: 2rem;  /* increased space below header */
@@ -68,13 +65,12 @@ button {
   font-size: 1.5rem;
   margin: 0.5rem 0 0;
 }
-
-/* Middle section: connect button in a frosted-blue container */
 .landing-middle {
   justify-self: center;
   align-self: center;
+  /* Use a frosted blue container for the button area */
   background: rgba(30, 90, 120, 0.8);
-  border: 2px solid #7bf8f9;
+  border: 2px solid rgba(30, 90, 120, 1);
   border-radius: 16px;
   padding: 1.5rem;
   width: 100%;
@@ -138,12 +134,14 @@ button {
   gap: 1rem;
 }
 .home-raffle-card {
-  background: rgba(30,90,120,0.8);
-  border: 2px solid #7bf8f9;
+  background: rgba(30, 90, 120, 0.8) !important;
+  border: 2px solid rgba(30, 90, 120, 1) !important;
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
+  color: #fff;
   text-decoration: none;
+  margin: 0.75rem 0;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -152,35 +150,36 @@ button {
   box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 .home-raffle-card.completed {
-  background: rgba(80,80,80,0.9);
-  border: 2px solid #aaa;
+  background: rgba(80,80,80,0.9) !important;
+  border: 2px solid rgba(80,80,80,1) !important;
 }
 
 /* --- My Raffles (Profile) Cards --- */
 .profile-raffle-card {
-  background: rgba(30,90,120,0.8);
-  border: 2px solid #7bf8f9;
+  background: rgba(30, 90, 120, 0.8) !important;
+  border: 2px solid rgba(30, 90, 120, 1) !important;
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
+  color: #fff;
   text-decoration: none;
+  margin: 0.5rem;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  margin: 0.5rem;
 }
 .profile-raffle-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
 .profile-raffle-card.completed {
-  background: rgba(80,80,80,0.9);
-  border: 2px solid #aaa;
+  background: rgba(80,80,80,0.9) !important;
+  border: 2px solid rgba(80,80,80,1) !important;
 }
 
 /* --- Leaderboard --- */
 .leaderboard {
   margin-top: 2rem;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0, 0, 0, 0.65);
   padding: 1rem;
   border-radius: 8px;
 }
@@ -245,8 +244,8 @@ button {
 
 /* --- Raffle Detail Container --- */
 .raffle-detail-container {
-  background: rgba(30,90,120,0.8);
-  border: 2px solid #7bf8f9;
+  background: rgba(30, 90, 120, 0.8);
+  border: 2px solid rgba(30, 90, 120, 1);
   border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 1rem;
