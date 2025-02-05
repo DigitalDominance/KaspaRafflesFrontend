@@ -69,8 +69,7 @@ button {
 .landing-middle {
   justify-self: center;
   align-self: center;
-  /* Vibrant blue frosted container with less transparency */
-  background: rgba(30, 90, 120, 0.95);
+  background: rgba(30, 90, 120, 0.95); /* vibrant blue, less transparent */
   border: 2px solid rgba(30, 90, 120, 1);
   border-radius: 16px;
   padding: 1.5rem;
@@ -107,7 +106,7 @@ button {
   font-weight: bold;
 }
 .navbar button {
-  background: linear-gradient(135deg, rgba(138, 212, 217, 0.2), rgba(138, 212, 217, 0.4));
+  background: linear-gradient(135deg, rgba(138,212,217,0.2), rgba(138,212,217,0.4));
   border: 2px solid #7bf8f9;
   padding: 0.5rem 1rem;
   border-radius: 12px;
@@ -118,7 +117,7 @@ button {
 }
 .navbar button:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(123, 248, 249, 0.7);
+  box-shadow: 0 0 15px rgba(123,248,249,0.7);
 }
 
 /* --- Page Container --- */
@@ -128,60 +127,69 @@ button {
   padding: 1rem;
 }
 
+/* --- Grid Layout for Home Page Cards --- */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  /* exactly 3 columns per row */
+  gap: 1rem;
+  width: 100%;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
 /* --- Home Page Cards (Popular Raffles) --- */
-.raffles-grid {
+.home-raffle-card {
+  background-color: #8a2be2 !important;  /* vibrant blue or as desired */
+  border: 2px solid #8a2be2 !important;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  color: #fff;
+  text-decoration: none;
+  /* Remove any margin that might cause overflow; grid gap is already set */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  word-break: break-word; /* Force long text to wrap */
+}
+.home-raffle-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+}
+/* Completed: neon purple for completed raffles on Home page */
+.home-raffle-card.completed {
+  background-color: #8a2be2 !important; /* Use the neon purple as your vibrant color */
+  border: 2px solid #8a2be2 !important;
+}
+
+/* --- My Raffles (Profile) Cards --- */
+.raffles-grid { /* Reuse .raffles-grid for Profile as well if desired */
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   width: 100%;
-  max-width: 90vw;  /* restrict the grid to 90% of viewport width */
+  max-width: 90vw;
   margin: 0 auto;
 }
-.home-raffle-card {
-  background-color: #8a2be2 !important;  /* more vibrant blue */
-  border: 2px solid #8a2be2 !important;
-  border-radius: 16px;
-  padding: 1.5rem;
-  text-align: center;
-  color: #fff;
-  text-decoration: none;
-  margin: 0.75rem 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.home-raffle-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-}
-/* Completed: neon purple, fully opaque */
-.home-raffle-card.completed {
-  background-color: rgba(30, 90, 120, 0.95) !important;
-  border: 2px solid rgba(30, 90, 120, 1) !important;
-}
-
-/* --- My Raffles (Profile) Cards --- */
 .profile-raffle-card {
-  grid-template-columns: repeat(3, 1fr);
-  background-color: #8a2be2 !important;  
+  background-color: #8a2be2 !important;
   border: 2px solid #8a2be2 !important;
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
   color: #fff;
   text-decoration: none;
-  margin: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  word-break: break-word;
 }
 .profile-raffle-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
+/* Completed: neon purple for Profile cards */
 .profile-raffle-card.completed {
-  background-color: rgba(30, 90, 120, 0.95) !important;
-  border: 2px solid rgba(30, 90, 120, 1) !important;
-  /* Ensure long wallet addresses break correctly */
-  word-break: break-all;
+  background-color: #8a2be2 !important;
+  border: 2px solid #8a2be2 !important;
 }
 
 /* --- Leaderboard --- */
@@ -193,8 +201,8 @@ button {
 }
 .leaderboard-entry {
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  word-break: break-all;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  word-break: break-word;
 }
 
 /* --- Entry Section --- */
@@ -239,7 +247,7 @@ button {
   align-items: center;
 }
 .spinner {
-  border: 8px solid rgba(255, 255, 255, 0.3);
+  border: 8px solid rgba(255,255,255,0.3);
   border-top: 8px solid #7bf8f9;
   border-radius: 50%;
   width: 60px;
