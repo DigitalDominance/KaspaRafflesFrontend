@@ -131,7 +131,7 @@ button {
 /* --- Home Page Cards (Popular Raffles) --- */
 .raffles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
 .home-raffle-card {
@@ -158,6 +158,7 @@ button {
 
 /* --- My Raffles (Profile) Cards --- */
 .profile-raffle-card {
+  grid-template-columns: repeat(3, 1fr);
   background-color: #8a2be2 !important;  
   border: 2px solid #8a2be2 !important;
   border-radius: 16px;
