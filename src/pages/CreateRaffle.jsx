@@ -140,7 +140,6 @@ const CreateRaffle = ({ wallet }) => {
     }
   };
 
-  // Handler to cancel/close the confirm modal
   const handleCloseModal = () => {
     setShowConfirmModal(false);
     setConfirmError('');
@@ -242,12 +241,12 @@ const CreateRaffle = ({ wallet }) => {
       {showConfirmModal && (
         <div className="processing-modal">
           <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-            <button onClick={handleCloseModal} style={{ fontSize: '1.5rem', background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>×</button>
+            <button className="close-button" onClick={handleCloseModal}>×</button>
           </div>
           {confirmError ? (
             <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
               <p style={{ color: 'red' }}>{confirmError}</p>
-              <button onClick={handleCloseModal}>Close</button>
+              <button className="close-button" onClick={handleCloseModal}>Close</button>
             </div>
           ) : (
             <>
