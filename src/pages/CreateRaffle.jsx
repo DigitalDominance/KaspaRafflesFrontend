@@ -12,7 +12,10 @@ const CreateRaffle = ({ wallet }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting raffle with:", { raffleType, tokenTicker, timeFrame, creditConversion, prize });
+    // Convert local datetime-local string to an ISO string
+    const localDate = new Date(timeFrame);
+    const isoDate = localDate.toISOString();
+    console.log("Submitting raffle with:", { raffleType, tokenTicker, isoDate, creditConversion, prize });
     if (!timeFrame || !creditConversion) {
       alert('Please fill all required fields');
       return;
@@ -20,7 +23,7 @@ const CreateRaffle = ({ wallet }) => {
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     const payload = {
       type: raffleType,
-      timeFrame,
+      timeFrame: isoDate,
       creditConversion,
       prize,
       tokenTicker: raffleType === 'KRC20' ? tokenTicker : undefined,
