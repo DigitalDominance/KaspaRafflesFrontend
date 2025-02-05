@@ -20,12 +20,11 @@ const CreateRaffle = ({ wallet }) => {
   const treasuryWallet = process.env.REACT_APP_TREASURY_WALLET;
 
   // Check the host's balance before initiating the prize transaction.
-  // For both KAS and KRC20, we compare sompi values.
   const checkPrizeBalance = async () => {
     if (prizeType === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        // Multiply prizeAmount (plain KAS) by 1e8 to convert to sompi.
+        // Multiply prizeAmount (in plain KAS) by 1e8 to get the required sompi.
         const required = parseFloat(prizeAmount) * 1e8;
         if (balance.confirmed < required) {
           setConfirmError('Insufficient KAS balance in your wallet.');
@@ -63,6 +62,7 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   // Handle form submission.
+  // (Note: The raffle is not created here; we only validate inputs and check funds.)
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isoDate = new Date(timeFrame).toISOString();
@@ -78,38 +78,17 @@ const CreateRaffle = ({ wallet }) => {
       setConfirmError('Please provide a token ticker for the prize.');
       return;
     }
-    // Check balance before proceeding.
+    // Check funds before proceeding.
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
 
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-    const payload = {
-      type: raffleType,
-      timeFrame: isoDate,
-      creditConversion,
-      prizeType,
-      prizeAmount,
-      creator: wallet.address,
-      treasuryAddress: treasuryWallet, // Use the defined variable here.
-      tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
-      prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
-    };
-    try {
-      // We do not create the raffle until the prize transaction is confirmed.
-      // So this endpoint might be used later for confirmation.
-      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
-      if (res.data.success) {
-        setShowConfirmModal(true);
-        localStorage.setItem('newRaffleId', res.data.raffleId);
-        setConfirmError('');
-      }
-    } catch (err) {
-      console.error("Error creating raffle:", err.response ? err.response.data : err.message);
-      setConfirmError('Error creating raffle: ' + (err.response?.data.error || err.message));
-    }
+    // If validations pass, show the confirmation modal.
+    setConfirmError('');
+    setShowConfirmModal(true);
   };
 
-  // Handle prize confirmation using KasWare. Only if a valid TXID is returned do we consider it successful.
+  // Handle prize confirmation using KasWare.
+  // Only if a valid TXID is returned, create the raffle.
   const handleConfirmPrize = async () => {
     setConfirmError('');
     const hasFunds = await checkPrizeBalance();
@@ -120,13 +99,13 @@ const CreateRaffle = ({ wallet }) => {
     let txid;
     try {
       if (prizeType === 'KAS') {
-        txid = await window.kasware.sendKaspa(treasuryWallet, prizeAmount * 1e8);
+        txid = await window.kasware.sendKaspa(treasuryWallet, parseFloat(prizeAmount) * 1e8);
       } else if (prizeType === 'KRC20') {
         const transferJson = JSON.stringify({
           p: "KRC-20",
           op: "transfer",
           tick: prizeTicker.trim().toUpperCase(),
-          amt: (prizeAmount * 1e8).toString(),
+          amt: (parseFloat(prizeAmount) * 1e8).toString(),
           to: treasuryWallet,
         });
         txid = await window.kasware.signKRC20Transaction(
@@ -135,18 +114,30 @@ const CreateRaffle = ({ wallet }) => {
           treasuryWallet
         );
       }
-      // If the transaction is cancelled or fails, txid should be falsy.
+      // If the transaction is cancelled or fails, txid will be falsy.
       if (!txid) {
         setConfirmError("Transaction was cancelled or failed. Raffle not created.");
         setConfirming(false);
         return;
       }
       console.log("Prize transaction sent, txid:", txid);
-      const raffleId = localStorage.getItem('newRaffleId');
-      const confirmRes = await axios.post(`${apiUrl}/raffles/${raffleId}/confirmPrize`, { txid });
-      if (confirmRes.data.success) {
+      // Create the raffle on the backend with the prize TXID.
+      const payload = {
+        type: raffleType,
+        timeFrame: new Date(timeFrame).toISOString(),
+        creditConversion,
+        prizeType,
+        prizeAmount,
+        creator: wallet.address,
+        treasuryAddress: treasuryWallet,
+        tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
+        prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
+        prizeTransactionId: txid
+      };
+      const res = await axios.post(`${apiUrl}/raffles/create`, payload);
+      if (res.data.success) {
         setShowConfirmModal(false);
-        navigate(`/raffle/${raffleId}`);
+        navigate(`/raffle/${res.data.raffleId}`);
       } else {
         setConfirmError("Prize confirmation failed.");
       }
@@ -166,7 +157,7 @@ const CreateRaffle = ({ wallet }) => {
 
   return (
     <div className="create-raffle-page page-container">
-      {/* Centered main heading using the global-heading class */}
+      {/* Global heading is centered on pages that use the global-heading class */}
       <h1 className="global-heading">Create a Raffle</h1>
       <form onSubmit={handleSubmit} className="frosted-form">
         <div>
@@ -177,7 +168,7 @@ const CreateRaffle = ({ wallet }) => {
                 type="radio"
                 value="KAS"
                 checked={raffleType === 'KAS'}
-                onChange={() => { setRaffleType('KAS'); }}
+                onChange={() => setRaffleType('KAS')}
               />
               KAS
             </label>
@@ -186,7 +177,7 @@ const CreateRaffle = ({ wallet }) => {
                 type="radio"
                 value="KRC20"
                 checked={raffleType === 'KRC20'}
-                onChange={() => { setRaffleType('KRC20'); }}
+                onChange={() => setRaffleType('KRC20')}
               />
               KRC20
             </label>
@@ -226,7 +217,7 @@ const CreateRaffle = ({ wallet }) => {
                 type="radio"
                 value="KAS"
                 checked={prizeType === 'KAS'}
-                onChange={() => { setPrizeType('KAS'); }}
+                onChange={() => setPrizeType('KAS')}
               />
               KAS
             </label>
@@ -235,7 +226,7 @@ const CreateRaffle = ({ wallet }) => {
                 type="radio"
                 value="KRC20"
                 checked={prizeType === 'KRC20'}
-                onChange={() => { setPrizeType('KRC20'); }}
+                onChange={() => setPrizeType('KRC20')}
               />
               KRC20
             </label>
@@ -262,7 +253,7 @@ const CreateRaffle = ({ wallet }) => {
         <button type="submit">Create Raffle</button>
       </form>
 
-      {/* Inline error message outside the modal if needed */}
+      {/* Inline error message (outside the modal) */}
       {confirmError && !showConfirmModal && (
         <div className="error-message" style={{ marginTop: '1rem', color: 'red', textAlign: 'center' }}>
           {confirmError}
