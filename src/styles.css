@@ -138,31 +138,33 @@ button {
 }
 
 /* --- Home Page Cards (Popular Raffles) --- */
+/* Copying exactly from My Raffles (Profile) Cards for responsive text wrapping */
 .home-raffle-card {
-  background-color: #8a2be2 !important;  /* vibrant blue or as desired */
+  background-color: #8a2be2 !important;
   border: 2px solid #8a2be2 !important;
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
   color: #fff;
   text-decoration: none;
-  /* Remove any margin that might cause overflow; grid gap is already set */
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  word-break: break-word; /* Force long text to wrap */
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .home-raffle-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
-/* Completed: neon purple for completed raffles on Home page */
+/* Completed: Copy styling from My Raffles completed */
 .home-raffle-card.completed {
-  background: rgba(30, 90, 120, 0.95) !important; /* vibrant blue, less transparent */
+  background-color: rgba(30, 90, 120, 0.95) !important;
   border: 2px solid rgba(30, 90, 120, 1) !important;
+  word-break: break-all;
 }
 
 /* --- My Raffles (Profile) Cards --- */
-.raffles-grid { /* Reuse .raffles-grid for Profile as well if desired */
+.raffles-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
@@ -181,15 +183,16 @@ button {
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   word-break: break-word;
+  overflow-wrap: break-word;
 }
 .profile-raffle-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 16px rgba(0,0,0,0.4);
 }
-/* Completed: neon purple for Profile cards */
 .profile-raffle-card.completed {
-  background: rgba(30, 90, 120, 0.95) !important; /* vibrant blue, less transparent */
+  background-color: rgba(30, 90, 120, 0.95) !important;
   border: 2px solid rgba(30, 90, 120, 1) !important;
+  word-break: break-all;
 }
 
 /* --- Leaderboard --- */
@@ -203,6 +206,7 @@ button {
   padding: 0.5rem 0;
   border-bottom: 1px solid rgba(255,255,255,0.3);
   word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* --- Entry Section --- */
