@@ -1,3 +1,4 @@
+// frontend/src/pages/RaffleDetail.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -35,8 +36,39 @@ const RaffleDetail = ({ wallet }) => {
       alert(`Minimum entry is ${raffle.creditConversion}`);
       return;
     }
-    // Implement your transaction code here using KasWare
-    alert("Transaction would be initiated here.");
+    // Here you would integrate with KasWare's functions for sending a transaction.
+    // For example, if it's a KAS raffle:
+    if (raffle.type === 'KAS') {
+      try {
+        const txid = await window.kasware.sendKaspa(
+          raffle.wallet.receivingAddress,
+          entryAmount * 1e8  // converting to sompi
+        );
+        alert(`Transaction sent: ${txid}`);
+      } catch (e) {
+        console.error(e);
+        alert('Transaction failed');
+      }
+    } else if (raffle.type === 'KRC20') {
+      try {
+        const transferJson = JSON.stringify({
+          p: "KRC-20",
+          op: "transfer",
+          tick: raffle.tokenTicker,
+          amt: (entryAmount * 1e8).toString(),
+          to: raffle.wallet.receivingAddress,
+        });
+        const txid = await window.kasware.signKRC20Transaction(
+          transferJson,
+          4,
+          raffle.wallet.receivingAddress
+        );
+        alert(`Transaction sent: ${txid}`);
+      } catch (e) {
+        console.error(e);
+        alert('Transaction failed');
+      }
+    }
   };
 
   if (loading) {
@@ -50,11 +82,12 @@ const RaffleDetail = ({ wallet }) => {
   return (
     <div className="raffle-detail page-container">
       <h1>{raffle.prize || 'Raffle Prize'}</h1>
-      <p>Type: {raffle.type}</p>
+      <p>
+        Conversion: {raffle.creditConversion} {raffle.type} = 1 Entry
+      </p>
       <p>Total Entries: {raffle.totalEntries}</p>
       <p>Current Entries: {raffle.currentEntries}</p>
       <p>Time Remaining: {new Date(raffle.timeFrame).toLocaleString()}</p>
-      <p>Minimum Entry: {raffle.creditConversion}</p>
       <div>
         <input
           type="number"
