@@ -1,3 +1,4 @@
+// frontend/src/components/WalletConnectModal.jsx
 import React from 'react';
 import '../styles.css';
 
@@ -19,7 +20,8 @@ const WalletConnectModal = ({ onConnect }) => {
   return (
     <div className="modal modal-centered">
       <div className="modal-content">
-        <h2>Connect Your KasWare Wallet</h2>
+        <h1>KASPA RAFFLES</h1>
+        <h3>Connect wallet to login</h3>
         <button onClick={handleConnect}>Connect Wallet</button>
       </div>
     </div>
