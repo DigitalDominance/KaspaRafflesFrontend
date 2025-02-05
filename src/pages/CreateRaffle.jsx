@@ -155,7 +155,8 @@ const CreateRaffle = ({ wallet }) => {
 
   return (
     <div className="create-raffle-page page-container">
-      <h1>Create a Raffle</h1>
+      {/* Centered global heading */}
+      <h1 className="global-heading">Create a Raffle</h1>
       <form onSubmit={handleSubmit} className="frosted-form">
         <div>
           <label>Raffle Type:</label>
