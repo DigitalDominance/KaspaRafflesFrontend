@@ -35,7 +35,7 @@ const Profile = ({ wallet }) => {
               to={`/raffle/${raffle.raffleId}`}
               className={`profile-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
             >
-              <h3>{raffle.prize || 'Raffle Prize'}</h3>
+              <h3>{raffle.prizeDisplay}</h3>
               <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
               <p>
                 {raffle.status === "live"
