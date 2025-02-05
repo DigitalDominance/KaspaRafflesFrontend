@@ -16,7 +16,7 @@ const CreateRaffle = ({ wallet }) => {
   const [confirmError, setConfirmError] = useState('');
   const navigate = useNavigate();
 
-  // Treasury wallet from environment variable
+  // Treasury wallet from env variable
   const treasuryWallet = process.env.REACT_APP_TREASURY_WALLET;
 
   // Check the host's balance before initiating the prize transaction.
@@ -63,6 +63,7 @@ const CreateRaffle = ({ wallet }) => {
     e.preventDefault();
     const isoDate = new Date(timeFrame).toISOString();
     if (!timeFrame || !creditConversion || !prizeAmount) {
+      setConfirmError('Please fill all required fields.');
       return;
     }
     if (raffleType === 'KRC20' && !tokenTicker) {
@@ -73,6 +74,11 @@ const CreateRaffle = ({ wallet }) => {
       setConfirmError('Please provide a token ticker for the prize.');
       return;
     }
+    
+    // Check prize balance BEFORE creating the raffle.
+    const hasFunds = await checkPrizeBalance();
+    if (!hasFunds) return;
+
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     const payload = {
       type: raffleType,
@@ -90,7 +96,7 @@ const CreateRaffle = ({ wallet }) => {
       if (res.data.success) {
         setShowConfirmModal(true);
         localStorage.setItem('newRaffleId', res.data.raffleId);
-        setConfirmError(''); // clear any previous errors
+        setConfirmError('');
       }
     } catch (err) {
       console.error("Error creating raffle:", err.response ? err.response.data : err.message);
@@ -99,10 +105,8 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   const handleConfirmPrize = async () => {
-    setConfirmError(''); // clear previous error before starting
-    const hasFunds = await checkPrizeBalance();
-    if (!hasFunds) return;
-    
+    setConfirmError('');
+    // Balance already checked in handleSubmit, but you can re-check here if desired.
     setConfirming(true);
     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
     let txid;
@@ -184,11 +188,19 @@ const CreateRaffle = ({ wallet }) => {
         )}
         <div>
           <label>Time Frame (end date/time):</label>
-          <input type="datetime-local" value={timeFrame} onChange={(e) => setTimeFrame(e.target.value)} />
+          <input
+            type="datetime-local"
+            value={timeFrame}
+            onChange={(e) => setTimeFrame(e.target.value)}
+          />
         </div>
         <div>
           <label>Credit Conversion (tokens per entry):</label>
-          <input type="number" value={creditConversion} onChange={(e) => setCreditConversion(e.target.value)} />
+          <input
+            type="number"
+            value={creditConversion}
+            onChange={(e) => setCreditConversion(e.target.value)}
+          />
         </div>
         <div>
           <label>Prize Type:</label>
@@ -225,7 +237,11 @@ const CreateRaffle = ({ wallet }) => {
         )}
         <div>
           <label>Prize Amount:</label>
-          <input type="number" value={prizeAmount} onChange={(e) => setPrizeAmount(e.target.value)} />
+          <input
+            type="number"
+            value={prizeAmount}
+            onChange={(e) => setPrizeAmount(e.target.value)}
+          />
         </div>
         <button type="submit">Create Raffle</button>
       </form>
@@ -234,7 +250,7 @@ const CreateRaffle = ({ wallet }) => {
       {confirmError && !showConfirmModal && (
         <div className="error-message" style={{ marginTop: '1rem', color: 'red', textAlign: 'center' }}>
           {confirmError}
-          <button onClick={() => setConfirmError('')} style={{ marginLeft: '1rem' }}>X</button>
+          <button className="close-button" onClick={() => setConfirmError('')} style={{ marginLeft: '1rem' }}>×</button>
         </div>
       )}
 
@@ -246,7 +262,7 @@ const CreateRaffle = ({ wallet }) => {
           {confirmError ? (
             <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
               <p style={{ color: 'red' }}>{confirmError}</p>
-              <button className="close-button" onClick={handleCloseModal}>Close</button>
+              <button className="close-button" onClick={handleCloseModal}>×</button>
             </div>
           ) : (
             <>
