@@ -13,6 +13,7 @@ const Home = () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles`);
       if (res.data.success) {
+        // Sort by currentEntries descending (you can adjust this sorting if needed)
         const sorted = res.data.raffles.sort((a, b) => b.currentEntries - a.currentEntries);
         setRaffles(sorted);
       }
@@ -44,7 +45,8 @@ const Home = () => {
 
   return (
     <div className="home page-container">
-      <h1>Popular Raffles</h1>
+      {/* Using global-heading for centered main heading */}
+      <h1 className="global-heading">Popular Raffles</h1>
       <div className="raffles-grid">
         {currentRaffles.map((raffle) => (
           <Link
@@ -53,7 +55,11 @@ const Home = () => {
             className={`home-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
           >
             <h3>{raffle.prizeDisplay}</h3>
-            <p>{raffle.status === "live" ? getTimeLeft(raffle.timeFrame, raffle.status) : "Completed"}</p>
+            <p>
+              {raffle.status === "live"
+                ? getTimeLeft(raffle.timeFrame, raffle.status)
+                : "Completed"}
+            </p>
             <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
             {raffle.status === "completed" && raffle.winner && (
               <p style={{ wordWrap: 'break-word' }}>Winner: {raffle.winner}</p>
