@@ -26,7 +26,7 @@ const CreateRaffle = ({ wallet }) => {
         const balance = await window.kasware.getBalance();
         // Multiply prizeAmount (in plain KAS) by 1e8 to get the required sompi.
         const required = parseFloat(prizeAmount) * 1e8;
-        if (balance.confirmed < required) {
+        if (balance.total < required) {
           setConfirmError('Insufficient KAS balance in your wallet.');
           return false;
         }
