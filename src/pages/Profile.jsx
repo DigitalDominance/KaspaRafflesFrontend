@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 
 const Profile = ({ wallet }) => {
   const [myRaffles, setMyRaffles] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
     const fetchMyRaffles = async () => {
       try {
-        // Use the API URL from environment variable
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/raffles?creator=${wallet.address}`);
+        const res = await axios.get(`${apiUrl}/raffles?creator=${wallet.address}`);
         if (res.data.success) {
           setMyRaffles(res.data.raffles);
         }
@@ -18,10 +18,10 @@ const Profile = ({ wallet }) => {
       }
     };
     fetchMyRaffles();
-  }, [wallet.address]);
+  }, [wallet.address, apiUrl]);
 
   return (
-    <div className="profile-page">
+    <div className="profile-page page-container">
       <h1>My Raffles</h1>
       {myRaffles.length === 0 ? (
         <p>You haven't created any raffles yet.</p>
