@@ -63,7 +63,6 @@ const CreateRaffle = ({ wallet }) => {
     e.preventDefault();
     const isoDate = new Date(timeFrame).toISOString();
     if (!timeFrame || !creditConversion || !prizeAmount) {
-      // You can also set a form-level error here if desired.
       return;
     }
     if (raffleType === 'KRC20' && !tokenTicker) {
@@ -139,6 +138,12 @@ const CreateRaffle = ({ wallet }) => {
     } finally {
       setConfirming(false);
     }
+  };
+
+  // Handler to cancel/close the confirm modal
+  const handleCloseModal = () => {
+    setShowConfirmModal(false);
+    setConfirmError('');
   };
 
   return (
@@ -226,7 +231,8 @@ const CreateRaffle = ({ wallet }) => {
         <button type="submit">Create Raffle</button>
       </form>
 
-      {confirmError && (
+      {/* Inline error message outside the modal if needed */}
+      {confirmError && !showConfirmModal && (
         <div className="error-message" style={{ marginTop: '1rem', color: 'red', textAlign: 'center' }}>
           {confirmError}
           <button onClick={() => setConfirmError('')} style={{ marginLeft: '1rem' }}>X</button>
@@ -235,15 +241,17 @@ const CreateRaffle = ({ wallet }) => {
 
       {showConfirmModal && (
         <div className="processing-modal">
+          <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+            <button onClick={handleCloseModal} style={{ fontSize: '1.5rem', background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>×</button>
+          </div>
           {confirmError ? (
-            // If there's an error, show an "X" icon or message instead of spinner.
             <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
               <p style={{ color: 'red' }}>{confirmError}</p>
-              <button onClick={() => setConfirmError('')}>Close</button>
+              <button onClick={handleCloseModal}>Close</button>
             </div>
           ) : (
             <>
-              <div className="spinner"></div>
+              {!confirming && <div className="spinner"></div>}
               <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                 <p>
                   Please send {prizeAmount} {prizeType === "KAS" ? "KAS" : prizeTicker.trim().toUpperCase()} to begin the raffle:
