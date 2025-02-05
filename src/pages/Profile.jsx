@@ -8,8 +8,8 @@ const Profile = ({ wallet }) => {
   useEffect(() => {
     const fetchMyRaffles = async () => {
       try {
-        // Extend your backend to support filtering by creator if desired.
-        const res = await axios.get(`/api/raffles?creator=${wallet.address}`);
+        // Use the API URL from environment variable
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/raffles?creator=${wallet.address}`);
         if (res.data.success) {
           setMyRaffles(res.data.raffles);
         }
