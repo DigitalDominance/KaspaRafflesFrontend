@@ -115,15 +115,6 @@ body {
 }
 
 /* Leaderboard styling */
-.leaderboard {
-  margin-top: 2rem;
-}
-
-.leaderboard-entry {
-  padding: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-}
-
 /* Entry section styling */
 .entry-section {
   margin-top: 1.5rem;
@@ -182,6 +173,17 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Leaderboard styling */
+.leaderboard {
+  margin-top: 2rem;
+}
+
+.leaderboard-entry {
+  padding: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 
 /* Frosted form styling */
 .frosted-form {
