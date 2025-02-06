@@ -12,6 +12,7 @@ const RaffleDetail = ({ wallet }) => {
   const [entryAmount, setEntryAmount] = useState('');
   const [entryError, setEntryError] = useState('');
   const [entryPage, setEntryPage] = useState(1);
+  const [connectedAddress, setConnectedAddress] = useState('');
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -25,6 +26,18 @@ const RaffleDetail = ({ wallet }) => {
     return `${hours}h ${minutes}m ${seconds}s`;
   };
 
+  // Helper: Fetch connected KasWare address.
+  const getConnectedAddress = async () => {
+    try {
+      const accounts = await window.kasware.getAccounts();
+      return accounts[0];
+    } catch (err) {
+      console.error('Error fetching connected account:', err);
+      return null;
+    }
+  };
+
+  // Fetch raffle details.
   const fetchRaffle = async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}`);
@@ -41,17 +54,28 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
+  // On mount, fetch raffle and connected address.
   useEffect(() => {
     fetchRaffle();
-    const interval = setInterval(fetchRaffle, 1000);
+    const updateConnectedAddress = async () => {
+      const addr = await getConnectedAddress();
+      if (addr) {
+        setConnectedAddress(addr);
+      }
+    };
+    updateConnectedAddress();
+    const interval = setInterval(() => {
+      fetchRaffle();
+      updateConnectedAddress();
+    }, 1000);
     return () => clearInterval(interval);
   }, [raffleId, apiUrl]);
 
-  // Compute the total entries for the currently connected wallet.
+  // Compute My Entries by filtering raffle entries by the connected address.
   const myEntries =
     raffle && raffle.entries && Array.isArray(raffle.entries)
       ? raffle.entries
-          .filter((entry) => entry.walletAddress === wallet.address)
+          .filter((entry) => entry.walletAddress === connectedAddress)
           .reduce((sum, entry) => sum + entry.creditsAdded, 0)
       : 0;
 
@@ -106,7 +130,7 @@ const RaffleDetail = ({ wallet }) => {
     }
     const hasFunds = await checkEntryBalance();
     if (!hasFunds) return;
-
+    
     setProcessing(true);
     try {
       let txid;
