@@ -47,6 +47,14 @@ const RaffleDetail = ({ wallet }) => {
     return () => clearInterval(interval);
   }, [raffleId, apiUrl]);
 
+  // Compute the total entries for the currently connected wallet.
+  const myEntries =
+    raffle && raffle.entries && Array.isArray(raffle.entries)
+      ? raffle.entries
+          .filter((entry) => entry.walletAddress === wallet.address)
+          .reduce((sum, entry) => sum + entry.creditsAdded, 0)
+      : 0;
+
   // Check if the user has sufficient balance for the entry.
   const checkEntryBalance = async () => {
     if (!entryAmount || !raffle) return false;
@@ -98,14 +106,14 @@ const RaffleDetail = ({ wallet }) => {
     }
     const hasFunds = await checkEntryBalance();
     if (!hasFunds) return;
-    
+
     setProcessing(true);
     try {
       let txid;
       if (raffle.type === 'KAS') {
         txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
-          parseFloat(entryAmount) * 1e8
+          parseFloat(entryAmount) * 1e8  // converting to sompi
         );
       } else if (raffle.type === 'KRC20') {
         const transferJson = JSON.stringify({
@@ -121,19 +129,20 @@ const RaffleDetail = ({ wallet }) => {
           raffle.wallet.receivingAddress
         );
       }
+      // If txid is falsy, assume the transaction was cancelled or failed.
       if (!txid) {
         setEntryError("Transaction was cancelled or failed. Entry not recorded.");
         setProcessing(false);
         return;
       }
       console.log("Transaction sent, txid:", txid);
+      // Post the TXID along with entry details to our backend.
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
         txid,
         walletAddress: wallet.address,
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
-        // Instead of alert, you could set a success message if desired.
         alert("Entry recorded successfully.");
       } else {
         alert("Entry recording failed.");
@@ -165,6 +174,7 @@ const RaffleDetail = ({ wallet }) => {
 
   return (
     <div className="raffle-detail page-container">
+      {/* Main heading for raffle detail remains left-aligned */}
       <h1>{raffle.prizeDisplay}</h1>
       <div className="raffle-detail-container">
         {raffle.status === "live" ? (
@@ -176,7 +186,7 @@ const RaffleDetail = ({ wallet }) => {
           </>
         )}
         <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
-        <p>Current Entries: {raffle.currentEntries.toFixed(2)}</p>
+        <p>My Entries: {myEntries.toFixed(2)}</p>
         <p>
           {raffle.status === "live"
             ? `Time Remaining: ${getTimeLeft(raffle.timeFrame)}`
