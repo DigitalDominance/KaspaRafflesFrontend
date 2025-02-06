@@ -71,7 +71,7 @@ const RaffleDetail = ({ wallet }) => {
     return () => clearInterval(interval);
   }, [raffleId, apiUrl]);
 
-  // Compute My Entries by filtering raffle entries by the connected address.
+  // Compute "My Entries" by filtering raffle entries by the connected address.
   const myEntries =
     raffle && raffle.entries && Array.isArray(raffle.entries)
       ? raffle.entries
@@ -130,14 +130,14 @@ const RaffleDetail = ({ wallet }) => {
     }
     const hasFunds = await checkEntryBalance();
     if (!hasFunds) return;
-    
+
     setProcessing(true);
     try {
       let txid;
       if (raffle.type === 'KAS') {
         txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
-          parseFloat(entryAmount) * 1e8  // converting to sompi
+          parseFloat(entryAmount) * 1e8 // converting to sompi
         );
       } else if (raffle.type === 'KRC20') {
         const transferJson = JSON.stringify({
@@ -181,12 +181,25 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // Pagination for leaderboard: sort entries by confirmedAt descending.
-  const sortedEntries = raffle && raffle.entries && raffle.entries.length > 0
-    ? [...raffle.entries].sort((a, b) => new Date(b.confirmedAt) - new Date(a.confirmedAt))
+  // Aggregate raffle entries by wallet.
+  const aggregatedEntries = raffle && raffle.entries
+    ? Object.values(
+        raffle.entries.reduce((acc, entry) => {
+          if (!acc[entry.walletAddress]) {
+            acc[entry.walletAddress] = { walletAddress: entry.walletAddress, creditsAdded: 0 };
+          }
+          acc[entry.walletAddress].creditsAdded += entry.creditsAdded;
+          return acc;
+        }, {})
+      )
     : [];
-  const totalEntryPages = Math.ceil(sortedEntries.length / entriesPerPage);
-  const displayedEntries = sortedEntries.slice((entryPage - 1) * entriesPerPage, entryPage * entriesPerPage);
+
+  // Sort aggregated entries descending by total credits.
+  const sortedAggregated = aggregatedEntries.sort((a, b) => b.creditsAdded - a.creditsAdded);
+
+  // Pagination for aggregated leaderboard.
+  const totalEntryPages = Math.ceil(sortedAggregated.length / entriesPerPage);
+  const displayedEntries = sortedAggregated.slice((entryPage - 1) * entriesPerPage, entryPage * entriesPerPage);
 
   if (loading) {
     return <div className="page-container"><p>Loading raffle...</p></div>;
