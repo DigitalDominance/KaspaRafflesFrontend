@@ -282,7 +282,7 @@ button {
 
 /* --- Raffle Detail Container --- */
 .raffle-detail-container {
-  max-width: 40vw
+  max-width: 40vw;
   background: #8a2be2 !important;
   border: 2px solid #8a2be2 !important;
   border-radius: 16px;
