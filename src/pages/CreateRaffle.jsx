@@ -63,15 +63,24 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   // Handle form submission.
-  // Also ensure the raffle end time is at least 24 hours in the future.
+  // Validates that the raffle end time is at least 24 hours in the future and no more than 5 days.
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const minTime = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    if (new Date(timeFrame) < minTime) {
+    const now = Date.now();
+    const minTime = new Date(now + 24 * 60 * 60 * 1000);
+    const maxTime = new Date(now + 5 * 24 * 60 * 60 * 1000);
+    const selectedTime = new Date(timeFrame);
+
+    if (selectedTime < minTime) {
       setConfirmError("Raffle must last at least 24 hours from now.");
       return;
     }
-    const isoDate = new Date(timeFrame).toISOString();
+    if (selectedTime > maxTime) {
+      setConfirmError("Raffle duration must not exceed 5 days.");
+      return;
+    }
+
+    const isoDate = selectedTime.toISOString();
     if (!timeFrame || !creditConversion || !prizeAmount) {
       setConfirmError('Please fill all required fields.');
       return;
@@ -159,7 +168,7 @@ const CreateRaffle = ({ wallet }) => {
 
   return (
     <div className="create-raffle-page page-container">
-      {/* Centered main heading using the global-heading class */}
+      {/* Global heading is centered on pages that use the global-heading class */}
       <h1 className="global-heading">Create a Raffle</h1>
       <form onSubmit={handleSubmit} className="frosted-form">
         <div>
