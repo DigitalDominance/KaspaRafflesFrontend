@@ -54,7 +54,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // On mount, fetch raffle and connected address.
+  // On mount, fetch raffle and update connected address.
   useEffect(() => {
     fetchRaffle();
     const updateConnectedAddress = async () => {
@@ -131,13 +131,20 @@ const RaffleDetail = ({ wallet }) => {
     const hasFunds = await checkEntryBalance();
     if (!hasFunds) return;
 
+    // Re-check connected wallet address before proceeding.
+    const currentAddress = await getConnectedAddress();
+    if (!currentAddress) {
+      setEntryError("Could not verify connected wallet address.");
+      return;
+    }
+
     setProcessing(true);
     try {
       let txid;
       if (raffle.type === 'KAS') {
         txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
-          parseFloat(entryAmount) * 1e8 // converting to sompi
+          parseFloat(entryAmount) * 1e8  // converting to sompi
         );
       } else if (raffle.type === 'KRC20') {
         const transferJson = JSON.stringify({
@@ -163,7 +170,7 @@ const RaffleDetail = ({ wallet }) => {
       // Post the TXID along with entry details to our backend.
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
         txid,
-        walletAddress: wallet.address,
+        walletAddress: currentAddress, // Use the re-checked wallet address
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
