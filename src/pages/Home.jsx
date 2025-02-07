@@ -57,8 +57,8 @@ const Home = () => {
             {raffle.status === "live" ? (
               <>
                 <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
-                <p>Winners: {raffle.winnersCount}</p>
-                <p>{getTimeLeft(raffle.timeFrame, raffle.status)}</p>
+                <p>Winner Amount: {raffle.winnersCount}</p>
+                <p>Time Remaining:{getTimeLeft(raffle.timeFrame, raffle.status)}</p>
               </>
             ) : (
               <>
