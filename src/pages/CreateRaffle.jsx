@@ -11,6 +11,9 @@ const CreateRaffle = ({ wallet }) => {
   const [prizeType, setPrizeType] = useState('KAS');
   const [prizeTicker, setPrizeTicker] = useState(''); // for KRC20 prize
   const [prizeAmount, setPrizeAmount] = useState('');
+  // New state for winners count – only allow numbers.
+  const [winnersCount, setWinnersCount] = useState(1);
+  
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState('');
@@ -63,7 +66,6 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   // Handle form submission.
-  // Validates that the raffle end time is at least 24 hours in the future and no more than 5 days.
   const handleSubmit = async (e) => {
     e.preventDefault();
     const now = Date.now();
@@ -80,7 +82,6 @@ const CreateRaffle = ({ wallet }) => {
       return;
     }
 
-    const isoDate = selectedTime.toISOString();
     if (!timeFrame || !creditConversion || !prizeAmount) {
       setConfirmError('Please fill all required fields.');
       return;
@@ -93,6 +94,11 @@ const CreateRaffle = ({ wallet }) => {
       setConfirmError('Please provide a token ticker for the prize.');
       return;
     }
+    // Validate winnersCount input: ensure it is a positive number.
+    if (!winnersCount || isNaN(winnersCount) || winnersCount < 1) {
+      setConfirmError('Please enter a valid number of winners (must be at least 1).');
+      return;
+    }
     // Check funds before proceeding.
     const hasFunds = await checkPrizeBalance();
     if (!hasFunds) return;
@@ -102,7 +108,6 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   // Handle prize confirmation using KasWare.
-  // Only if a valid TXID is returned, create the raffle.
   const handleConfirmPrize = async () => {
     setConfirmError('');
     const hasFunds = await checkPrizeBalance();
@@ -124,7 +129,6 @@ const CreateRaffle = ({ wallet }) => {
         });
         txid = await window.kasware.signKRC20Transaction(transferJson, 4, treasuryWallet);
       }
-      // If the transaction is cancelled or fails, txid will be falsy.
       if (!txid) {
         setConfirmError("Transaction was cancelled or failed. Raffle not created.");
         setConfirming(false);
@@ -142,7 +146,8 @@ const CreateRaffle = ({ wallet }) => {
         treasuryAddress: treasuryWallet,
         tokenTicker: raffleType === 'KRC20' ? tokenTicker.trim().toUpperCase() : undefined,
         prizeTicker: prizeType === 'KRC20' ? prizeTicker.trim().toUpperCase() : undefined,
-        prizeTransactionId: txid
+        prizeTransactionId: txid,
+        winnersCount: parseInt(winnersCount, 10)  // send the winners count
       };
       const res = await axios.post(`${apiUrl}/raffles/create`, payload);
       if (res.data.success) {
@@ -160,7 +165,6 @@ const CreateRaffle = ({ wallet }) => {
     }
   };
 
-  // Handler to close/cancel the confirmation modal.
   const handleCloseModal = () => {
     setShowConfirmModal(false);
     setConfirmError('');
@@ -168,7 +172,6 @@ const CreateRaffle = ({ wallet }) => {
 
   return (
     <div className="create-raffle-page page-container">
-      {/* Global heading is centered on pages that use the global-heading class */}
       <h1 className="global-heading">Create a Raffle</h1>
       <form onSubmit={handleSubmit} className="frosted-form">
         <div>
@@ -261,10 +264,19 @@ const CreateRaffle = ({ wallet }) => {
             onChange={(e) => setPrizeAmount(e.target.value)}
           />
         </div>
+        {/* New Winners input */}
+        <div>
+          <label>Winners:</label>
+          <input
+            type="number"
+            min="1"
+            value={winnersCount}
+            onChange={(e) => setWinnersCount(e.target.value)}
+          />
+        </div>
         <button type="submit">Create Raffle</button>
       </form>
 
-      {/* Inline error message */}
       {confirmError && !showConfirmModal && (
         <div className="message error" style={{ marginTop: '1rem', textAlign: 'center' }}>
           {confirmError}
@@ -272,7 +284,6 @@ const CreateRaffle = ({ wallet }) => {
         </div>
       )}
 
-      {/* Inline success message */}
       {successMessage && (
         <div className="message success" style={{ marginTop: '1rem', textAlign: 'center' }}>
           {successMessage}
