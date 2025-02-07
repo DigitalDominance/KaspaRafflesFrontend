@@ -94,9 +94,13 @@ const CreateRaffle = ({ wallet }) => {
       setConfirmError('Please provide a token ticker for the prize.');
       return;
     }
-    // Validate winnersCount input: ensure it is a positive number.
+    // Validate winnersCount input: ensure it is a positive number and does not exceed 5.
     if (!winnersCount || isNaN(winnersCount) || winnersCount < 1) {
       setConfirmError('Please enter a valid number of winners (must be at least 1).');
+      return;
+    }
+    if (winnersCount > 5) {
+      setConfirmError('Maximum allowed winners is 5.');
       return;
     }
     // Check funds before proceeding.
