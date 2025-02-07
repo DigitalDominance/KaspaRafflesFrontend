@@ -13,7 +13,7 @@ const Home = () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles`);
       if (res.data.success) {
-        // Sort by currentEntries descending (you can adjust this sorting if needed)
+        // Sort by currentEntries descending (or adjust as needed)
         const sorted = res.data.raffles.sort((a, b) => b.currentEntries - a.currentEntries);
         setRaffles(sorted);
       }
@@ -45,7 +45,6 @@ const Home = () => {
 
   return (
     <div className="home page-container">
-      {/* Using global-heading for centered main heading */}
       <h1 className="global-heading">Popular Raffles</h1>
       <div className="raffles-grid">
         {currentRaffles.map((raffle) => (
@@ -55,25 +54,39 @@ const Home = () => {
             className={`home-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
           >
             <h3>{raffle.prizeDisplay}</h3>
-            <p>
-              {raffle.status === "live"
-                ? getTimeLeft(raffle.timeFrame, raffle.status)
-                : "Completed"}
-            </p>
-            <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
-            {raffle.status === "completed" && raffle.winner && (
-              <p style={{ wordWrap: 'break-word' }}>Winner: {raffle.winner}</p>
+            {raffle.status === "live" ? (
+              <>
+                <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
+                <p>Winners: {raffle.winnersCount}</p>
+                <p>{getTimeLeft(raffle.timeFrame, raffle.status)}</p>
+              </>
+            ) : (
+              <>
+                {raffle.winnersCount > 1 ? (
+                  <p>Winners: View Here</p>
+                ) : (
+                  <p>Winner: {raffle.winner ? raffle.winner : "No Entries"}</p>
+                )}
+              </>
             )}
           </Link>
         ))}
       </div>
       {totalPages > 1 && (
         <div className="pagination">
-          <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}>Previous</button>
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
           <span>Page {currentPage} of {totalPages}</span>
-          <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}>Next</button>
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
         </div>
       )}
     </div>
