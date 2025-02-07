@@ -9,7 +9,6 @@ const Profile = () => {
   const rafflesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  // Fetch the currently connected Kaspa address using KasWare.
   const getConnectedAddress = async () => {
     try {
       const accounts = await window.kasware.getAccounts();
@@ -20,7 +19,6 @@ const Profile = () => {
     }
   };
 
-  // Fetch raffles for the connected account.
   const fetchMyRaffles = async () => {
     try {
       const currentAddress = await getConnectedAddress();
@@ -28,17 +26,12 @@ const Profile = () => {
       
       const res = await axios.get(`${apiUrl}/raffles?creator=${currentAddress}`);
       if (res.data.success) {
-        // Separate live and completed raffles.
         const live = res.data.raffles.filter(r => r.status === 'live');
         const completed = res.data.raffles.filter(r => r.status !== 'live');
 
-        // Sort live raffles: ending soonest first.
         live.sort((a, b) => new Date(a.timeFrame) - new Date(b.timeFrame));
-
-        // Sort completed raffles: most recently completed first.
         completed.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
 
-        // Merge arrays: live ones first, then completed.
         const sortedRaffles = [...live, ...completed];
         setMyRaffles(sortedRaffles);
       }
@@ -48,11 +41,9 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    // Re-check the connected account and fetch raffles every time the page loads.
     fetchMyRaffles();
   }, [apiUrl]);
 
-  // Pagination calculations.
   const indexOfLast = currentPage * rafflesPerPage;
   const indexOfFirst = indexOfLast - rafflesPerPage;
   const currentRaffles = myRaffles.slice(indexOfFirst, indexOfLast);
@@ -60,7 +51,6 @@ const Profile = () => {
 
   return (
     <div className="profile-page page-container">
-      {/* Global heading is centered using the global-heading class */}
       <h1 className="global-heading">My Raffles</h1>
       {myRaffles.length === 0 ? (
         <p>You haven't created any raffles yet.</p>
@@ -74,12 +64,21 @@ const Profile = () => {
                 className={`profile-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
               >
                 <h3>{raffle.prizeDisplay}</h3>
-                <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
-                <p>
-                  {raffle.status === "live"
-                    ? `Time Left: ${new Date(raffle.timeFrame).toLocaleString()}`
-                    : `Completed - Winner: ${raffle.winner ? raffle.winner : "No Entries"}`}
-                </p>
+                {raffle.status === "live" ? (
+                  <>
+                    <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
+                    <p>Winners: {raffle.winnersCount}</p>
+                    <p>Time Left: {new Date(raffle.timeFrame).toLocaleString()}</p>
+                  </>
+                ) : (
+                  <>
+                    {raffle.winnersCount > 1 ? (
+                      <p>Winners: View Here</p>
+                    ) : (
+                      <p>Winner: {raffle.winner ? raffle.winner : "No Entries"}</p>
+                    )}
+                  </>
+                )}
               </Link>
             ))}
           </div>
