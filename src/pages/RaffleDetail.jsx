@@ -218,24 +218,46 @@ const RaffleDetail = ({ wallet }) => {
 
   return (
     <div className="raffle-detail page-container">
-      {/* Main heading for raffle detail remains left-aligned */}
+      {/* Main heading for raffle detail */}
       <h1>{raffle.prizeDisplay}</h1>
       <div className="raffle-detail-container">
         {raffle.status === "live" ? (
-          <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
+          <>
+            <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
+            <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
+            <p>My Entries: {myEntries.toFixed(2)}</p>
+            <p>Time Remaining: {getTimeLeft(raffle.timeFrame)}</p>
+          </>
         ) : (
           <>
             <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
-            <p><strong>Winner: {raffle.winner ? raffle.winner : "No Entries"}</strong></p>
+            <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
+            <p>My Entries: {myEntries.toFixed(2)}</p>
+            <p>Status: Completed</p>
           </>
         )}
-        <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
-        <p>My Entries: {myEntries.toFixed(2)}</p>
-        <p>
-          {raffle.status === "live"
-            ? `Time Remaining: ${getTimeLeft(raffle.timeFrame)}`
-            : "Completed"}
-        </p>
+        {/* New Winners row */}
+        <p>Winners: {raffle.winnersCount}</p>
+        {raffle.status === "completed" && (
+          <>
+            {raffle.winnersCount > 1 ? (
+              <div className="winners-list">
+                <h3>Winners List:</h3>
+                {raffle.winnersList && raffle.winnersList.length > 0 ? (
+                  raffle.winnersList.map((winner, index) => (
+                    <p key={index}>
+                      {index + 1}. {winner}
+                    </p>
+                  ))
+                ) : (
+                  <p>No winners selected.</p>
+                )}
+              </div>
+            ) : (
+              <p><strong>Winner: {raffle.winner ? raffle.winner : "No winner selected"}</strong></p>
+            )}
+          </>
+        )}
       </div>
       {raffle.status === "live" && (
         <div className="entry-section">
