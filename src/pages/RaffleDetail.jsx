@@ -85,7 +85,6 @@ const RaffleDetail = ({ wallet }) => {
     if (raffle.type === 'KAS') {
       try {
         const balance = await window.kasware.getBalance();
-        // Multiply entryAmount (in plain KAS) by 1e8 to get required sompi.
         const required = parseFloat(entryAmount) * 1e8;
         if (balance.total < required) {
           setEntryError('Insufficient KAS balance for entry.');
@@ -131,7 +130,6 @@ const RaffleDetail = ({ wallet }) => {
     const hasFunds = await checkEntryBalance();
     if (!hasFunds) return;
 
-    // Re-check connected wallet address before proceeding.
     const currentAddress = await getConnectedAddress();
     if (!currentAddress) {
       setEntryError("Could not verify connected wallet address.");
@@ -144,7 +142,7 @@ const RaffleDetail = ({ wallet }) => {
       if (raffle.type === 'KAS') {
         txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
-          parseFloat(entryAmount) * 1e8  // converting to sompi
+          parseFloat(entryAmount) * 1e8
         );
       } else if (raffle.type === 'KRC20') {
         const transferJson = JSON.stringify({
@@ -160,17 +158,15 @@ const RaffleDetail = ({ wallet }) => {
           raffle.wallet.receivingAddress
         );
       }
-      // If txid is falsy, assume the transaction was cancelled or failed.
       if (!txid) {
         setEntryError("Transaction was cancelled or failed. Entry not recorded.");
         setProcessing(false);
         return;
       }
       console.log("Transaction sent, txid:", txid);
-      // Post the TXID along with entry details to our backend.
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
         txid,
-        walletAddress: currentAddress, // Use the re-checked wallet address
+        walletAddress: currentAddress,
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
@@ -208,7 +204,6 @@ const RaffleDetail = ({ wallet }) => {
   const totalEntryPages = Math.ceil(sortedAggregated.length / entriesPerPage);
   const displayedEntries = sortedAggregated.slice((entryPage - 1) * entriesPerPage, entryPage * entriesPerPage);
 
-  // Guard: if raffle is still null (shouldn't happen once loading is false), display a message.
   if (!raffle) {
     return <div className="page-container"><p>No raffle data available.</p></div>;
   }
@@ -216,9 +211,8 @@ const RaffleDetail = ({ wallet }) => {
   // Prepare prize dispersal information (only for completed raffles)
   let prizeDispersalInfo = null;
   if (raffle.status === "completed") {
-    // Determine winners: if winnersList exists, use it; otherwise, use raffle.winner.
-    const winners = (raffle.winnersList && raffle.winnersList.length > 0) 
-                      ? raffle.winnersList 
+    const winners = (raffle.winnersList && raffle.winnersList.length > 0)
+                      ? raffle.winnersList
                       : (raffle.winner && raffle.winner !== "No Entries" ? [raffle.winner] : []);
     // Group prize dispersal TXIDs by winner.
     const txidByWinner = {};
@@ -232,16 +226,27 @@ const RaffleDetail = ({ wallet }) => {
     }
     prizeDispersalInfo = winners.map((winner, idx) => {
       const prizeSent = txidByWinner[winner] && txidByWinner[winner].length > 0;
+      // If not yet sent, show "In Progress...", if sent then "Complete!"
+      const statusText = prizeSent ? "Complete!" : "In Progress...";
       return (
-        <div key={idx} className="prize-info" style={{ marginBottom: '1rem', padding: '0.5rem', border: '1px solid #ccc' }}>
-          <p><strong>Winner:</strong> {winner}</p>
-          <p><strong>Prize Sent:</strong> {prizeSent ? "True" : "False"}</p>
+        <div key={idx} className="prize-info">
+          <p className="prize-winner"><strong>Winner:</strong> {winner}</p>
+          <p className="prize-status"><strong>Prize Sent:</strong> {statusText}</p>
           {prizeSent && (
-            <div>
-              <p><strong>TXID(s):</strong></p>
-              <ul>
+            <div className="txid-container">
+              <p className="txid-label"><strong>TXID(s):</strong></p>
+              <ul className="txid-list">
                 {txidByWinner[winner].map((tx, txIdx) => (
-                  <li key={txIdx}>{tx}</li>
+                  <li key={txIdx}>
+                    <a
+                      className="txid-link"
+                      href={`https://kas.fyi/transaction/${tx}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {tx}
+                    </a>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -270,7 +275,6 @@ const RaffleDetail = ({ wallet }) => {
             <p>Status: Completed</p>
           </>
         )}
-        {/* Winners section */}
         {raffle.status === "completed" && (
           <>
             {raffle.winnersCount > 1 ? (
@@ -289,7 +293,6 @@ const RaffleDetail = ({ wallet }) => {
             ) : (
               <p><strong>Winner: {raffle.winner ? raffle.winner : "No winner selected"}</strong></p>
             )}
-            {/* Prize Dispersal Section */}
             <div className="prize-dispersal-section">
               <h3>Prize Dispersal Details</h3>
               {prizeDispersalInfo ? prizeDispersalInfo : <p>No prize transactions recorded.</p>}
@@ -310,9 +313,9 @@ const RaffleDetail = ({ wallet }) => {
         </div>
       )}
       {entryError && (
-        <div className="message error" style={{ marginTop: '1rem', textAlign: 'center' }}>
+        <div className="message error">
           {entryError}
-          <button className="close-button" onClick={() => setEntryError('')} style={{ marginLeft: '1rem' }}>×</button>
+          <button className="close-button" onClick={() => setEntryError('')}>×</button>
         </div>
       )}
       {processing && (
