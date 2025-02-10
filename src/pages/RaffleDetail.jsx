@@ -208,6 +208,11 @@ const RaffleDetail = ({ wallet }) => {
   const totalEntryPages = Math.ceil(sortedAggregated.length / entriesPerPage);
   const displayedEntries = sortedAggregated.slice((entryPage - 1) * entriesPerPage, entryPage * entriesPerPage);
 
+  // Guard: if raffle is still null (shouldn't happen once loading is false), display a message.
+  if (!raffle) {
+    return <div className="page-container"><p>No raffle data available.</p></div>;
+  }
+
   // Prepare prize dispersal information (only for completed raffles)
   let prizeDispersalInfo = null;
   if (raffle.status === "completed") {
@@ -244,14 +249,6 @@ const RaffleDetail = ({ wallet }) => {
         </div>
       );
     });
-  }
-
-  if (loading) {
-    return <div className="page-container"><p>Loading raffle...</p></div>;
-  }
-
-  if (error) {
-    return <div className="page-container"><p>{error}</p></div>;
   }
 
   return (
