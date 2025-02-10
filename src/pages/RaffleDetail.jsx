@@ -208,6 +208,44 @@ const RaffleDetail = ({ wallet }) => {
   const totalEntryPages = Math.ceil(sortedAggregated.length / entriesPerPage);
   const displayedEntries = sortedAggregated.slice((entryPage - 1) * entriesPerPage, entryPage * entriesPerPage);
 
+  // Prepare prize dispersal information (only for completed raffles)
+  let prizeDispersalInfo = null;
+  if (raffle.status === "completed") {
+    // Determine winners: if winnersList exists, use it; otherwise, use raffle.winner.
+    const winners = (raffle.winnersList && raffle.winnersList.length > 0) 
+                      ? raffle.winnersList 
+                      : (raffle.winner && raffle.winner !== "No Entries" ? [raffle.winner] : []);
+    // Group prize dispersal TXIDs by winner.
+    const txidByWinner = {};
+    if (raffle.prizeDispersalTxids && raffle.prizeDispersalTxids.length > 0) {
+      raffle.prizeDispersalTxids.forEach(record => {
+        if (!txidByWinner[record.winnerAddress]) {
+          txidByWinner[record.winnerAddress] = [];
+        }
+        txidByWinner[record.winnerAddress].push(record.txid);
+      });
+    }
+    prizeDispersalInfo = winners.map((winner, idx) => {
+      const prizeSent = txidByWinner[winner] && txidByWinner[winner].length > 0;
+      return (
+        <div key={idx} className="prize-info" style={{ marginBottom: '1rem', padding: '0.5rem', border: '1px solid #ccc' }}>
+          <p><strong>Winner:</strong> {winner}</p>
+          <p><strong>Prize Sent:</strong> {prizeSent ? "True" : "False"}</p>
+          {prizeSent && (
+            <div>
+              <p><strong>TXID(s):</strong></p>
+              <ul>
+                {txidByWinner[winner].map((tx, txIdx) => (
+                  <li key={txIdx}>{tx}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      );
+    });
+  }
+
   if (loading) {
     return <div className="page-container"><p>Loading raffle...</p></div>;
   }
@@ -218,7 +256,6 @@ const RaffleDetail = ({ wallet }) => {
 
   return (
     <div className="raffle-detail page-container">
-      {/* Main heading for raffle detail */}
       <h1>{raffle.prizeDisplay}</h1>
       <div className="raffle-detail-container">
         {raffle.status === "live" ? (
@@ -236,8 +273,7 @@ const RaffleDetail = ({ wallet }) => {
             <p>Status: Completed</p>
           </>
         )}
-        {/* New Winners row */}
-        <p>Winners: {raffle.winnersCount}</p>
+        {/* Winners section */}
         {raffle.status === "completed" && (
           <>
             {raffle.winnersCount > 1 ? (
@@ -256,6 +292,11 @@ const RaffleDetail = ({ wallet }) => {
             ) : (
               <p><strong>Winner: {raffle.winner ? raffle.winner : "No winner selected"}</strong></p>
             )}
+            {/* Prize Dispersal Section */}
+            <div className="prize-dispersal-section">
+              <h3>Prize Dispersal Details</h3>
+              {prizeDispersalInfo ? prizeDispersalInfo : <p>No prize transactions recorded.</p>}
+            </div>
           </>
         )}
       </div>
