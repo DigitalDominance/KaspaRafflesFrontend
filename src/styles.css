@@ -390,7 +390,50 @@ button {
   border: 1px solid green;
   color: green;
 }
+/* Prize Dispersal Section */
+.prize-dispersal-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 8px;
+}
+.prize-info {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #7bf8f9;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+.prize-info:hover {
+  background: rgba(123,248,249,0.1);
+}
+.prize-winner, .prize-status {
+  margin: 0.25rem 0;
+}
 
+/* TXID Link Styling */
+.txid-container {
+  margin-top: 0.5rem;
+}
+.txid-label {
+  margin-bottom: 0.25rem;
+}
+.txid-list {
+  list-style: none;
+  padding-left: 0;
+}
+.txid-list li {
+  margin: 0.25rem 0;
+}
+.txid-link {
+  color: #7bf8f9;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.txid-link:hover {
+  color: #ff69b4;
+  text-decoration: underline;
+}
 /* --- NEW: Winners List Animation & Styling --- */
 .winners-list {
   animation: fadeInUp 0.8s ease both;
