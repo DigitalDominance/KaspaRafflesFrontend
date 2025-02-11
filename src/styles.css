@@ -170,39 +170,110 @@ button {
 }
 
 /* --- Grid Layout for Home Page Cards --- */
-.home-grid {
+/* Updated Home Page Styles */
+.home {
+  padding: 2rem 0;
+}
+
+.home .global-heading {
+  font-size: 2.5rem;
+  color: #7bf8f9;
+  text-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
+  margin-bottom: 2rem;
+}
+
+.raffles-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
   width: 100%;
-  max-width: 90vw;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
-/* --- Home Page Cards (Popular Raffles) --- */
 .home-raffle-card {
-  background-color: #8a2be2 !important;
-  border: 2px solid #8a2be2 !important;
+  background: rgba(138, 43, 226, 0.2);
+  border: 2px solid #8a2be2;
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
   color: #fff;
   text-decoration: none;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-.home-raffle-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-}
-.home-raffle-card.completed {
-  background-color: rgba(30, 90, 120, 0.95) !important;
-  border: 2px solid rgba(30, 90, 120, 1) !important;
-  word-break: break-all;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
+.home-raffle-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(123, 248, 249, 0.4);
+}
+
+.home-raffle-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #7bf8f9;
+}
+
+.home-raffle-card p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.home-raffle-card.completed {
+  background: rgba(30, 90, 120, 0.2);
+  border-color: rgba(30, 90, 120, 1);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.pagination button {
+  background: rgba(123, 248, 249, 0.2);
+  border: 1px solid #7bf8f9;
+  color: #7bf8f9;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: rgba(123, 248, 249, 0.4);
+  transform: translateY(-2px);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  color: #7bf8f9;
+  margin: 0 1rem;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.time-remaining {
+  animation: pulse 2s infinite;
+  font-weight: bold;
+}
 /* --- My Raffles (Profile) Cards --- */
 .raffles-grid {
   display: grid;
