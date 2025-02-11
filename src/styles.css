@@ -571,6 +571,13 @@ button {
   margin-bottom: 1rem;
   color: #7bf8f9;
 }
+.text-content {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+}
 
 .raffle-info {
   display: flex;
