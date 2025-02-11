@@ -1,54 +1,63 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { motion } from "framer-motion"
-import "../styles.css"
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import '../styles.css';
 
 const Navbar = ({ wallet, onDisconnect }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleDisconnect = async () => {
     try {
-      const origin = window.location.origin
-      await window.kasware.disconnect(origin)
-      onDisconnect()
-      console.log("Wallet disconnected")
+      const origin = window.location.origin;
+      await window.kasware.disconnect(origin);
+      onDisconnect();
+      console.log('Wallet disconnected');
     } catch (e) {
-      console.error("Error disconnecting wallet:", e)
+      console.error('Error disconnecting wallet:', e);
     }
-  }
+  };
 
-  const toggleMenu = () => setIsOpen(!isOpen)
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
     <motion.nav
       className="navbar"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 120, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 20 }}
     >
       <div className="navbar-container">
-        <motion.div className="navbar-logo" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+        <motion.div
+          className="navbar-logo"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
           <Link to="/">KASPA RAFFLES</Link>
         </motion.div>
         <div className="navbar-menu">
-          <motion.div
-            className={`navbar-links ${isOpen ? "active" : ""}`}
-            initial={false}
-            animate={isOpen ? { height: "auto" } : { height: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link to="/profile">My Raffles</Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Link to="/create">Create Raffle</Link>
-            </motion.div>
-            <motion.button onClick={handleDisconnect} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              Disconnect Wallet
-            </motion.button>
-          </motion.div>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                className="navbar-links"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <NavLink to="/profile">My Raffles</NavLink>
+                <NavLink to="/create">Create Raffle</NavLink>
+                <motion.button
+                  onClick={handleDisconnect}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Disconnect Wallet
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <motion.div
             className="navbar-toggle"
             onClick={toggleMenu}
@@ -62,8 +71,21 @@ const Navbar = ({ wallet, onDisconnect }) => {
         </div>
       </div>
     </motion.nav>
-  )
-}
+  );
+};
 
-export default Navbar
+const NavLink = ({ to, children }) => (
+  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+    <Link to={to} className="nav-link">
+      {children}
+      <motion.div
+        className="link-underline"
+        initial={{ scaleX: 0 }}
+        whileHover={{ scaleX: 1 }}
+        transition={{ duration: 0.3 }}
+      />
+    </Link>
+  </motion.div>
+);
 
+export default Navbar;
