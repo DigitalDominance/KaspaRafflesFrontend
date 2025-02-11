@@ -575,7 +575,7 @@ button {
 .raffle-info {
   display: flex;
   align-items: left;
-  justify-content: center;
+  justify-content: left;
   margin-bottom: 0.5rem;
 }
 
