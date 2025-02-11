@@ -27,7 +27,7 @@ const Home = () => {
     fetchRaffles()
     const interval = setInterval(fetchRaffles, 1000)
     return () => clearInterval(interval)
-  }, [apiUrl, fetchRaffles]) // Added fetchRaffles to dependencies
+  }, [apiUrl]) // Removed fetchRaffles from dependencies
 
   const indexOfLast = currentPage * rafflesPerPage
   const indexOfFirst = indexOfLast - rafflesPerPage
