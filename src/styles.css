@@ -77,7 +77,7 @@ button {
 }
 
 .landing-heading {
-  font-size: 3.5rem;
+  font-size: 4rem;
   font-weight: 700;
   margin-bottom: 3rem;
   color: var(--text-color);
@@ -85,7 +85,7 @@ button {
 }
 
 .landing-subheading {
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 300;
   margin-bottom: 6rem;
   color: var(--text-color);
