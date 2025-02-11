@@ -574,7 +574,7 @@ button {
 .text-content {
   position: relative;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-70%);
   width: 100%;
   text-align: center;
 }
