@@ -83,7 +83,7 @@ const Profile = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <h1 className="global-heading">My Raffles</h1>
+      <h1 className="profile-heading">My Raffles</h1>
       {loading && <div className="profile-loading-spinner"></div>}
       {error && <p className="error-message">{error}</p>}
       {!loading && !error && myRaffles.length === 0 && (
