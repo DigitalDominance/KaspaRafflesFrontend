@@ -1137,7 +1137,13 @@ button {
   margin: 0 auto;
   padding: 2rem;
 }
-
+.create-raffle-page .global-heading {
+  font-size: 2.5rem;
+  color: #7bf8f9;
+  text-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+}
 .frosted-form {
   background: rgba(138, 212, 217, 0.1);
   padding: 2rem;
