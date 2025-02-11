@@ -34,7 +34,7 @@ button {
   padding: 0.75rem;
 }
 .footer-logo {
-  max-width: 120px;
+  max-width: 200px;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
