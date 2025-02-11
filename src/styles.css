@@ -523,10 +523,13 @@ button {
   min-height: 100vh;
 }
 
+.profile-page-container {
+  margin-top: 2rem;
+}
 /* --- Raffles Grid --- */
 .raffles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   width: 100%;
   margin: 0 auto;
