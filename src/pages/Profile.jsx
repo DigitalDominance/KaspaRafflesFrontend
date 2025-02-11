@@ -117,15 +117,15 @@ const Profile = () => {
                       <>
                         <div className="raffle-info">
                           <FaTrophy className="info-icon" />
-                          <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
+                          <p> className="text-content">Entries: {raffle.currentEntries.toFixed(2)}</p>
                         </div>
                         <div className="raffle-info">
                           <FaUsers className="info-icon" />
-                          <p>Winners: {raffle.winnersCount}</p>
+                          <p> className="text-content">Winners: {raffle.winnersCount}</p>
                         </div>
                         <div className="raffle-info">
                           <FaClock className="info-icon" />
-                          <p>Time Left: {getTimeLeft(raffle.timeFrame)}</p>
+                          <p> className="text-content">Time Left: {getTimeLeft(raffle.timeFrame)}</p>
                         </div>
                       </>
                     ) : (
