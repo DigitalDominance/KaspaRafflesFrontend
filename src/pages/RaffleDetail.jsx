@@ -1,7 +1,11 @@
-// frontend/src/pages/RaffleDetail.jsx
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaClock, FaCoins, FaTrophy, FaUserAlt } from 'react-icons/fa';
+import '../styles.css';
 
 const RaffleDetail = ({ wallet }) => {
   const { raffleId } = useParams();
@@ -69,7 +73,7 @@ const RaffleDetail = ({ wallet }) => {
       updateConnectedAddress();
     }, 1000);
     return () => clearInterval(interval);
-  }, [raffleId, apiUrl]);
+  }, [raffleId, apiUrl, fetchRaffle, getConnectedAddress]); // Added missing dependencies
 
   // Compute "My Entries" by filtering raffle entries by the connected address.
   const myEntries =
@@ -204,8 +208,16 @@ const RaffleDetail = ({ wallet }) => {
   const totalEntryPages = Math.ceil(sortedAggregated.length / entriesPerPage);
   const displayedEntries = sortedAggregated.slice((entryPage - 1) * entriesPerPage, entryPage * entriesPerPage);
 
+  if (loading) {
+    return (
+      <div className="raffle-detail page-container">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
   if (!raffle) {
-    return <div className="page-container"><p>No raffle data available.</p></div>;
+    return <div className="raffle-detail page-container"><p>No raffle data available.</p></div>;
   }
 
   // Prepare prize dispersal information (only for completed raffles)
@@ -229,7 +241,13 @@ const RaffleDetail = ({ wallet }) => {
       // If not yet sent, show "In Progress...", if sent then "Complete!"
       const statusText = prizeSent ? "Complete!" : "In Progress...";
       return (
-        <div key={idx} className="prize-info">
+        <motion.div 
+          key={idx} 
+          className="prize-info"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: idx * 0.1 }}
+        >
           <p className="prize-winner"><strong>Winner:</strong> {winner}</p>
           <p className="prize-status"><strong>Prize Sent:</strong> {statusText}</p>
           {prizeSent && (
@@ -251,57 +269,91 @@ const RaffleDetail = ({ wallet }) => {
               </ul>
             </div>
           )}
-        </div>
+        </motion.div>
       );
     });
   }
 
   return (
-    <div className="raffle-detail page-container">
-      <h1>{raffle.prizeDisplay}</h1>
-      <div className="raffle-detail-container">
-        {raffle.status === "live" ? (
-          <>
+    <motion.div 
+      className="raffle-detail page-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <h1 className="raffle-title">{raffle.prizeDisplay}</h1>
+      <motion.div 
+        className={`raffle-detail-container ${raffle.status === "completed" ? "completed" : ""}`}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="raffle-info">
+          <div className="info-item">
+            <FaCoins className="info-icon" />
             <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
+          </div>
+          <div className="info-item">
+            <FaTrophy className="info-icon" />
             <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
+          </div>
+          <div className="info-item">
+            <FaUserAlt className="info-icon" />
             <p>My Entries: {myEntries.toFixed(2)}</p>
-            <p>Time Remaining: {getTimeLeft(raffle.timeFrame)}</p>
-          </>
-        ) : (
-          <>
-            <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
-            <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
-            <p>My Entries: {myEntries.toFixed(2)}</p>
-            <p>Status: Completed</p>
-          </>
-        )}
+          </div>
+          {raffle.status === "live" ? (
+            <div className="info-item">
+              <FaClock className="info-icon" />
+              <p>Time Remaining: {getTimeLeft(raffle.timeFrame)}</p>
+            </div>
+          ) : (
+            <div className="info-item">
+              <FaClock className="info-icon" />
+              <p>Status: Completed</p>
+            </div>
+          )}
+        </div>
         {raffle.status === "completed" && (
-          <>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
             {raffle.winnersCount > 1 ? (
               <div className="winners-list">
                 <h3>Winners List:</h3>
                 {raffle.winnersList && raffle.winnersList.length > 0 ? (
                   raffle.winnersList.map((winner, index) => (
-                    <p key={index}>
+                    <motion.p 
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                    >
                       {index + 1}. {winner}
-                    </p>
+                    </motion.p>
                   ))
                 ) : (
                   <p>No winners selected.</p>
                 )}
               </div>
             ) : (
-              <p><strong>Winner: {raffle.winner ? raffle.winner : "No winner selected"}</strong></p>
+              <p className="single-winner"><strong>Winner: {raffle.winner ? raffle.winner : "No winner selected"}</strong></p>
             )}
             <div className="prize-dispersal-section">
               <h3>Prize Dispersal Details</h3>
               {prizeDispersalInfo ? prizeDispersalInfo : <p>No prize transactions recorded.</p>}
             </div>
-          </>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
       {raffle.status === "live" && (
-        <div className="entry-section">
+        <motion.div 
+          className="entry-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
           <input
             className="entry-input"
             type="number"
@@ -310,28 +362,51 @@ const RaffleDetail = ({ wallet }) => {
             onChange={(e) => setEntryAmount(e.target.value)}
           />
           <button onClick={handleEnterRaffle}>Enter Raffle</button>
-        </div>
+        </motion.div>
       )}
-      {entryError && (
-        <div className="message error">
-          {entryError}
-          <button className="close-button" onClick={() => setEntryError('')}>×</button>
-        </div>
-      )}
+      <AnimatePresence>
+        {entryError && (
+          <motion.div 
+            className="message error"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            {entryError}
+            <button className="close-button" onClick={() => setEntryError('')}>×</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {processing && (
-        <div className="processing-modal">
+        <motion.div 
+          className="processing-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
           <div className="spinner"></div>
           <p>Your entry is being processed and will be counted soon...</p>
           <button className="close-button" onClick={() => setProcessing(false)}>×</button>
-        </div>
+        </motion.div>
       )}
-      <div className="leaderboard">
+      <motion.div 
+        className="leaderboard"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+      >
         <h3>Leaderboard (Entries)</h3>
         {displayedEntries.length > 0 ? (
           displayedEntries.map((entry, index) => (
-            <div key={index} className="leaderboard-entry">
+            <motion.div 
+              key={index} 
+              className="leaderboard-entry"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 * index }}
+            >
               <span>{entry.walletAddress}</span>: <span>{entry.creditsAdded.toFixed(2)} entries</span>
-            </div>
+            </motion.div>
           ))
         ) : (
           <p>No entries yet.</p>
@@ -347,8 +422,8 @@ const RaffleDetail = ({ wallet }) => {
             </button>
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
