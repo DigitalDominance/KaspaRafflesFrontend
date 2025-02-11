@@ -1,7 +1,7 @@
 // frontend/src/pages/CreateRaffle.jsx
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { motion } from "framer-motion"
 
 const CreateRaffle = ({ wallet }) => {
   const [raffleType, setRaffleType] = useState('KAS');
@@ -175,156 +175,158 @@ const CreateRaffle = ({ wallet }) => {
   };
 
   return (
-    <div className="create-raffle-page page-container">
+    <motion.div
+      className="create-raffle-page page-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
       <h1 className="global-heading">Create a Raffle</h1>
-      <form onSubmit={handleSubmit} className="frosted-form">
-        <div>
+      <motion.form
+        onSubmit={handleSubmit}
+        className="frosted-form"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }}>
           <label>Raffle Type:</label>
           <div>
             <label>
-              <input
-                type="radio"
-                value="KAS"
-                checked={raffleType === 'KAS'}
-                onChange={() => setRaffleType('KAS')}
-              />
+              <input type="radio" value="KAS" checked={raffleType === "KAS"} onChange={() => setRaffleType("KAS")} />
               KAS
             </label>
             <label>
               <input
                 type="radio"
                 value="KRC20"
-                checked={raffleType === 'KRC20'}
-                onChange={() => setRaffleType('KRC20')}
+                checked={raffleType === "KRC20"}
+                onChange={() => setRaffleType("KRC20")}
               />
               KRC20
             </label>
           </div>
-        </div>
-        {raffleType === 'KRC20' && (
-          <div>
+        </motion.div>
+        {raffleType === "KRC20" && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+          >
             <label>Raffle Token Ticker:</label>
-            <input
-              type="text"
-              value={tokenTicker}
-              onChange={(e) => setTokenTicker(e.target.value)}
-            />
-          </div>
+            <input type="text" value={tokenTicker} onChange={(e) => setTokenTicker(e.target.value)} />
+          </motion.div>
         )}
-        <div>
+        <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }}>
           <label>Time Frame (end date/time):</label>
-          <input
-            type="datetime-local"
-            value={timeFrame}
-            onChange={(e) => setTimeFrame(e.target.value)}
-          />
-        </div>
-        <div>
+          <input type="datetime-local" value={timeFrame} onChange={(e) => setTimeFrame(e.target.value)} />
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }}>
           <label>Credit Conversion (tokens per entry):</label>
-          <input
-            type="number"
-            value={creditConversion}
-            onChange={(e) => setCreditConversion(e.target.value)}
-          />
-        </div>
-        <div>
+          <input type="number" value={creditConversion} onChange={(e) => setCreditConversion(e.target.value)} />
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }}>
           <label>Prize Type:</label>
           <div>
             <label>
-              <input
-                type="radio"
-                value="KAS"
-                checked={prizeType === 'KAS'}
-                onChange={() => setPrizeType('KAS')}
-              />
+              <input type="radio" value="KAS" checked={prizeType === "KAS"} onChange={() => setPrizeType("KAS")} />
               KAS
             </label>
             <label>
               <input
                 type="radio"
                 value="KRC20"
-                checked={prizeType === 'KRC20'}
-                onChange={() => setPrizeType('KRC20')}
+                checked={prizeType === "KRC20"}
+                onChange={() => setPrizeType("KRC20")}
               />
               KRC20
             </label>
           </div>
-        </div>
-        {prizeType === 'KRC20' && (
-          <div>
+        </motion.div>
+        {prizeType === "KRC20" && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+          >
             <label>Prize Token Ticker:</label>
-            <input
-              type="text"
-              value={prizeTicker}
-              onChange={(e) => setPrizeTicker(e.target.value)}
-            />
-          </div>
+            <input type="text" value={prizeTicker} onChange={(e) => setPrizeTicker(e.target.value)} />
+          </motion.div>
         )}
-        <div>
+        <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }}>
           <label>Prize Amount:</label>
-          <input
-            type="number"
-            value={prizeAmount}
-            onChange={(e) => setPrizeAmount(e.target.value)}
-          />
-        </div>
-        {/* New Winners input */}
-        <div>
+          <input type="number" value={prizeAmount} onChange={(e) => setPrizeAmount(e.target.value)} />
+        </motion.div>
+        <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }}>
           <label>Winners:</label>
-          <input
-            type="number"
-            min="1"
-            value={winnersCount}
-            onChange={(e) => setWinnersCount(e.target.value)}
-          />
-        </div>
-        <button type="submit">Create Raffle</button>
-      </form>
+          <input type="number" min="1" value={winnersCount} onChange={(e) => setWinnersCount(e.target.value)} />
+        </motion.div>
+        <motion.button type="submit" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          Create Raffle
+        </motion.button>
+      </motion.form>
 
       {confirmError && !showConfirmModal && (
-        <div className="message error" style={{ marginTop: '1rem', textAlign: 'center' }}>
+        <motion.div className="message error" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           {confirmError}
-          <button className="close-button" onClick={() => setConfirmError('')} style={{ marginLeft: '1rem' }}>×</button>
-        </div>
+          <button className="close-button" onClick={() => setConfirmError("")}>
+            ×
+          </button>
+        </motion.div>
       )}
 
       {successMessage && (
-        <div className="message success" style={{ marginTop: '1rem', textAlign: 'center' }}>
+        <motion.div className="message success" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           {successMessage}
-          <button className="close-button" onClick={() => setSuccessMessage('')} style={{ marginLeft: '1rem' }}>×</button>
-        </div>
+          <button className="close-button" onClick={() => setSuccessMessage("")}>
+            ×
+          </button>
+        </motion.div>
       )}
 
       {showConfirmModal && (
-        <div className="processing-modal">
-          <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-            <button className="close-button" onClick={handleCloseModal}>×</button>
-          </div>
-          {confirmError ? (
-            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-              <p className="message error" style={{ color: 'red' }}>{confirmError}</p>
-              <button className="close-button" onClick={handleCloseModal}>×</button>
-            </div>
-          ) : (
-            <>
-              {!confirming && <div className="spinner"></div>}
-              <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                <p>
-                  Please send {prizeAmount} {prizeType === "KAS" ? "KAS" : prizeTicker.trim().toUpperCase()} to begin the raffle:
-                </p>
-                <p style={{ fontSize: '0.9rem', fontStyle: 'italic' }}>
-                  Note: KASPER takes 5% of the generated tokens.
-                </p>
+        <motion.div
+          className="processing-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300 }}>
+            <button className="close-button" onClick={handleCloseModal}>
+              ×
+            </button>
+            {confirmError ? (
+              <div className="message error">
+                <p>{confirmError}</p>
+                <button className="close-button" onClick={handleCloseModal}>
+                  ×
+                </button>
               </div>
-              <button onClick={handleConfirmPrize} disabled={confirming}>
-                {confirming ? "Confirming..." : "Confirm Prize"}
-              </button>
-            </>
-          )}
-        </div>
+            ) : (
+              <>
+                {!confirming && <div className="spinner"></div>}
+                <div>
+                  <p>
+                    Please send {prizeAmount} {prizeType === "KAS" ? "KAS" : prizeTicker.trim().toUpperCase()} to begin
+                    the raffle:
+                  </p>
+                  <p className="note">Note: KASPER takes 5% of the generated tokens.</p>
+                </div>
+                <motion.button
+                  onClick={handleConfirmPrize}
+                  disabled={confirming}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {confirming ? "Confirming..." : "Confirm Prize"}
+                </motion.button>
+              </>
+            )}
+          </motion.div>
+        </motion.div>
       )}
-    </div>
-  );
-};
+    </motion.div>
+  )
+}
 
 export default CreateRaffle;
