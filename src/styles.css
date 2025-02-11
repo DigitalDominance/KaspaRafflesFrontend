@@ -186,7 +186,7 @@ button {
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 3.5rem; /* Increased gap between cards */
+  gap: 2rem; /* Increased gap between cards */
   width: 100%;
   max-width: 90vw;
   margin: 0 auto;
@@ -206,7 +206,7 @@ button {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   height: 100%;
-  width: calc(100% - 1rem); /* Adjusted width to account for margin */
+  width: 100%; 
   min-width: 0;
 }
 
