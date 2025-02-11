@@ -573,24 +573,31 @@ button {
   margin-bottom: 1rem;
   color: #7bf8f9;
 }
+/* --- Raffle Info Section --- */
 .raffle-info {
   display: flex;
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
-  gap: 0.5rem; /* Add spacing between icon and text */
+  align-items: center;
+  justify-content: flex-start; /* Align to left */
   margin: 0.5rem 0;
+  width: 100%;
 }
 
 .text-content {
-  /* Remove the absolute positioning */
-  width: auto;
-  text-align: center;
+  text-align: left;
+  margin-left: 0.5rem; /* Space between icon and text */
+  width: calc(100% - 2rem); /* Account for icon space */
 }
 
 .info-icon {
-  /* Add icon alignment adjustment */
   margin-top: 0;
-  font-size: 1.1rem; /* Match text size */
+  font-size: 1.1rem;
+  min-width: 1.5rem; /* Consistent icon width */
+}
+
+/* Ensure card content starts from top */
+.profile-raffle-card {
+  justify-content: flex-start; /* Align content to top */
+  align-items: flex-start; /* Align items to left */
 }
 
 .winners-info,
@@ -860,6 +867,7 @@ button {
   border-radius: 16px;
   padding: 2rem;
   margin-top: 2rem;
+  min-width: 900px;
 }
 
 .leaderboard h3 {
