@@ -278,7 +278,7 @@ button {
 /* Update the home page container background */
 .home.page-container {
   background: var(--background-color);
-  min-height: 100vh;
+  min-height: 90vh;
   padding: 2rem 0;
 }
 
