@@ -61,7 +61,7 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 80vh;
+  min-height: 90vh;
   padding: 2rem;
   text-align: center;
   background: var(--background-color);
