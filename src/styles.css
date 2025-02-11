@@ -395,6 +395,7 @@ button {
   color: #7bf8f9;
   text-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
   margin-bottom: 2rem;
+  margin-top: 2rem;
 }
 
 /* --- Grid Layout for Home Page Cards --- */
@@ -408,7 +409,7 @@ button {
   justify-items: center;
   column-gap: 0.5rem;
   row-gap: 3.5rem;/* vertical gap between rows */
-  margin-left: -3.5rem;
+  margin-left: -4rem;
 }
 
 /* --- Home Page Cards (Popular Raffles) --- */
