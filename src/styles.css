@@ -406,7 +406,7 @@ button {
   max-width: 90vw;
   margin: 0 auto;
   justify-items: center;
-  column-gap: 1rem;
+  column-gap: 0.5rem;
   row-gap: 3.5rem;/* vertical gap between rows */
   margin-left: -5rem;
 }
