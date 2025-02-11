@@ -169,6 +169,7 @@ button {
   padding: 1rem;
 }
 
+/* Updated Home Page Styles */
 .home {
   padding: 2rem 0;
 }
@@ -180,9 +181,10 @@ button {
   margin-bottom: 2rem;
 }
 
+/* --- Grid Layout for Home Page Cards --- */
 .home-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   width: 100%;
   max-width: 90vw;
@@ -198,10 +200,11 @@ button {
   margin: 0 auto;
 }
 
+/* --- Home Page Cards (Popular Raffles) --- */
 .home-raffle-card {
   max-width: 30vw;
   width: 100%;
-  background: rgba(138, 43, 226, 0.2);
+  background-color: rgba(138, 43, 226, 0.2);
   border: 2px solid #8a2be2;
   border-radius: 16px;
   padding: 1.5rem;
@@ -209,20 +212,24 @@ button {
   color: #fff;
   text-decoration: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  word-break: break-word;
+  overflow-wrap: break-word;
   backdrop-filter: blur(10px);
   margin: 0 auto;
 }
 
 .home-raffle-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
   box-shadow: 0 8px 16px rgba(123, 248, 249, 0.4);
+  background-color: rgba(138, 43, 226, 0.3);
 }
 
 .home-raffle-card h3 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
   color: #7bf8f9;
+  text-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
 }
 
 .home-raffle-card p {
@@ -231,8 +238,9 @@ button {
 }
 
 .home-raffle-card.completed {
-  background: rgba(30, 90, 120, 0.2);
-  border-color: rgba(30, 90, 120, 1);
+  background-color: rgba(30, 90, 120, 0.2) !important;
+  border: 2px solid rgba(30, 90, 120, 1) !important;
+  word-break: break-all;
 }
 
 .pagination {
@@ -268,10 +276,17 @@ button {
   margin: 0 1rem;
 }
 
+/* Update the home page container background */
 .home.page-container {
   background: var(--background-color);
   min-height: 100vh;
   padding: 2rem 0;
+}
+
+.time-remaining {
+  animation: pulse 2s infinite;
+  font-weight: bold;
+  color: #7bf8f9;
 }
 
 @keyframes pulse {
@@ -284,11 +299,6 @@ button {
   100% {
     opacity: 1;
   }
-}
-
-.time-remaining {
-  animation: pulse 2s infinite;
-  font-weight: bold;
 }
 /* --- My Raffles (Profile) Cards --- */
 .raffles-grid {
