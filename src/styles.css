@@ -139,9 +139,10 @@ button {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.8);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7));
   backdrop-filter: blur(10px);
   border-bottom: 2px solid rgba(123, 248, 249, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-container {
@@ -154,13 +155,19 @@ button {
 }
 
 .navbar-logo a {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
   color: #7bf8f9;
   text-decoration: none;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(123, 248, 249, 0.7);
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(123, 248, 249, 0.7), 0 0 20px rgba(123, 248, 249, 0.5);
+  transition: all 0.3s ease;
+}
+
+.navbar-logo a:hover {
+  color: #fff;
+  text-shadow: 0 0 15px rgba(123, 248, 249, 0.9), 0 0 30px rgba(123, 248, 249, 0.7);
 }
 
 .navbar-links {
@@ -168,29 +175,29 @@ button {
   align-items: center;
 }
 
-.navbar-links a {
+.nav-link {
   color: #fff;
   margin-right: 1.5rem;
   text-decoration: none;
   font-weight: bold;
   position: relative;
   overflow: hidden;
+  padding: 0.5rem 0;
+  transition: color 0.3s ease;
 }
 
-.navbar-links a::after {
-  content: "";
+.nav-link:hover {
+  color: #7bf8f9;
+}
+
+.link-underline {
   position: absolute;
-  bottom: -2px;
+  bottom: 0;
   left: 0;
   width: 100%;
   height: 2px;
   background-color: #7bf8f9;
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-}
-
-.navbar-links a:hover::after {
-  transform: translateX(0);
+  transform-origin: left;
 }
 
 .navbar button {
@@ -202,11 +209,30 @@ button {
   font-weight: bold;
   color: #fff;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.navbar button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(123, 248, 249, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.navbar button:hover::before {
+  opacity: 1;
 }
 
 .navbar button:hover {
   background: linear-gradient(135deg, rgba(123, 248, 249, 0.4), rgba(123, 248, 249, 0.6));
   box-shadow: 0 0 15px rgba(123, 248, 249, 0.7);
+  transform: translateY(-2px);
 }
 
 .navbar-toggle {
@@ -231,20 +257,28 @@ button {
     right: 0;
     flex-direction: column;
     background: rgba(0, 0, 0, 0.9);
-    overflow: hidden;
-  }
-
-  .navbar-links.active {
     padding: 1rem;
+    gap: 1rem;
   }
 
-  .navbar-links a,
-  .navbar-links button {
-    margin: 0.5rem 0;
+  .nav-link {
+    margin-right: 0;
   }
 
   .navbar-toggle {
     display: flex;
+  }
+
+  .navbar-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .navbar-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .navbar-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
   }
 }
 
@@ -263,6 +297,7 @@ button {
 .navbar button {
   animation: glow 2s infinite;
 }
+
 /* --- Page Container --- */
 .page-container {
   max-width: 90vw;
