@@ -190,15 +190,6 @@ button {
   margin: 0 auto;
 }
 
-.raffles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(3, 1fr));
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
 .home-raffle-card {
   max-width: 30vw;
   width: 100%;
