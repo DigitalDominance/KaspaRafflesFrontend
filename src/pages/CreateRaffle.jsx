@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
+import axios from 'axios'; 
 
 const CreateRaffle = ({ wallet }) => {
   const [raffleType, setRaffleType] = useState('KAS');
