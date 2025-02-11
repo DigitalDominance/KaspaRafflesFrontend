@@ -288,7 +288,7 @@ const RaffleDetail = ({ wallet }) => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="raffle-info">
+        <div className="raffle-info-detail">
           <div className="info-item">
             <FaCoins className="info-icon" />
             <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
