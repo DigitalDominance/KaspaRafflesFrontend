@@ -191,13 +191,10 @@ button {
   text-align: center;
   color: #fff;
   text-decoration: none;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   word-break: break-word;
   overflow-wrap: break-word;
-  max-width: 30vw;
-  width: 100%;
-  margin: 0 auto;
 }
 
 .home-raffle-card:hover {
