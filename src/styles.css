@@ -242,7 +242,7 @@ button {
 .home-raffle-card.completed {
   background-color: rgba(30, 90, 120, 0.95) !important;
   border: 2px solid rgba(30, 90, 120, 1) !important;
-
+}
 
 .pagination {
   display: flex;
