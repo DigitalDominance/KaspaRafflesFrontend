@@ -182,45 +182,6 @@ button {
 }
 
 /* --- Grid Layout for Home Page Cards --- */
-/* --- Home Page Cards (Popular Raffles) --- */
-.home-raffle-card {
-  background-color: #8a2be2 !important;
-  border: 2px solid #8a2be2 !important;
-  border-radius: 16px;
-  padding: 1.5rem;
-  text-align: center;
-  color: #fff;
-  text-decoration: none;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-
-.home-raffle-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-}
-
-.home-raffle-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #7bf8f9;
-  text-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
-}
-
-.home-raffle-card p {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-.home-raffle-card.completed {
-  background-color: rgba(30, 90, 120, 0.95);
-  border: 2px solid rgba(30, 90, 120, 1);
-  word-break: break-all;
-}
-
-/* --- Grid Layout for Home Page Cards --- */
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -228,6 +189,56 @@ button {
   width: 100%;
   max-width: 90vw;
   margin: 0 auto;
+}
+
+/* --- Home Page Cards (Popular Raffles) --- */
+.home-raffle-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #8a2be2 !important;
+  border: 2px solid #8a2be2 !important;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  width: 100%;
+  min-width: 0; /* Prevents flex items from overflowing */
+}
+
+.home-raffle-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #7bf8f9;
+  text-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
+  /* Ensure prize text wraps properly */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.home-raffle-card p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  /* Ensure wallet addresses wrap properly */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-all;
+  max-width: 100%;
+}
+
+.home-raffle-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.home-raffle-card.completed {
+  background-color: rgba(30, 90, 120, 0.95) !important;
+  border: 2px solid rgba(30, 90, 120, 1) !important;
 }
 
 
