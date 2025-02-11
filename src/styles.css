@@ -169,7 +169,6 @@ button {
   padding: 1rem;
 }
 
-/* --- Grid Layout for Home Page Cards --- */
 .home {
   padding: 2rem 0;
 }
@@ -190,6 +189,15 @@ button {
   margin: 0 auto;
 }
 
+.raffles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .home-raffle-card {
   max-width: 30vw;
   width: 100%;
@@ -203,6 +211,7 @@ button {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
+  margin: 0 auto;
 }
 
 .home-raffle-card:hover {
@@ -262,6 +271,7 @@ button {
 .home.page-container {
   background: var(--background-color);
   min-height: 100vh;
+  padding: 2rem 0;
 }
 
 @keyframes pulse {
