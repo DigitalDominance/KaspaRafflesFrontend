@@ -576,10 +576,11 @@ button {
   display: flex;
   align-items: left;
   justify-content: left;
-  max-width: 18vw
+  max-width: 16vw
 }
 
 .info-icon {
+  margin-top: 1rem;
   color: #7bf8f9;
 }
 
