@@ -190,6 +190,7 @@ button {
   width: 100%;
   max-width: 90vw;
   margin: 0 auto;
+  justify-items: center;
 }
 
 /* --- Home Page Cards (Popular Raffles) --- */
