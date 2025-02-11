@@ -150,8 +150,12 @@ button {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
+}
+
+.navbar-logo {
+  flex: 1;
 }
 
 .navbar-logo a {
@@ -173,16 +177,19 @@ button {
 .navbar-menu {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex: 2;
 }
 
 .navbar-links {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  gap: 2rem;
 }
 
 .nav-link {
   color: #fff;
-  margin-right: 1.5rem;
   text-decoration: none;
   font-weight: bold;
   position: relative;
@@ -259,9 +266,14 @@ button {
     flex-wrap: wrap;
   }
 
+  .navbar-logo {
+    flex: 0 0 100%;
+    margin-bottom: 1rem;
+  }
+
   .navbar-menu {
-    width: 100%;
-    justify-content: flex-end;
+    flex: 0 0 100%;
+    justify-content: space-between;
   }
 
   .navbar-links {
@@ -280,7 +292,6 @@ button {
   }
 
   .nav-link {
-    margin-right: 0;
     margin-bottom: 1rem;
   }
 
@@ -320,6 +331,8 @@ button {
 .navbar button {
   animation: glow 2s infinite;
 }
+
+
 
 /* --- Page Container --- */
 .page-container {
