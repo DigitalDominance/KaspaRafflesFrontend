@@ -83,7 +83,11 @@ button {
   }
 }
 
-
+.raffle-info-detail {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
 
 
 /* Global Heading - Use on all main pages except those you want left-aligned */
