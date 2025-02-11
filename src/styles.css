@@ -197,7 +197,7 @@ button {
 /* --- Home Page Cards (Popular Raffles) --- */
 .home-raffle-card {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   background-color: #8a2be2 !important;
   border: 2px solid #8a2be2 !important;
   border-radius: 16px;
