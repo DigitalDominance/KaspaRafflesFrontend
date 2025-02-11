@@ -409,7 +409,7 @@ button {
   justify-items: center;
   column-gap: 0.5rem;
   row-gap: 3.5rem;/* vertical gap between rows */
-  margin-left: -4rem;
+  margin-left: -4.5rem;
 }
 
 /* --- Home Page Cards (Popular Raffles) --- */
