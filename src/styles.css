@@ -576,7 +576,6 @@ button {
   display: flex;
   align-items: left;
   justify-content: left;
-  max-width: 17vw
 }
 
 .info-icon {
