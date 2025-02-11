@@ -191,7 +191,7 @@ button {
   margin: 0 auto;
   justify-items: center;
   column-gap: 2.5rem; /* horizontal gap if needed */
-  row-gap: 4rem;     /* vertical gap between rows */
+  row-gap: 3rem;     /* vertical gap between rows */
   margin-left: -1.25rem;
 }
 
