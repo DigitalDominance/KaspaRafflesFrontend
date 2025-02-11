@@ -63,7 +63,7 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 100vh;
+  min-height: 80vh;
   padding: 2rem;
   text-align: center;
   background: var(--background-color);
@@ -72,9 +72,10 @@ button {
 .landing-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* Move content higher */
   align-items: center;
   flex-grow: 1;
+  padding-top: 4rem; /* Move heading up */
 }
 
 .landing-heading {
