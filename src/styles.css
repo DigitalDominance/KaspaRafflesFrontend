@@ -49,51 +49,87 @@ button {
   text-align: center;
 }
 
-/* --- Landing (Wallet Connect) Page --- */
+:root {
+  --primary-color: #7bf8f9;
+  --secondary-color: rgba(30, 90, 120, 0.95);
+  --background-color: rgba(0, 0, 0, 0.2);
+  --text-color: #ffffff;
+  --button-hover-color: #5ce0e1;
+}
+
+
+
 .landing-container {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  height: 100vh;
-  padding: 1rem 2rem;
-  background: rgba(0, 0, 0, 0.2);
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  padding: 2rem;
   text-align: center;
+  background: var(--background-color);
 }
-.landing-header {
-  width: 100%;
-  margin-bottom: 1.5rem;
+
+.landing-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
 }
+
 .landing-heading {
   font-size: 3rem;
-  margin: 0;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-color);
 }
+
 .landing-subheading {
   font-size: 1.5rem;
-  margin: 0.5rem 0 0;
-  margin-top: 3rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  color: var(--text-color);
 }
-.landing-middle {
-  justify-self: center;
-  align-self: center;
-  background: rgba(30, 90, 120, 0.95);
-  border: 2px solid rgba(30, 90, 120, 1);
-  border-radius: 16px;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
+
 .landing-button {
-  padding: 1rem 2rem;
+  position: relative;
   font-size: 1.25rem;
-  background: #7bf8f9;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(123, 248, 249, 0.3);
 }
+
+.landing-button:focus {
+  outline: none;
+}
+
 .landing-button:hover {
-  transform: scale(1.05);
+  background-color: var(--button-hover-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(123, 248, 249, 0.4);
+}
+
+.button-background {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.landing-button:hover .button-background {
+  opacity: 0.3;
 }
 
 /* --- Navbar --- */
