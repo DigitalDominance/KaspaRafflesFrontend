@@ -190,13 +190,14 @@ button {
   max-width: 90vw;
   margin: 0 auto;
   justify-items: center;
-  gap: 2rem;
+  gap: 2.5rem;
+  margin-left: -1rem
 }
 
 /* --- Home Page Cards (Popular Raffles) --- */
 .home-raffle-card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   background-color: #8a2be2 !important;
   border: 2px solid #8a2be2 !important;
   border-radius: 16px;
