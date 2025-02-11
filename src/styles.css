@@ -117,7 +117,7 @@ button {
   justify-content: flex-start; /* Move content higher */
   align-items: center;
   flex-grow: 1;
-  padding-top: 4rem; /* Move heading up */
+  padding-top: 6rem; /* Move heading up */
 }
 
 .landing-heading {
