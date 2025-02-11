@@ -549,6 +549,7 @@ button {
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
+  align-items: center;
   color: #fff;
   text-decoration: none;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
