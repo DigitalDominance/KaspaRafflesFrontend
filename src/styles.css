@@ -9,7 +9,7 @@ body {
   color: #fff;
   overflow-x: hidden;
 }
-
+r
 /* Ensure all buttons use Roboto Mono */
 button {
   font-family: 'Roboto Mono', monospace;
@@ -576,8 +576,7 @@ button {
   display: flex;
   align-items: left;
   justify-content: left;
-  margin-bottom: 0.5rem;
-  max-width: 20vw
+  max-width: 18vw
 }
 
 .info-icon {
