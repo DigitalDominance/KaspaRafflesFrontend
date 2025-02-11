@@ -1,12 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../styles.css';
 
 const Navbar = ({ wallet, onDisconnect }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleDisconnect = async () => {
     try {
@@ -37,37 +47,37 @@ const Navbar = ({ wallet, onDisconnect }) => {
           <Link to="/">KASPA RAFFLES</Link>
         </motion.div>
         <div className="navbar-menu">
-          <AnimatePresence>
-            {isOpen && (
-              <motion.div
-                className="navbar-links"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
+          {(!isMobile || isOpen) && (
+            <motion.div
+              className="navbar-links"
+              initial={isMobile ? { opacity: 0, height: 0 } : false}
+              animate={isMobile ? { opacity: 1, height: 'auto' } : false}
+              exit={isMobile ? { opacity: 0, height: 0 } : false}
+              transition={{ duration: 0.3 }}
+            >
+              <NavLink to="/profile">My Raffles</NavLink>
+              <NavLink to="/create">Create Raffle</NavLink>
+              <motion.button
+                onClick={handleDisconnect}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <NavLink to="/profile">My Raffles</NavLink>
-                <NavLink to="/create">Create Raffle</NavLink>
-                <motion.button
-                  onClick={handleDisconnect}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Disconnect Wallet
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <motion.div
-            className="navbar-toggle"
-            onClick={toggleMenu}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </motion.div>
+                Disconnect Wallet
+              </motion.button>
+            </motion.div>
+          )}
+          {isMobile && (
+            <motion.div
+              className={`navbar-toggle ${isOpen ? 'active' : ''}`}
+              onClick={toggleMenu}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.nav>
