@@ -186,7 +186,7 @@ button {
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem; /* Increased gap between cards */
+  gap: 3.5rem; /* Increased gap between cards */
   width: 100%;
   max-width: 90vw;
   margin: 0 auto;
