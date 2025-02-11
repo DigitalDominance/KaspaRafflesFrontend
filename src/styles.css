@@ -32,8 +32,6 @@ button {
 .app-footer {
   text-align: center;
   padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(10px);
 }
 .footer-logo {
   max-width: 120px;
@@ -83,12 +81,13 @@ button {
   font-weight: 700;
   margin-bottom: 1rem;
   color: var(--text-color);
+  padding-bottom: 2rem; 
 }
 
 .landing-subheading {
   font-size: 1.5rem;
   font-weight: 300;
-  margin-bottom: 2rem;
+  margin-bottom: 4rem;
   color: var(--text-color);
 }
 
