@@ -550,6 +550,7 @@ button {
   flex-direction: column;
   justify-content: space-between;
   min-height: 250px;
+  width: 30vw:
 }
 
 .profile-raffle-card:hover {
