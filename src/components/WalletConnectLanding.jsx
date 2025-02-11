@@ -1,46 +1,76 @@
-import { motion } from "framer-motion"
-import "../styles.css"
-import Footer from "./Footer"
+'use client';
 
-const WalletConnectLanding = ({ onConnect }) => {
-  const handleConnect = async () => {
-    if (window.kasware) {
-      try {
-        const accounts = await window.kasware.requestAccounts()
-        console.log("Connected wallet:", accounts[0])
-        onConnect({ address: accounts[0] })
-      } catch (err) {
-        console.error("Error connecting wallet:", err)
-      }
-    } else {
-      alert("Please install KasWare Wallet")
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import '../styles.css';
+
+const Navbar = ({ wallet, onDisconnect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleDisconnect = async () => {
+    try {
+      const origin = window.location.origin;
+      await window.kasware.disconnect(origin);
+      onDisconnect();
+      console.log('Wallet disconnected');
+    } catch (e) {
+      console.error('Error disconnecting wallet:', e);
     }
-  }
+  };
+
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <div className="landing-container">
-      <motion.div
-        className="landing-content"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <h1 className="landing-heading">KASPA RAFFLES</h1>
-        <h3 className="landing-subheading">Connect wallet to login</h3>
-        <motion.button
-          className="landing-button"
-          onClick={handleConnect}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+    <motion.nav
+      className="navbar"
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+    >
+      <div className="navbar-container">
+        <motion.div
+          className="navbar-logo"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
         >
-          Connect Wallet
-          <div className="button-background" />
-        </motion.button>
-      </motion.div>
-      <Footer />
-    </div>
-  )
-}
+          <Link to="/">KASPA RAFFLES</Link>
+        </motion.div>
+        <div className="navbar-menu">
+          <motion.div
+            className={`navbar-links ${isOpen ? 'active' : ''}`}
+            initial={false}
+            animate={isOpen ? { height: 'auto' } : { height: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <Link to="/profile">My Raffles</Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <Link to="/create">Create Raffle</Link>
+            </motion.div>
+            <motion.button
+              onClick={handleDisconnect}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Disconnect Wallet
+            </motion.button>
+          </motion.div>
+          <motion.div
+            className="navbar-toggle"
+            onClick={toggleMenu}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </motion.div>
+        </div>
+      </div>
+    </motion.nav>
+  );
+};
 
-export default WalletConnectLanding
-
+export default Navbar;
