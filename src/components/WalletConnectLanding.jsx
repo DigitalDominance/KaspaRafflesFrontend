@@ -25,17 +25,21 @@ const WalletConnectLanding = ({ onConnect }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <h1 className="wallet-landing-heading">KASPA RAFFLES</h1>
-        <h3 className="wallet-landing-subheading">Connect wallet to login</h3>
-        <motion.button
-          className="wallet-landing-button"
-          onClick={handleConnect}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Connect Wallet
-          <div className="button-background" />
-        </motion.button>
+        <div>
+          <h1 className="wallet-landing-heading">KASPA RAFFLES</h1>
+          <h3 className="wallet-landing-subheading">Connect wallet to login</h3>
+        </div>
+        <div className="button-container">
+          <motion.button
+            className="wallet-landing-button"
+            onClick={handleConnect}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Connect Wallet
+            <div className="button-background" />
+          </motion.button>
+        </div>
       </motion.div>
       <Footer />
     </div>
