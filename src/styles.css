@@ -107,7 +107,7 @@ button {
 .wallet-landing-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   min-height: 100vh;
   padding: 2rem;
   text-align: center;
@@ -131,16 +131,16 @@ button {
 .wallet-landing-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   flex-grow: 1;
   z-index: 1;
+  padding-top: 5vh;
 }
 
 .wallet-landing-heading {
   font-size: 4.5rem;
   font-weight: 700;
-  margin-top: -20vh;
   margin-bottom: 1rem;
   color: var(--primary-color);
   text-shadow: 0 0 10px rgba(123, 248, 249, 0.7);
@@ -150,10 +150,16 @@ button {
 .wallet-landing-subheading {
   font-size: 1.8rem;
   font-weight: 300;
-  margin-top: -10vh;
   margin-bottom: 3rem;
   color: var(--text-color);
   opacity: 0.9;
+}
+
+.button-container {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .wallet-landing-button {
@@ -211,7 +217,6 @@ button {
     padding: 0.8rem 2rem;
   }
 }
-
 /* --- Navbar --- */
 .navbar {
   position: fixed;
