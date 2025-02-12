@@ -857,7 +857,38 @@ button {
   margin-right: auto;
   width: 100%;
 }
+.home-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5rem;
+}
 
+.home-pagination button {
+  background: rgba(123, 248, 249, 0.2);
+  border: 1px solid #7bf8f9;
+  color: #7bf8f9;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.home-pagination button:hover:not(:disabled) {
+  background: rgba(123, 248, 249, 0.4);
+  transform: translateY(-2px);
+}
+
+.home-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.home-pagination span {
+  color: #7bf8f9;
+  margin: 0 1rem;
+}
 
 .leaderboard h3 {
   color: #7bf8f9;
