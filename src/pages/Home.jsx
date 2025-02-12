@@ -25,7 +25,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchRaffles()
-    const interval = setInterval(fetchRaffles, 1000)
+    const interval = setInterval(fetchRaffles, 10000)
     return () => clearInterval(interval)
   }, [apiUrl]) // Removed fetchRaffles from dependencies
 
