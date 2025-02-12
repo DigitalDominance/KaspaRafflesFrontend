@@ -101,7 +101,7 @@ const Home = () => {
       </motion.div>
       {totalPages > 1 && (
         <motion.div
-          className="pagination"
+          className="home-pagination"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
