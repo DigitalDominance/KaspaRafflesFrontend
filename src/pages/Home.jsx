@@ -62,12 +62,7 @@ const Home = () => {
   }
 
   return (
-    <motion.div 
-      className="home page-container" 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
-      exit={{ opacity: 0 }}
-    >
+    <motion.div className="home page-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <motion.h1
         className="global-heading"
         initial={{ y: -50, opacity: 0 }}
@@ -80,10 +75,10 @@ const Home = () => {
       {error && <p className="error-message">{error}</p>}
       {!loading && !error && (
         <>
-          <motion.div 
-            className="home-grid" 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
+          <motion.div
+            className="home-grid"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
             <AnimatePresence>
@@ -184,3 +179,4 @@ const Home = () => {
 }
 
 export default Home
+
