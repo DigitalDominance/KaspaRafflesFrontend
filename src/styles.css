@@ -105,45 +105,62 @@ button {
 
 
 
-.landing-container {
+.wallet-landing-container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 95vh;
+  min-height: 100vh;
   padding: 2rem;
   text-align: center;
-  background: var(--background-color);
+  background: linear-gradient(135deg, var(--secondary-color), #000000);
+  position: relative;
+  overflow: hidden;
 }
 
-.landing-content {
+.wallet-landing-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("/assets/kaspabg.png") no-repeat center center;
+  background-size: cover;
+  opacity: 0.2;
+  z-index: -1;
+}
+
+.wallet-landing-content {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Move content higher */
+  justify-content: center;
   align-items: center;
   flex-grow: 1;
-  padding-top: 6rem; /* Move heading up */
+  z-index: 1;
 }
 
-.landing-heading {
-  font-size: 4rem;
+.wallet-landing-heading {
+  font-size: 4.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: var(--text-color);
-  padding-bottom: 2rem; 
+  color: var(--primary-color);
+  text-shadow: 0 0 10px rgba(123, 248, 249, 0.7);
+  letter-spacing: 4px;
 }
 
-.landing-subheading {
-  font-size: 1.7rem;
+.wallet-landing-subheading {
+  font-size: 1.8rem;
   font-weight: 300;
-  margin-bottom: 10rem;
+  margin-bottom: 3rem;
   color: var(--text-color);
+  opacity: 0.9;
 }
 
-.landing-button {
+.wallet-landing-button {
   position: relative;
   font-size: 1.5rem;
   font-weight: 600;
-  padding: 1rem 2rem;
+  padding: 1rem 2.5rem;
   background-color: var(--primary-color);
   color: var(--secondary-color);
   border: none;
@@ -154,11 +171,11 @@ button {
   box-shadow: 0 4px 15px rgba(123, 248, 249, 0.3);
 }
 
-.landing-button:focus {
+.wallet-landing-button:focus {
   outline: none;
 }
 
-.landing-button:hover {
+.wallet-landing-button:hover {
   background-color: var(--button-hover-color);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(123, 248, 249, 0.4);
@@ -176,8 +193,23 @@ button {
   transition: opacity 0.3s ease;
 }
 
-.landing-button:hover .button-background {
+.wallet-landing-button:hover .button-background {
   opacity: 0.3;
+}
+
+@media (max-width: 768px) {
+  .wallet-landing-heading {
+    font-size: 3rem;
+  }
+
+  .wallet-landing-subheading {
+    font-size: 1.4rem;
+  }
+
+  .wallet-landing-button {
+    font-size: 1.2rem;
+    padding: 0.8rem 2rem;
+  }
 }
 
 /* --- Navbar --- */
