@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaClock, FaCoins, FaTrophy, FaUserAlt } from 'react-icons/fa';
+import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaAward } from 'react-icons/fa';
 import '../styles.css';
 
 const RaffleDetail = ({ wallet }) => {
@@ -295,6 +295,10 @@ const RaffleDetail = ({ wallet }) => {
           </div>
           <div className="info-item">
             <FaTrophy className="info-icon" />
+            <p>Winners: {raffle.winnersCount}</p>
+          </div>
+          <div className="info-item">
+            <FaAward className="info-icon" />
             <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
           </div>
           <div className="info-item">
