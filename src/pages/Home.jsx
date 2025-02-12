@@ -1,64 +1,75 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import axios from "axios"
-import { Link } from "react-router-dom"
-import { motion, AnimatePresence } from "framer-motion"
-import { FaClock, FaTrophy, FaUsers } from "react-icons/fa"
-import "../styles.css"
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaClock, FaTrophy, FaUsers } from "react-icons/fa";
+import "../styles.css";
 
 const Home = () => {
-  const [raffles, setRaffles] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const rafflesPerPage = 6
-  const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000/api"
+  const [raffles, setRaffles] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [now, setNow] = useState(new Date()); // state to keep current time
+  const rafflesPerPage = 6;
+  const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
+  // Fetch raffles from the server once (or at a slower interval)
   const fetchRaffles = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
     try {
-      const res = await axios.get(`${apiUrl}/raffles`)
+      const res = await axios.get(`${apiUrl}/raffles`);
       if (res.data.success) {
-        const sorted = res.data.raffles.sort((a, b) => b.currentEntries - a.currentEntries)
-        setRaffles(sorted)
+        const sorted = res.data.raffles.sort((a, b) => b.currentEntries - a.currentEntries);
+        setRaffles(sorted);
       } else {
-        setError("Failed to fetch raffles")
+        setError("Failed to fetch raffles");
       }
     } catch (err) {
-      console.error("Error fetching raffles:", err)
-      setError("An error occurred while fetching raffles")
+      console.error("Error fetching raffles:", err);
+      setError("An error occurred while fetching raffles");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [apiUrl])
+  }, [apiUrl]);
 
   useEffect(() => {
-    fetchRaffles()
-    const interval = setInterval(fetchRaffles, 1000)
-    return () => clearInterval(interval)
-  }, [fetchRaffles])
+    fetchRaffles();
+    // Optionally, if you want to refresh raffles periodically, set a longer interval (e.g., every minute)
+    // const fetchInterval = setInterval(fetchRaffles, 60000);
+    // return () => clearInterval(fetchInterval);
+  }, [fetchRaffles]);
 
-  const indexOfLast = currentPage * rafflesPerPage
-  const indexOfFirst = indexOfLast - rafflesPerPage
-  const currentRaffles = raffles.slice(indexOfFirst, indexOfLast)
-  const totalPages = Math.ceil(raffles.length / rafflesPerPage)
+  // Update the current time every second so the time remaining display updates
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const indexOfLast = currentPage * rafflesPerPage;
+  const indexOfFirst = indexOfLast - rafflesPerPage;
+  const currentRaffles = raffles.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(raffles.length / rafflesPerPage);
 
   const getTimeLeft = (timeFrame, status) => {
-    if (status === "completed") return "Completed"
-    const diff = new Date(timeFrame) - new Date()
-    if (diff <= 0) return "Completed"
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((diff / 1000) % 60)
-    return `${days}d ${hours}h ${minutes}m ${seconds}s`
-  }
+    if (status === "completed") return "Completed";
+    const diff = new Date(timeFrame) - now;
+    if (diff <= 0) return "Completed";
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff / 1000) % 60);
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  };
 
-  const pageNumbers = []
+  const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i)
+    pageNumbers.push(i);
   }
 
   return (
@@ -175,8 +186,7 @@ const Home = () => {
         </>
       )}
     </motion.div>
-  )
-}
+  );
+};
 
-export default Home
-
+export default Home;
