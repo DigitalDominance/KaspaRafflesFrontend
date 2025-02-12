@@ -112,7 +112,6 @@ button {
   min-height: 100vh;
   padding: 2rem;
   text-align: center;
-  background: linear-gradient(135deg, var(--secondary-color), #000000);
   position: relative;
   overflow: hidden;
 }
@@ -142,6 +141,7 @@ button {
 .wallet-landing-heading {
   font-size: 4.5rem;
   font-weight: 700;
+  margin-top: -6rem;
   margin-bottom: 1rem;
   color: var(--primary-color);
   text-shadow: 0 0 10px rgba(123, 248, 249, 0.7);
@@ -151,6 +151,7 @@ button {
 .wallet-landing-subheading {
   font-size: 1.8rem;
   font-weight: 300;
+  margin-top: -3rem;
   margin-bottom: 3rem;
   color: var(--text-color);
   opacity: 0.9;
