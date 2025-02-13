@@ -631,7 +631,11 @@ button {
   font-size: 1.1rem;
   min-width: 1.5rem; /* Consistent icon width */
 }
-
+.info-icon2 {
+  margin-top: 0;
+  font-size: 0.8rem;
+  min-width: 1rem; /* Consistent icon width */
+}
 /* Ensure card content starts from top */
 .profile-raffle-card {
   justify-content: flex-start; /* Align content to top */
