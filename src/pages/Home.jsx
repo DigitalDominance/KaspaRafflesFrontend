@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaClock, FaTrophy, FaUsers } from "react-icons/fa";
+import { FaClock, FaTrophy, FaUserAlt, FaUsers } from "react-icons/fa";
 import "../styles.css";
 
 const Home = () => {
@@ -133,10 +133,14 @@ const Home = () => {
                       </>
                     ) : (
                       <>
-                        {raffle.winnersCount > 1 ? (
-                          <p className="winners-info">Winners: View Here</p>
+                        {raffle.winnersCount > 1 ? ( 
+                          <p className="winners-info">
+                            <FaUsers className="info-icon" /> Winners: View Here
+                          </p>
                         ) : (
-                          <p className="winner-info">Winner: {raffle.winner ? raffle.winner : "No Entries"}</p>
+                          <p className="winner-info">
+                            <FaUserAlt className="info-icon" /> Winner: {raffle.winner ? raffle.winner : "No Entries"}
+                          </p>
                         )}
                       </>
                     )}
