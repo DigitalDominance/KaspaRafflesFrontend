@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaClock, FaTrophy, FaUserAlt, FaUsers, FaCrown } from "react-icons/fa";
+import { FaClock, FaTrophy, FaUserAlt, FaUsers, FaCrown, FaClipboardList } from "react-icons/fa";
 import "../styles.css";
 
 const Home = () => {
@@ -137,6 +137,12 @@ const Home = () => {
                       </>
                     ) : (
                       <>
+                        <p className="total-entries-info">
+                          <FaClipboardList className="info-icon2" /> Total Entries: {raffle.totalEntries.toFixed(2)}
+                        </p>
+                        <p className="status-info">
+                          <FaClock className="info-icon2" /> Status: Completed
+                        </p>
                         {raffle.winnersCount > 1 ? ( 
                           <p className="winners-info">
                             <FaUsers className="info-icon2" /> Winners: View Here
