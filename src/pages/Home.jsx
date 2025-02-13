@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaClock, FaTrophy, FaUserAlt, FaUsers } from "react-icons/fa";
+import { FaClock, FaTrophy, FaUserAlt, FaUsers, FaCrown } from "react-icons/fa";
 import "../styles.css";
 
 const Home = () => {
@@ -105,9 +105,13 @@ const Home = () => {
                     to={`/raffle/${raffle.raffleId}`}
                     className={`home-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
                   >
-                    <motion.h3 whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }}>
-                      {raffle.prizeDisplay}
+                    <motion.h3 
+                      whileHover={{ scale: 1.05 }} 
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <FaCrown className="info-icon3" /> {raffle.prizeDisplay}
                     </motion.h3>
+
                     {raffle.status === "live" ? (
                       <>
                         <div className="raffle-info">
