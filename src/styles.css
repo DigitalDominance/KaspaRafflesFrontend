@@ -448,7 +448,7 @@ button {
   justify-content: center;
   align-items: center;
   column-gap: 0.25rem;
-  row-gap: 3.5rem;/* vertical gap between rows */
+  row-gap: 2rem;/* vertical gap between rows */
 }
 
 /* --- Home Page Cards (Popular Raffles) --- */
@@ -460,8 +460,6 @@ button {
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
-  justify-items: center;
-  justify-content: center;
   color: #fff;
   text-decoration: none;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
