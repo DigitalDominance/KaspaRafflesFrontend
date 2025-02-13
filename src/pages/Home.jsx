@@ -115,8 +115,8 @@ const Home = () => {
                     {raffle.status === "live" ? (
                       <>
                         <div className="raffle-info">
-                          <FaTrophy className="info-icon" />
-                          <p>Entries: {raffle.currentEntries.toFixed(2)}</p>
+                          <FaClipboardList className="info-icon" />
+                          <p>Total Entries: {raffle.currentEntries.toFixed(2)}</p>
                         </div>
                         <div className="raffle-info">
                           <FaUsers className="info-icon" />
