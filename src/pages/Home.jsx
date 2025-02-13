@@ -135,11 +135,11 @@ const Home = () => {
                       <>
                         {raffle.winnersCount > 1 ? ( 
                           <p className="winners-info">
-                            <FaUsers className="info-icon" /> Winners: View Here
+                            <FaUsers className="info-icon2" /> Winners: View Here
                           </p>
                         ) : (
                           <p className="winner-info">
-                            <FaUserAlt className="info-icon" /> Winner: {raffle.winner ? raffle.winner : "No Entries"}
+                            <FaUserAlt className="info-icon2" /> Winner: {raffle.winner ? raffle.winner : "No Entries"}
                           </p>
                         )}
                       </>
