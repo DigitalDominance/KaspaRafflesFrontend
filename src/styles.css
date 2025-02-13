@@ -636,8 +636,8 @@ button {
   margin-top: 0;
   color: #7bf8f9;
   filter: drop-shadow(0 0 10px rgba(123, 248, 249, 0.5));
-  font-size: 0.85rem;
-  min-width: 1.05rem; /* Consistent icon width */
+  font-size: 1.1rem;
+  min-width: 1.5rem; /* Consistent icon width */
 }
 
 .info-icon3 {
