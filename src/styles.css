@@ -536,7 +536,6 @@ button {
 .home.page-container {
   background: var(--background-color);
   min-height: 90vh;
-  padding: 2rem 0;
 }
 
 .time-remaining {
