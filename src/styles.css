@@ -633,7 +633,7 @@ button {
 }
 
 .info-icon2 {
-  margin-bottom: -2px
+  margin-bottom: -2px;
   color: #7bf8f9;
   filter: drop-shadow(0 0 10px rgba(123, 248, 249, 0.5));
   font-size: 1.1rem;
