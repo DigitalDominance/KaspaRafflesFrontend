@@ -544,6 +544,7 @@ button {
   animation: pulse 2s infinite;
   font-weight: bold;
   color: #7bf8f9;
+  text-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
 }
 
 @keyframes pulse {
