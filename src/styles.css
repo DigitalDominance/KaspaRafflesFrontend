@@ -444,8 +444,6 @@ button {
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  width: 100%;
-  max-width: 100vw;
   justify-items: center;
   column-gap: 0.25rem;
   row-gap: 3.5rem;/* vertical gap between rows */
