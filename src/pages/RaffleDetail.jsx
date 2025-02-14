@@ -226,8 +226,8 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
 
-      // Extract transaction id string (supports both string and object responses)
-      const txidString = typeof txid === 'object' && txid.id ? txid.id : txid;
+      // Extract the transaction ID using the "TransactionId" field.
+      const txidString = typeof txid === 'object' && txid.TransactionId ? txid.TransactionId : txid;
       console.log("Transaction sent, txid:", txidString);
 
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
@@ -236,12 +236,12 @@ const RaffleDetail = ({ wallet }) => {
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
-        // Set success message with clickable hyperlink.
+        // Set success message with clickable hyperlink and small font for the TXID.
         setEntrySuccess(
           <>
             Transaction Successful! TXID:{" "}
             <a
-              className="txid-link"
+              className="txid-link small-txid"
               href={`https://kas.fyi/transaction/${txidString}`}
               target="_blank"
               rel="noopener noreferrer"
