@@ -783,7 +783,14 @@ button {
   margin-top: 2rem;
 }
 
-
+.message.success {
+  color: rgba(73, 234, 203, 1);
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid #ff0000;
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+}
 /* --- Entry Section --- */
 .entry-section {
   margin-top: 1.5rem;
