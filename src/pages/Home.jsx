@@ -7,6 +7,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaClock, FaTrophy, FaUserAlt, FaUsers, FaCrown, FaClipboardList } from "react-icons/fa";
 import "../styles.css";
 
+const TokenLogo = ({ ticker }) => {
+  const [imgError, setImgError] = useState(false);
+
+  return imgError ? (
+    <div className="tokenlogo-fallback">{ticker}</div>
+  ) : (
+    <img
+      src={`https://kaspamarket.io/static/${ticker}.jpg`}
+      alt={ticker}
+      className="tokenlogo"
+      onError={() => setImgError(true)}
+    />
+  );
+};
+
 const Home = () => {
   const [raffles, setRaffles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,7 +81,7 @@ const Home = () => {
     const seconds = Math.floor((diff / 1000) % 60);
     return `${days}d ${hours}h ${minutes}m ${seconds}s`;
   };
-
+  
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
@@ -109,16 +124,9 @@ const Home = () => {
                       whileHover={{ scale: 1.05 }} 
                       transition={{ type: "spring", stiffness: 300 }}
                     >
-                      <FaCrown className="info-icon3" /> {raffle.prizeDisplay}
-                      <img 
-                        src={`https://kaspamarket.io/static/${raffle.prizeTicker}.jpg`} 
-                        alt={raffle.prizeTicker} 
-                        className="tokenlogo" 
-                      />
+                      <TokenLogo ticker={raffle.prizeTicker} /> {raffle.prizeDisplay}
                     </motion.h3>
-
-
-
+                    
                     {raffle.status === "live" ? (
                       <>
                         <div className="raffle-info">
