@@ -110,7 +110,14 @@ const Home = () => {
                       transition={{ type: "spring", stiffness: 300 }}
                     >
                       <FaCrown className="info-icon3" /> {raffle.prizeDisplay}
+                      <img 
+                        src={`https://kaspamarket.io/static/${raffle.prizeTicker}.jpg`} 
+                        alt={raffle.prizeTicker} 
+                        className="tokenlogo" 
+                      />
                     </motion.h3>
+
+
 
                     {raffle.status === "live" ? (
                       <>
