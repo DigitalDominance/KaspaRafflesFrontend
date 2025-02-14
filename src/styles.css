@@ -514,13 +514,14 @@ button {
 }
 
 /* --- New CSS for the fallback circular icon --- */
+/* --- New CSS for the fallback circular icon --- */
 .tokenlogo-fallback {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   background-color: #8a2be2; /* Or any fallback background color */
   color: #7bf8f9;
-  display: flex;
+  display: inline-flex;       /* Change from flex to inline-flex */
   align-items: center;
   justify-content: center;
   margin-right: 0.5rem;
