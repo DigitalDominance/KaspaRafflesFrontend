@@ -795,6 +795,7 @@ button {
 .small-txid {
   color: rgba(73, 234, 203, 1);
   font-size: 0.8rem;
+}
 /* --- Entry Section --- */
 .entry-section {
   margin-top: 1.5rem;
