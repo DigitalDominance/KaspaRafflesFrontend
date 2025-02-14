@@ -8,7 +8,6 @@ import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaUsers } from 'react-icons/fa';
 import '../styles.css';
 
 // Updated TokenLogoBig component with one-shot 3D spin (cannot be interrupted)
-// The logo will pop (scale up) and spin 360° when hovered, then return to its initial state.
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
   const controls = useAnimation();
@@ -22,7 +21,6 @@ const TokenLogoBig = ({ ticker }) => {
   const handleHoverStart = () => {
     if (!animating) {
       setAnimating(true);
-      // Start the "hover" animation and then return to "initial" when done.
       controls.start("hover").then(() => {
         controls.start("initial");
         setAnimating(false);
@@ -70,6 +68,7 @@ const RaffleDetail = ({ wallet }) => {
   const [error, setError] = useState(null);
   const [entryAmount, setEntryAmount] = useState('');
   const [entryError, setEntryError] = useState('');
+  const [entrySuccess, setEntrySuccess] = useState('');
   const [entryPage, setEntryPage] = useState(1);
   const [connectedAddress, setConnectedAddress] = useState('');
   const entriesPerPage = 6;
@@ -181,7 +180,10 @@ const RaffleDetail = ({ wallet }) => {
   };
 
   const handleEnterRaffle = async () => {
+    // Clear any previous messages
     setEntryError('');
+    setEntrySuccess('');
+    
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
       setEntryError(`Minimum entry is ${raffle.creditConversion}`);
       return;
@@ -223,14 +225,31 @@ const RaffleDetail = ({ wallet }) => {
         setProcessing(false);
         return;
       }
-      console.log("Transaction sent, txid:", txid);
+
+      // Extract transaction id string (supports both string and object responses)
+      const txidString = typeof txid === 'object' && txid.id ? txid.id : txid;
+      console.log("Transaction sent, txid:", txidString);
+
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
-        txid,
+        txid: txidString,
         walletAddress: currentAddress,
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
-        // Optionally, you can add a success notification here.
+        // Set success message with clickable hyperlink.
+        setEntrySuccess(
+          <>
+            Transaction Successful! TXID:{" "}
+            <a
+              className="txid-link"
+              href={`https://kas.fyi/transaction/${txidString}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {txidString}
+            </a>
+          </>
+        );
       } else {
         setEntryError("Transaction Failed: Entry recording failed.");
       }
@@ -504,6 +523,21 @@ const RaffleDetail = ({ wallet }) => {
           >
             {entryError}
             <button className="close-button" onClick={() => setEntryError('')}>×</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {entrySuccess && (
+          <motion.div 
+            className="message success"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            {entrySuccess}
+            <button className="close-button" onClick={() => setEntrySuccess('')}>×</button>
           </motion.div>
         )}
       </AnimatePresence>
