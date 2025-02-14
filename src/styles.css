@@ -920,7 +920,7 @@ button {
   justify-content: center;
   margin-right: 0.5rem;
   position: relative;
-  top: -10px; /* Adjust this value as needed */
+  top: -8px; /* Adjust this value as needed */
   border: 2px solid #7bf8f9;
   box-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
   /* Responsive font size: adjusts if ticker text is longer */
