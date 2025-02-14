@@ -500,6 +500,15 @@ button {
   background-color: rgba(30, 90, 120, 0.95) !important;
   border: 2px solid rgba(30, 90, 120, 1) !important;
 }
+/* --- New CSS for the token logo image --- */
+.tokenlogo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;        /* Circular clipping */
+  object-fit: cover;         /* Ensures the image fills the area */
+  margin-left: 0.5rem;       /* Spacing between prize text and image */
+  border: 2px solid #7bf8f9;    /* Optional: a border to make the image pop */
+}
 
 .pagination {
   display: flex;
