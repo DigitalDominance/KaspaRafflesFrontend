@@ -117,9 +117,9 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-height: 80vh;
+  min-height: 100vh;
+  margin-top: -10vh;
   padding: 2rem;
-  
   text-align: center;
   position: relative;
   overflow: hidden;
