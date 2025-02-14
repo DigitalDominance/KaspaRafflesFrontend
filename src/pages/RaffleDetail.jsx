@@ -7,19 +7,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaUsers } from 'react-icons/fa';
 import '../styles.css';
 
-// Updated TokenLogoBig component with 3D spin effect on hover
+// Updated TokenLogoBig component with 3D spin and pop effect on hover
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
-
-  // 3D spin effect: full rotation on hover
-  const hoverAnimation = { rotateY: 360 };
+  // Token logo: pop and spin effect on hover
+  const tokenHover = { scale: 1.1, rotateY: 360 };
 
   return imgError ? (
     <motion.div 
       className="tokenLogoBig-fallback"
-      whileHover={hoverAnimation}
+      whileHover={tokenHover}
       whileTap={{ scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20, duration:1.5 }}
     >
       {ticker}
     </motion.div>
@@ -29,9 +28,9 @@ const TokenLogoBig = ({ ticker }) => {
       alt={ticker}
       className="tokenLogoBig"
       onError={() => setImgError(true)}
-      whileHover={hoverAnimation}
+      whileHover={tokenHover}
       whileTap={{ scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20, duration:1.5 }}
     />
   );
 };
@@ -368,7 +367,15 @@ const RaffleDetail = ({ wallet }) => {
       exit={{ opacity: 0 }}
     >
       <h1 className="raffle-title">
-        <TokenLogoBig ticker={raffle.prizeTicker} /> {raffle.prizeDisplay}
+        {/* Wrap the token logo and prize display text separately */}
+        <TokenLogoBig ticker={raffle.prizeTicker} />{' '}
+        <motion.span 
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        >
+          {raffle.prizeDisplay}
+        </motion.span>
       </h1>
       <motion.div 
         className={`raffle-detail-container ${raffle.status === "completed" ? "completed" : ""}`}
