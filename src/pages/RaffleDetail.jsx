@@ -10,7 +10,7 @@ import '../styles.css';
 // Updated TokenLogoBig component with 3D spin and pop effect on hover
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
-  // Token logo: pop and spin effect on hover
+  // Token logo: pop and spin effect on hover. (Only the token spins.)
   const tokenHover = { scale: 1.1, rotateY: 360 };
 
   return imgError ? (
@@ -18,7 +18,7 @@ const TokenLogoBig = ({ ticker }) => {
       className="tokenLogoBig-fallback"
       whileHover={tokenHover}
       whileTap={{ scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20, duration:1.5 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20, duration: 1.5 }}
     >
       {ticker}
     </motion.div>
@@ -30,7 +30,7 @@ const TokenLogoBig = ({ ticker }) => {
       onError={() => setImgError(true)}
       whileHover={tokenHover}
       whileTap={{ scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20, duration:1.5 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20, duration: 1.5 }}
     />
   );
 };
@@ -366,17 +366,16 @@ const RaffleDetail = ({ wallet }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <h1 className="raffle-title">
-        {/* Wrap the token logo and prize display text separately */}
-        <TokenLogoBig ticker={raffle.prizeTicker} />{' '}
-        <motion.span 
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        >
-          {raffle.prizeDisplay}
-        </motion.span>
-      </h1>
+      {/* Wrap the token logo and prize text together in one motion container */}
+      <motion.div 
+        className="raffle-title-container"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      >
+        <TokenLogoBig ticker={raffle.prizeTicker} />
+        <span className="raffle-title">{raffle.prizeDisplay}</span>
+      </motion.div>
       <motion.div 
         className={`raffle-detail-container ${raffle.status === "completed" ? "completed" : ""}`}
         initial={{ y: 20, opacity: 0 }}
