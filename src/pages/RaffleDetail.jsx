@@ -7,6 +7,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaUsers } from 'react-icons/fa';
 import '../styles.css';
 
+const TokenLogoBig = ({ ticker }) => {
+  const [imgError, setImgError] = useState(false);
+
+  return imgError ? (
+    <div className="tokenLogoBig-fallback">{ticker}</div>
+  ) : (
+    <img
+      src={`https://kaspamarket.io/static/${ticker}.jpg`}
+      alt={ticker}
+      className="tokenLogoBig"
+      onError={() => setImgError(true)}
+    />
+  );
+};
 const RaffleDetail = ({ wallet }) => {
   const { raffleId } = useParams();
   const [raffle, setRaffle] = useState(null);
@@ -281,7 +295,9 @@ const RaffleDetail = ({ wallet }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <h1 className="raffle-title">{raffle.prizeDisplay}</h1>
+      <h1 className="raffle-title">
+        <TokenLogoBig ticker={raffle.prizeTicker} /> {raffle.prizeDisplay}
+      </h1>
       <motion.div 
         className={`raffle-detail-container ${raffle.status === "completed" ? "completed" : ""}`}
         initial={{ y: 20, opacity: 0 }}
