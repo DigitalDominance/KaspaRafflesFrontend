@@ -239,15 +239,7 @@ const RaffleDetail = ({ wallet }) => {
         // Set success message with clickable hyperlink and small font for the TXID.
         setEntrySuccess(
           <>
-            Transaction Successful! TXID:{" "}
-            <a
-              className="txid-link small-txid"
-              href={`https://kas.fyi/transaction/${txidString}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {txidString}
-            </a>
+            Entry Successful!
           </>
         );
       } else {
