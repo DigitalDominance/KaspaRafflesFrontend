@@ -219,7 +219,7 @@ const RaffleDetail = ({ wallet }) => {
       }
       // If the transaction was cancelled or did not return a valid txid, display a styled error.
       if (!txid) {
-        setEntryError("Transaction Cancelled");
+        setEntryError("Transaction Failed");
         setProcessing(false);
         return;
       }
@@ -236,7 +236,7 @@ const RaffleDetail = ({ wallet }) => {
       }
     } catch (e) {
       console.error(e);
-      setEntryError("Transaction Failed");
+      setEntryError("Transaction Cancelled");
     } finally {
       setProcessing(false);
       setEntryAmount('');
