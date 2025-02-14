@@ -18,7 +18,7 @@ const TokenLogoBig = ({ ticker }) => {
       className="tokenLogoBig-fallback"
       whileHover={tokenHover}
       whileTap={{ scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 7 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 7 }}
     >
       {ticker}
     </motion.div>
@@ -30,7 +30,7 @@ const TokenLogoBig = ({ ticker }) => {
       onError={() => setImgError(true)}
       whileHover={tokenHover}
       whileTap={{ scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 7 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 7 }}
     />
   );
 };
