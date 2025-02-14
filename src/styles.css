@@ -530,7 +530,7 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   /* Responsive font size: it won't go below 0.6rem or above 0.8rem */
-  font-size: clamp(0.6rem, 2vw, 0.8rem);
+  font-size: clamp(0.45rem, 2vw, 0.65rem);
   text-transform: uppercase;
 }
 .pagination {
