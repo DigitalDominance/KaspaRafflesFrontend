@@ -516,7 +516,7 @@ button {
 /* --- New CSS for the fallback circular icon --- */
 .tokenlogo-fallback {
   position: relative;
-  top: -8px; /* Adjust this value as needed */
+  top: -6px; /* Adjust this value as needed */
   width: 32px;
   height: 32px;
   border-radius: 50%;
