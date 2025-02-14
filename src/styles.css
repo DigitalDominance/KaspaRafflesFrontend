@@ -525,7 +525,7 @@ button {
   justify-content: center;
   border: 2px solid #7bf8f9;
   box-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   text-transform: uppercase;
 }
 .pagination {
