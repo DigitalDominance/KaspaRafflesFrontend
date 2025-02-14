@@ -7,17 +7,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaUsers } from 'react-icons/fa';
 import '../styles.css';
 
+// Updated TokenLogoBig component with 3D spin effect on hover
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
 
+  // 3D spin effect: full rotation on hover
+  const hoverAnimation = { rotateY: 360 };
+
   return imgError ? (
-    <div className="tokenLogoBig-fallback">{ticker}</div>
+    <motion.div 
+      className="tokenLogoBig-fallback"
+      whileHover={hoverAnimation}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+    >
+      {ticker}
+    </motion.div>
   ) : (
-    <img
+    <motion.img
       src={`https://kaspamarket.io/static/${ticker}.jpg`}
       alt={ticker}
       className="tokenLogoBig"
       onError={() => setImgError(true)}
+      whileHover={hoverAnimation}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     />
   );
 };
