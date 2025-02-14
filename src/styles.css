@@ -92,8 +92,8 @@ button {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: 30px;
-  margin-bottom: 20px;
+  margin-top: 35px;
+  margin-bottom: 10px;
 }
 
 /* Global Heading - Use on all main pages except those you want left-aligned */
