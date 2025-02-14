@@ -523,7 +523,7 @@ button {
   display: inline-flex;       /* Change from flex to inline-flex */
   align-items: center;
   justify-content: center;
-  margin-top: -16px;
+  margin-top: -20px;
   border: 2px solid #7bf8f9;
   box-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
   white-space: nowrap;        /* Keep it on one line */
@@ -897,7 +897,7 @@ button {
   border-radius: 50%;        /* Circular clipping */
   object-fit: cover;         /* Ensures the image fills the area */
   margin-right: 0.5rem;       /* Spacing between logo and text */
-  margin-top: 4px;           /* Moved down a little */
+  margin-top: 15px;           /* Moved down a little */
   border: 2px solid #7bf8f9;  /* Border styling */
   box-shadow: 0 0 10px rgba(123, 248, 249, 0.5); /* Shadow effect */
 }
@@ -913,7 +913,7 @@ button {
   align-items: center;
   justify-content: center;
   margin-right: 0.5rem;
-  margin-top: 4px;
+  margin-top: -20px;
   border: 2px solid #7bf8f9;
   box-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
   /* Responsive font size: adjusts if ticker text is longer */
