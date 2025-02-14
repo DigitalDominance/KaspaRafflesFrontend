@@ -905,7 +905,7 @@ button {
   height: 50px;
   transform-style: preserve-3d;
   position: relative;
-  top: -18px; /* Adjust this value as needed */
+  top: -20px; /* Adjust this value as needed */
   perspective: 1000px;
   border-radius: 50%;        /* Circular clipping */
   object-fit: cover;         /* Ensures the image fills the area */
