@@ -14,7 +14,9 @@ r
 button {
   font-family: 'Roboto Mono', monospace;
 }
-
+.raffle-detail.page-container {
+  margin-top: -25px;
+}
 /* Global Container */
 .app-container {
   min-height: 100vh;
