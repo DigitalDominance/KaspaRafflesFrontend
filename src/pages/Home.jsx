@@ -38,7 +38,7 @@ const TokenLogo = ({ ticker }) => {
         variants={variants}
         onHoverStart={handleHoverStart}
         whileTap={{ scale: 0.95 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 1.5 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 75, duration: 1.5 }}
       >
         {ticker}
       </motion.div>
@@ -55,7 +55,7 @@ const TokenLogo = ({ ticker }) => {
         variants={variants}
         onHoverStart={handleHoverStart}
         whileTap={{ scale: 0.95 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 1.5 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 75, duration: 1.5 }}
       />
     );
   }
