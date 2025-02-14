@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,6 +21,7 @@ const TokenLogoBig = ({ ticker }) => {
     />
   );
 };
+
 const RaffleDetail = ({ wallet }) => {
   const { raffleId } = useParams();
   const [raffle, setRaffle] = useState(null);
@@ -45,7 +46,7 @@ const RaffleDetail = ({ wallet }) => {
   };
 
   // Helper: Fetch connected KasWare address.
-  const getConnectedAddress = async () => {
+  const getConnectedAddress = useCallback(async () => {
     try {
       const accounts = await window.kasware.getAccounts();
       return accounts[0];
@@ -53,10 +54,10 @@ const RaffleDetail = ({ wallet }) => {
       console.error('Error fetching connected account:', err);
       return null;
     }
-  };
+  }, []);
 
   // Fetch raffle details.
-  const fetchRaffle = async () => {
+  const fetchRaffle = useCallback(async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}`);
       if (res.data.success) {
@@ -70,7 +71,7 @@ const RaffleDetail = ({ wallet }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiUrl, raffleId]);
 
   // On mount, fetch raffle and update connected address.
   useEffect(() => {
@@ -87,7 +88,7 @@ const RaffleDetail = ({ wallet }) => {
       updateConnectedAddress();
     }, 1000);
     return () => clearInterval(interval);
-  }, [raffleId, apiUrl, fetchRaffle, getConnectedAddress]); // Added missing dependencies
+  }, [raffleId, apiUrl, fetchRaffle, getConnectedAddress]);
 
   // Compute "My Entries" by filtering raffle entries by the connected address.
   const myEntries =
@@ -231,15 +232,20 @@ const RaffleDetail = ({ wallet }) => {
   }
 
   if (!raffle) {
-    return <div className="raffle-detail page-container"><p>No raffle data available.</p></div>;
+    return (
+      <div className="raffle-detail page-container">
+        <p>No raffle data available.</p>
+      </div>
+    );
   }
 
   // Prepare prize dispersal information (only for completed raffles)
   let prizeDispersalInfo = null;
+  let completedContent = null;
   if (raffle.status === "completed") {
     const winners = (raffle.winnersList && raffle.winnersList.length > 0)
-                      ? raffle.winnersList
-                      : (raffle.winner && raffle.winner !== "No Entries" ? [raffle.winner] : []);
+      ? raffle.winnersList
+      : (raffle.winner && raffle.winner !== "No Entries" ? [raffle.winner] : []);
     // Group prize dispersal TXIDs by winner.
     const txidByWinner = {};
     if (raffle.prizeDispersalTxids && raffle.prizeDispersalTxids.length > 0) {
@@ -301,215 +307,218 @@ const RaffleDetail = ({ wallet }) => {
         </motion.div>
       );
     });
-  
-    return (
-      <motion.div 
-        className="raffle-detail page-container"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+
+    completedContent = (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
       >
-        <h1 className="raffle-title">
-          <TokenLogoBig ticker={raffle.prizeTicker} /> {raffle.prizeDisplay}
-        </h1>
-        <motion.div 
-          className={`raffle-detail-container ${raffle.status === "completed" ? "completed" : ""}`}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="raffle-info-detail">
-            <motion.div 
-              className="info-item"
-              whileHover={{ scale: 1.02, y: -2 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <FaCoins className="info-icon" />
-              <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
-            </motion.div>
-            <motion.div 
-              className="info-item"
-              whileHover={{ scale: 1.02, y: -2 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <FaTrophy className="info-icon" />
-              <p>Winners: {raffle.winnersCount}</p>
-            </motion.div>
-            <motion.div 
-              className="info-item"
-              whileHover={{ scale: 1.02, y: -2 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <FaUsers className="info-icon" />
-              <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
-            </motion.div>
-            <motion.div 
-              className="info-item"
-              whileHover={{ scale: 1.02, y: -2 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            >
-              <FaUserAlt className="info-icon" />
-              <p>My Entries: {myEntries.toFixed(2)}</p>
-            </motion.div>
-            {raffle.status === "live" ? (
-              <motion.div 
-                className="info-item"
-                whileHover={{ scale: 1.02, y: -2 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                <FaClock className="info-icon" />
-                <p>Time Remaining: {getTimeLeft(raffle.timeFrame)}</p>
-              </motion.div>
+        {raffle.winnersCount > 1 ? (
+          <div className="winners-list">
+            <h3>Winners List:</h3>
+            {raffle.winnersList && raffle.winnersList.length > 0 ? (
+              raffle.winnersList.map((winner, index) => (
+                <motion.p 
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  whileHover={{ scale: 1.05, x: 5 }}
+                  transition={{ delay: 0.1 * index, type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  {index + 1}. {winner}
+                </motion.p>
+              ))
             ) : (
-              <motion.div 
-                className="info-item"
-                whileHover={{ scale: 1.02, y: -2 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                <FaClock className="info-icon" />
-                <p>Status: Completed</p>
-              </motion.div>
+              <p>No winners selected.</p>
             )}
           </div>
-          {raffle.status === "completed" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+        ) : (
+          <p className="single-winner">
+            <strong>Winner: {raffle.winner ? raffle.winner : "No winner selected"}</strong>
+          </p>
+        )}
+        <div className="prize-dispersal-section">
+          <h3>Prize Dispersal Details</h3>
+          {prizeDispersalInfo ? prizeDispersalInfo : <p>No prize transactions recorded.</p>}
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div 
+      className="raffle-detail page-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <h1 className="raffle-title">
+        <TokenLogoBig ticker={raffle.prizeTicker} /> {raffle.prizeDisplay}
+      </h1>
+      <motion.div 
+        className={`raffle-detail-container ${raffle.status === "completed" ? "completed" : ""}`}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="raffle-info-detail">
+          <motion.div 
+            className="info-item"
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <FaCoins className="info-icon" />
+            <p>Conversion: {raffle.creditConversion} {raffle.type === "KAS" ? "KAS" : raffle.tokenTicker} = 1 Entry</p>
+          </motion.div>
+          <motion.div 
+            className="info-item"
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <FaTrophy className="info-icon" />
+            <p>Winners: {raffle.winnersCount}</p>
+          </motion.div>
+          <motion.div 
+            className="info-item"
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <FaUsers className="info-icon" />
+            <p>Total Entries: {raffle.totalEntries.toFixed(2)}</p>
+          </motion.div>
+          <motion.div 
+            className="info-item"
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <FaUserAlt className="info-icon" />
+            <p>My Entries: {myEntries.toFixed(2)}</p>
+          </motion.div>
+          {raffle.status === "live" ? (
+            <motion.div 
+              className="info-item"
+              whileHover={{ scale: 1.02, y: -2 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              {raffle.winnersCount > 1 ? (
-                <div className="winners-list">
-                  <h3>Winners List:</h3>
-                  {raffle.winnersList && raffle.winnersList.length > 0 ? (
-                    raffle.winnersList.map((winner, index) => (
-                      <motion.p 
-                        key={index}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        whileHover={{ scale: 1.05, x: 5 }}
-                        transition={{ delay: 0.1 * index, type: "spring", stiffness: 300, damping: 20 }}
-                      >
-                        {index + 1}. {winner}
-                      </motion.p>
-                    ))
-                  ) : (
-                    <p>No winners selected.</p>
-                  )}
-                </div>
-              ) : (
-                <p className="single-winner">
-                  <strong>Winner: {raffle.winner ? raffle.winner : "No winner selected"}</strong>
-                </p>
-              )}
-              <div className="prize-dispersal-section">
-                <h3>Prize Dispersal Details</h3>
-                {prizeDispersalInfo ? prizeDispersalInfo : <p>No prize transactions recorded.</p>}
-              </div>
+              <FaClock className="info-icon" />
+              <p>Time Remaining: {getTimeLeft(raffle.timeFrame)}</p>
+            </motion.div>
+          ) : (
+            <motion.div 
+              className="info-item"
+              whileHover={{ scale: 1.02, y: -2 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <FaClock className="info-icon" />
+              <p>Status: Completed</p>
             </motion.div>
           )}
-        </motion.div>
-        {raffle.status === "live" && (
-          <motion.div 
-            className="entry-section"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+        </div>
+        {raffle.status === "completed" && completedContent}
+      </motion.div>
+      {raffle.status === "live" && (
+        <motion.div 
+          className="entry-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <motion.input
+            className="entry-input"
+            type="number"
+            placeholder={`Min ${raffle.creditConversion} tokens`}
+            value={entryAmount}
+            onChange={(e) => setEntryAmount(e.target.value)}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          />
+          <motion.button 
+            onClick={handleEnterRaffle}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
-            <motion.input
-              className="entry-input"
-              type="number"
-              placeholder={`Min ${raffle.creditConversion} tokens`}
-              value={entryAmount}
-              onChange={(e) => setEntryAmount(e.target.value)}
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            />
+            Enter Raffle
+          </motion.button>
+        </motion.div>
+      )}
+      <AnimatePresence>
+        {entryError && (
+          <motion.div 
+            className="message error"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            {entryError}
+            <button className="close-button" onClick={() => setEntryError('')}>×</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {processing && (
+        <motion.div 
+          className="processing-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="spinner"></div>
+          <p>Your entry is being processed and will be counted soon...</p>
+          <button className="close-button" onClick={() => setProcessing(false)}>×</button>
+        </motion.div>
+      )}
+      <motion.div 
+        className="leaderboard"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+      >
+        <h3>Leaderboard (Entries)</h3>
+        {displayedEntries.length > 0 ? (
+          displayedEntries.map((entry, index) => (
+            <motion.div 
+              key={index} 
+              className="leaderboard-entry"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              whileHover={{ scale: 1.02, x: 5 }}
+              transition={{ delay: 0.1 * index, type: "spring", stiffness: 300, damping: 20 }}
+            >
+              <span>{entry.walletAddress}</span>: <span>{entry.creditsAdded.toFixed(2)} entries</span>
+            </motion.div>
+          ))
+        ) : (
+          <p>No entries yet.</p>
+        )}
+        {totalEntryPages > 1 && (
+          <div className="pagination">
             <motion.button 
-              onClick={handleEnterRaffle}
+              onClick={() => setEntryPage(prev => Math.max(prev - 1, 1))} 
+              disabled={entryPage === 1}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              Enter Raffle
+              Previous
             </motion.button>
-          </motion.div>
-        )}
-        <AnimatePresence>
-          {entryError && (
-            <motion.div 
-              className="message error"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              whileHover={{ scale: 1.02 }}
+            <span>Page {entryPage} of {totalEntryPages}</span>
+            <motion.button 
+              onClick={() => setEntryPage(prev => Math.min(prev + 1, totalEntryPages))} 
+              disabled={entryPage === totalEntryPages}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              {entryError}
-              <button className="close-button" onClick={() => setEntryError('')}>×</button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {processing && (
-          <motion.div 
-            className="processing-modal"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="spinner"></div>
-            <p>Your entry is being processed and will be counted soon...</p>
-            <button className="close-button" onClick={() => setProcessing(false)}>×</button>
-          </motion.div>
+              Next
+            </motion.button>
+          </div>
         )}
-        <motion.div 
-          className="leaderboard"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-        >
-          <h3>Leaderboard (Entries)</h3>
-          {displayedEntries.length > 0 ? (
-            displayedEntries.map((entry, index) => (
-              <motion.div 
-                key={index} 
-                className="leaderboard-entry"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                whileHover={{ scale: 1.02, x: 5 }}
-                transition={{ delay: 0.1 * index, type: "spring", stiffness: 300, damping: 20 }}
-              >
-                <span>{entry.walletAddress}</span>: <span>{entry.creditsAdded.toFixed(2)} entries</span>
-              </motion.div>
-            ))
-          ) : (
-            <p>No entries yet.</p>
-          )}
-          {totalEntryPages > 1 && (
-            <div className="pagination">
-              <motion.button 
-                onClick={() => setEntryPage(prev => Math.max(prev - 1, 1))} 
-                disabled={entryPage === 1}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                Previous
-              </motion.button>
-              <span>Page {entryPage} of {totalEntryPages}</span>
-              <motion.button 
-                onClick={() => setEntryPage(prev => Math.min(prev + 1, totalEntryPages))} 
-                disabled={entryPage === totalEntryPages}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                Next
-              </motion.button>
-            </div>
-          )}
-        </motion.div>
       </motion.div>
-    );
-  };
-  
-  export default RaffleDetail;
+    </motion.div>
+  );
+};
+
+export default RaffleDetail;
