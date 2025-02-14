@@ -226,23 +226,8 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
 
-      // Try to parse the returned value if it's a string.
-      let parsedTx;
-      try {
-        parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
-      } catch (e) {
-        parsedTx = txid;
-      }
-      
       // Extract the transaction ID using the "TransactionId" field.
-      const txidString = parsedTx && parsedTx.TransactionId ? parsedTx.TransactionId : '';
-      
-      if (!txidString) {
-        setEntryError("Transaction did not return a TransactionId");
-        setProcessing(false);
-        return;
-      }
-      
+      const txidString = typeof txid === 'object' && txid.TransactionId ? txid.TransactionId : txid;
       console.log("Transaction sent, txid:", txidString);
 
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
