@@ -896,6 +896,8 @@ button {
 .tokenLogoBig {
   width: 50px;
   height: 50px;
+  transform-style: preserve-3d;
+  perspective: 1000px;
   border-radius: 50%;        /* Circular clipping */
   object-fit: cover;         /* Ensures the image fills the area */
   margin-right: 0.5rem;       /* Spacing between logo and text */
@@ -908,6 +910,8 @@ button {
 .tokenLogoBig-fallback {
   width: 50px;
   height: 50px;
+  transform-style: preserve-3d;
+  perspective: 1000px;
   border-radius: 50%;
   background-color: #8a2be2;  /* Fallback background color */
   color: #7bf8f9;
