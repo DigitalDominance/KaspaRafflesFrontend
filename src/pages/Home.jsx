@@ -1,25 +1,64 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { FaClock, FaTrophy, FaUserAlt, FaUsers, FaCrown, FaClipboardList } from "react-icons/fa";
 import "../styles.css";
 
+// Updated TokenLogo component with one-shot 3D spin and pop effect on hover
 const TokenLogo = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
+  const controls = useAnimation();
+  const [animating, setAnimating] = useState(false);
 
-  return imgError ? (
-    <div className="tokenlogo-fallback">{ticker}</div>
-  ) : (
-    <img
-      src={`https://kaspamarket.io/static/${ticker}.jpg`}
-      alt={ticker}
-      className="tokenlogo"
-      onError={() => setImgError(true)}
-    />
-  );
+  // Define the variants for the token logo.
+  const variants = {
+    initial: { scale: 1, rotateY: 0 },
+    hover: { scale: 1.1, rotateY: 360 }
+  };
+
+  const handleHoverStart = () => {
+    if (!animating) {
+      setAnimating(true);
+      controls.start("hover").then(() => {
+        controls.start("initial");
+        setAnimating(false);
+      });
+    }
+  };
+
+  if (imgError) {
+    return (
+      <motion.div 
+        className="tokenlogo-fallback"
+        animate={controls}
+        initial="initial"
+        variants={variants}
+        onHoverStart={handleHoverStart}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 1.5 }}
+      >
+        {ticker}
+      </motion.div>
+    );
+  } else {
+    return (
+      <motion.img
+        src={`https://kaspamarket.io/static/${ticker}.jpg`}
+        alt={ticker}
+        className="tokenlogo"
+        onError={() => setImgError(true)}
+        animate={controls}
+        initial="initial"
+        variants={variants}
+        onHoverStart={handleHoverStart}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 1.5 }}
+      />
+    );
+  }
 };
 
 const Home = () => {
@@ -120,8 +159,10 @@ const Home = () => {
                     to={`/raffle/${raffle.raffleId}`}
                     className={`home-raffle-card ${raffle.status === "completed" ? "completed" : ""}`}
                   >
+                    {/* Combined container: the token logo (with spin) and the prize text pop on hover */}
                     <motion.h3 
-                      whileHover={{ scale: 1.05 }} 
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       transition={{ type: "spring", stiffness: 300 }}
                     >
                       <TokenLogo ticker={raffle.prizeTicker} /> {raffle.prizeDisplay}
