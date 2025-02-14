@@ -3,36 +3,63 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaUsers } from 'react-icons/fa';
 import '../styles.css';
 
-// Updated TokenLogoBig component with 3D spin and pop effect on hover
+// Updated TokenLogoBig component with one-shot 3D spin (cannot be interrupted)
+// The logo will pop (scale up) and spin 360° when hovered, then return to its initial state.
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
-  // Token logo: pop and spin effect on hover. (Only the token spins.)
-  const tokenHover = { scale: 1.1, rotateY: 360 };
+  const controls = useAnimation();
+  const [animating, setAnimating] = useState(false);
 
-  return imgError ? (
-    <motion.div 
-      className="tokenLogoBig-fallback"
-      whileHover={tokenHover}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 7 }}
-    >
-      {ticker}
-    </motion.div>
-  ) : (
-    <motion.img
-      src={`https://kaspamarket.io/static/${ticker}.jpg`}
-      alt={ticker}
-      className="tokenLogoBig"
-      onError={() => setImgError(true)}
-      whileHover={tokenHover}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 7 }}
-    />
-  );
+  const tokenVariants = {
+    initial: { scale: 1, rotateY: 0 },
+    hover: { scale: 1.1, rotateY: 360 }
+  };
+
+  const handleHoverStart = () => {
+    if (!animating) {
+      setAnimating(true);
+      // Start the "hover" animation and then return to "initial" when done.
+      controls.start("hover").then(() => {
+        controls.start("initial");
+        setAnimating(false);
+      });
+    }
+  };
+
+  if (imgError) {
+    return (
+      <motion.div 
+        className="tokenLogoBig-fallback"
+        animate={controls}
+        initial="initial"
+        variants={tokenVariants}
+        onHoverStart={handleHoverStart}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 1.5 }}
+      >
+        {ticker}
+      </motion.div>
+    );
+  } else {
+    return (
+      <motion.img
+        src={`https://kaspamarket.io/static/${ticker}.jpg`}
+        alt={ticker}
+        className="tokenLogoBig"
+        onError={() => setImgError(true)}
+        animate={controls}
+        initial="initial"
+        variants={tokenVariants}
+        onHoverStart={handleHoverStart}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 50, duration: 1.5 }}
+      />
+    );
+  }
 };
 
 const RaffleDetail = ({ wallet }) => {
@@ -271,7 +298,6 @@ const RaffleDetail = ({ wallet }) => {
     }
     prizeDispersalInfo = winners.map((winner, idx) => {
       const prizeSent = txidByWinner[winner] && txidByWinner[winner].length > 0;
-      // If not yet sent, show "In Progress...", if sent then "Complete!"
       const statusText = prizeSent ? "Complete!" : "In Progress...";
       return (
         <motion.div 
@@ -362,16 +388,18 @@ const RaffleDetail = ({ wallet }) => {
   return (
     <motion.div 
       className="raffle-detail page-container"
+      style={{ marginTop: '120px', textAlign: 'center' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Wrap the token logo and prize text together in one motion container */}
+      {/* Combined container for token logo and prize text */}
       <motion.div 
         className="raffle-title-container"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
       >
         <TokenLogoBig ticker={raffle.prizeTicker} />
         <span className="raffle-title">{raffle.prizeDisplay}</span>
