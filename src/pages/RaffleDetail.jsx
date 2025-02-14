@@ -183,7 +183,7 @@ const RaffleDetail = ({ wallet }) => {
   const handleEnterRaffle = async () => {
     setEntryError('');
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
-      alert(`Minimum entry is ${raffle.creditConversion}`);
+      setEntryError(`Minimum entry is ${raffle.creditConversion}`);
       return;
     }
     const hasFunds = await checkEntryBalance();
@@ -217,8 +217,9 @@ const RaffleDetail = ({ wallet }) => {
           raffle.wallet.receivingAddress
         );
       }
+      // If the transaction was cancelled or did not return a valid txid, display a styled error.
       if (!txid) {
-        setEntryError("Transaction was cancelled or failed. Entry not recorded.");
+        setEntryError("Transaction Cancelled");
         setProcessing(false);
         return;
       }
@@ -229,13 +230,13 @@ const RaffleDetail = ({ wallet }) => {
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
-        alert("Entry recorded successfully.");
+        // Optionally, you can add a success notification here.
       } else {
-        alert("Entry recording failed.");
+        setEntryError("Transaction Failed: Entry recording failed.");
       }
     } catch (e) {
       console.error(e);
-      alert("Transaction failed");
+      setEntryError("Transaction Failed");
     } finally {
       setProcessing(false);
       setEntryAmount('');
