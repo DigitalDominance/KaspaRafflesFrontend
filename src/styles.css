@@ -507,7 +507,7 @@ button {
   height: 32px;
   border-radius: 50%;        /* Circular clipping */
   object-fit: cover;         /* Ensures the image fills the area */
-  margin-bottom: -12px;           /* Moved down a little */
+  margin-bottom: -10px;           /* Moved down a little */
   border: 2px solid #7bf8f9;    /* Optional: a border to make the image pop */
   box-shadow: 0 0 10px rgba(123, 248, 249, 0.5); /* Shadow effect */
 }
@@ -523,7 +523,7 @@ button {
   display: inline-flex;       /* Change from flex to inline-flex */
   align-items: center;
   justify-content: center;
-  margin-top: -12px;
+  margin-top: -16px;
   border: 2px solid #7bf8f9;
   box-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
   white-space: nowrap;        /* Keep it on one line */
@@ -889,6 +889,36 @@ button {
   margin: 0;
   font-size: 1rem;
   color: #fff;
+}
+/* --- New CSS for the big token logo image --- */
+.tokenLogoBig {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;        /* Circular clipping */
+  object-fit: cover;         /* Ensures the image fills the area */
+  margin-right: 0.5rem;       /* Spacing between logo and text */
+  margin-top: 4px;           /* Moved down a little */
+  border: 2px solid #7bf8f9;  /* Border styling */
+  box-shadow: 0 0 10px rgba(123, 248, 249, 0.5); /* Shadow effect */
+}
+
+/* --- New CSS for the big fallback circular icon --- */
+.tokenLogoBig-fallback {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #8a2be2;  /* Fallback background color */
+  color: #7bf8f9;
+  display: inline-flex;      /* Inline-flex so it sits on the same line as text */
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+  margin-top: 4px;
+  border: 2px solid #7bf8f9;
+  box-shadow: 0 0 10px rgba(123, 248, 249, 0.5);
+  /* Responsive font size: adjusts if ticker text is longer */
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  text-transform: uppercase;
 }
 
 /* --- Entry Section --- */
