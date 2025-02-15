@@ -72,11 +72,13 @@ const RaffleDetail = ({ wallet }) => {
   const [entryAmount, setEntryAmount] = useState('');
   const [entryError, setEntryError] = useState('');
   const [entrySuccess, setEntrySuccess] = useState('');
-  const [extractingTx, setExtractingTx] = useState(false);
   const [entryPage, setEntryPage] = useState(1);
   const [connectedAddress, setConnectedAddress] = useState('');
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+  // A state to indicate that we are extracting the TXID (to show a spinner, for example)
+  const [extractingTx, setExtractingTx] = useState(false);
 
   // Helper: Live countdown.
   const getTimeLeft = (endTime) => {
@@ -121,7 +123,9 @@ const RaffleDetail = ({ wallet }) => {
     fetchRaffle();
     const updateConnectedAddress = async () => {
       const addr = await getConnectedAddress();
-      if (addr) setConnectedAddress(addr);
+      if (addr) {
+        setConnectedAddress(addr);
+      }
     };
     updateConnectedAddress();
     const interval = setInterval(() => {
@@ -130,6 +134,36 @@ const RaffleDetail = ({ wallet }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [raffleId, apiUrl, fetchRaffle, getConnectedAddress]);
+
+  // Listen for Kasware's transactionReplacementResponse event.
+  useEffect(() => {
+    const kasware = window.kasware;
+    const handleTxReplacement = (res) => {
+      // When the event fires, update the success message with the new TXID.
+      console.log("Transaction Replacement Event:", res);
+      const newTxid = res.transactionId || res.replacedTransactionId;
+      if (newTxid) {
+        setEntrySuccess(
+          <>
+            Entry Successful! TXID:{" "}
+            <a
+              className="txid-link small-txid"
+              href={`https://kas.fyi/transaction/${newTxid}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {newTxid}
+            </a>
+          </>
+        );
+      }
+    };
+
+    kasware.on("transactionReplacementResponse", handleTxReplacement);
+    return () => {
+      kasware.removeListener("transactionReplacementResponse", handleTxReplacement);
+    };
+  }, []);
 
   // Compute "My Entries" by filtering raffle entries by the connected address.
   const myEntries =
@@ -227,13 +261,13 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Delay before extracting TXID to allow transaction settlement.
+      // Delay before extracting TXID so the transaction can settle.
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Now log the raw txid.
+      // Log the raw txid for debugging.
       console.log("Raw txid from wallet:", txid);
-  
-      // Indicate we're now extracting the TXID.
+      
+      // Indicate that we are now extracting the TXID.
       setExtractingTx(true);
       
       let txidString = "";
@@ -257,12 +291,11 @@ const RaffleDetail = ({ wallet }) => {
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
+        // Show a spinner if we are still extracting.
         setEntrySuccess(
           <>
             Entry Successful! TXID:{" "}
-            {extractingTx ? (
-              <Spinner />
-            ) : (
+            {extractingTx ? <Spinner /> : (
               <a
                 className="txid-link small-txid"
                 href={`https://kas.fyi/transaction/${txidString}`}
@@ -281,7 +314,7 @@ const RaffleDetail = ({ wallet }) => {
       console.error(e);
       setEntryError("Transaction Cancelled");
     } finally {
-      // Optionally wait a bit before refreshing to ensure latest data is available.
+      // Optionally wait a bit before refreshing.
       await new Promise(resolve => setTimeout(resolve, 500));
       setProcessing(false);
       setEntryAmount('');
