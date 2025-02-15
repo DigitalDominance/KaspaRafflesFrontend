@@ -180,6 +180,7 @@ const RaffleDetail = ({ wallet }) => {
   };
 
   const handleEnterRaffle = async () => {
+    // Clear any previous messages
     setEntryError('');
     setEntrySuccess('');
     
@@ -218,7 +219,7 @@ const RaffleDetail = ({ wallet }) => {
           raffle.wallet.receivingAddress
         );
       }
-      // If the transaction was cancelled or did not return a valid txid, display a styled error.
+      // If the transaction was cancelled or did not return a valid txid, display an error.
       if (!txid) {
         setEntryError("Transaction Failed");
         setProcessing(false);
@@ -227,20 +228,16 @@ const RaffleDetail = ({ wallet }) => {
   
       let txidString = "";
       if (raffle.type === 'KAS') {
-        // KAS transactions return full transaction JSON.
+        // For KAS, parse the returned JSON and extract the transactionId from the first input.
         const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
         txidString = parsedTx.inputs[0].transactionId;
       } else if (raffle.type === 'KRC20') {
-        // For KRC20, we now extract the TXID from the commitTxStr.
-        if (txid && txid.commitTxStr) {
-          const commitTx = typeof txid.commitTxStr === 'string'
-            ? JSON.parse(txid.commitTxStr)
-            : txid.commitTxStr;
-          txidString = commitTx.inputs[0].transactionId;
-        } else {
-          // Fallback if commitTxStr isn't present.
-          txidString = typeof txid === 'string' ? txid : txid.transactionId || '';
-        }
+        // For KRC20, do the same but using the commitTxStr field.
+        const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
+        const commitTx = typeof parsedTx.commitTxStr === 'string'
+          ? JSON.parse(parsedTx.commitTxStr)
+          : parsedTx.commitTxStr;
+        txidString = commitTx.inputs[0].transactionId;
       }
   
       console.log("Transaction sent, txid:", txidString);
@@ -251,7 +248,6 @@ const RaffleDetail = ({ wallet }) => {
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
-        // Set success message with clickable hyperlink and small font for the TXID.
         setEntrySuccess(
           <>
             Entry Successful! TXID:{" "}
