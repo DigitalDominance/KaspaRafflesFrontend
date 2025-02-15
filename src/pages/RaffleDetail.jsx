@@ -11,7 +11,7 @@ const Spinner = () => (
   <div className="spinner" style={{ display: 'inline-block', marginLeft: '0.5rem' }} />
 );
 
-// Updated TokenLogoBig component with one-shot 3D spin (cannot be interrupted)
+// Updated TokenLogoBig component with one-shot 3D spin
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
   const controls = useAnimation();
@@ -34,7 +34,7 @@ const TokenLogoBig = ({ ticker }) => {
 
   if (imgError) {
     return (
-      <motion.div 
+      <motion.div
         className="tokenLogoBig-fallback"
         animate={controls}
         initial="initial"
@@ -72,8 +72,6 @@ const RaffleDetail = ({ wallet }) => {
   const [entryAmount, setEntryAmount] = useState('');
   const [entryError, setEntryError] = useState('');
   const [entrySuccess, setEntrySuccess] = useState('');
-  // pendingTx indicates that the transaction has been submitted and we are waiting for the event
-  const [pendingTx, setPendingTx] = useState(false);
   const [entryPage, setEntryPage] = useState(1);
   const [connectedAddress, setConnectedAddress] = useState('');
   const entriesPerPage = 6;
@@ -89,7 +87,7 @@ const RaffleDetail = ({ wallet }) => {
     return `${hours}h ${minutes}m ${seconds}s`;
   };
 
-  // Helper: Fetch connected KasWare address.
+  // Helper: Fetch connected Kasware address.
   const getConnectedAddress = useCallback(async () => {
     try {
       const accounts = await window.kasware.getAccounts();
@@ -100,7 +98,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   }, []);
 
-  // Fetch raffle details with cache busting.
+  // Fetch raffle details (cache busting included).
   const fetchRaffle = useCallback(async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}?t=${new Date().getTime()}`);
@@ -131,36 +129,6 @@ const RaffleDetail = ({ wallet }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [raffleId, apiUrl, fetchRaffle, getConnectedAddress]);
-
-  // Listen for Kasware's transactionReplacementResponse event.
-  // When this event fires, we update the success message with the new TXID.
-  useEffect(() => {
-    const kasware = window.kasware;
-    const handleTxReplacement = (res) => {
-      console.log('transactionReplacementResponse event:', res);
-      const newTxid = res.transactionId || res.replacedTransactionId;
-      if (newTxid && pendingTx) {
-        setEntrySuccess(
-          <>
-            Entry Successful! TXID:{' '}
-            <a
-              className="txid-link small-txid"
-              href={`https://kas.fyi/transaction/${newTxid}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {newTxid}
-            </a>
-          </>
-        );
-        setPendingTx(false);
-      }
-    };
-    kasware.on('transactionReplacementResponse', handleTxReplacement);
-    return () => {
-      kasware.removeListener('transactionReplacementResponse', handleTxReplacement);
-    };
-  }, [pendingTx]);
 
   // Compute "My Entries" by filtering raffle entries by the connected address.
   const myEntries =
@@ -213,10 +181,9 @@ const RaffleDetail = ({ wallet }) => {
   };
 
   const handleEnterRaffle = async () => {
-    // Clear previous messages and reset pending flag
+    // Clear any previous messages
     setEntryError('');
     setEntrySuccess('');
-    setPendingTx(false);
     
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
       setEntryError(`Minimum entry is ${raffle.creditConversion}`);
@@ -259,18 +226,31 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Instead of immediately extracting TXID from the returned response,
-      // we now set the pending flag and let the event update the state.
-      setPendingTx(true);
-      setEntrySuccess(<>Entry Submitted! Waiting for confirmation <Spinner /></>);
-      console.log("Transaction submitted, awaiting transactionReplacementResponse event...");
+      // Directly set the TXID from the wallet call.
+      // (Assuming Kasware returns the final TXID immediately as in the demo's SendKaspa.)
+      setEntrySuccess(
+        <>
+          Entry Successful! TXID:{' '}
+          <a
+            className="txid-link small-txid"
+            href={`https://kas.fyi/transaction/${txid}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {txid}
+          </a>
+        </>
+      );
   
-      // (Optional: You could add a fallback timeout here if the event never fires.)
+      await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
+        txid: txid,
+        walletAddress: currentAddress,
+        amount: parseFloat(entryAmount)
+      });
     } catch (e) {
       console.error(e);
       setEntryError("Transaction Cancelled");
     } finally {
-      // Optionally wait a bit before refreshing raffle data.
       await new Promise(resolve => setTimeout(resolve, 500));
       setProcessing(false);
       setEntryAmount('');
@@ -427,7 +407,6 @@ const RaffleDetail = ({ wallet }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Combined container for token logo and prize text */}
       <motion.div 
         className="raffle-title-container"
         whileHover={{ scale: 1.05 }}
