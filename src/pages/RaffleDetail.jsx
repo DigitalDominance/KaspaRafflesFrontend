@@ -95,10 +95,10 @@ const RaffleDetail = ({ wallet }) => {
     }
   }, []);
 
-  // Fetch raffle details.
+  // Fetch raffle details with cache busting.
   const fetchRaffle = useCallback(async () => {
     try {
-      const res = await axios.get(`${apiUrl}/raffles/${raffleId}`);
+      const res = await axios.get(`${apiUrl}/raffles/${raffleId}?t=${new Date().getTime()}`);
       if (res.data.success) {
         setRaffle(res.data.raffle);
       } else {
@@ -219,20 +219,20 @@ const RaffleDetail = ({ wallet }) => {
           raffle.wallet.receivingAddress
         );
       }
-      // If the transaction was cancelled or did not return a valid txid, display an error.
       if (!txid) {
         setEntryError("Transaction Failed");
         setProcessing(false);
         return;
       }
   
+      // Log the raw txid to verify the returned response
+      console.log("Raw txid from wallet:", txid);
+  
       let txidString = "";
       if (raffle.type === 'KAS') {
-        // For KAS, parse the returned JSON and extract the transactionId from the first input.
         const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
         txidString = parsedTx.inputs[0].transactionId;
       } else if (raffle.type === 'KRC20') {
-        // For KRC20, do the same but using the commitTxStr field.
         const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
         const commitTx = typeof parsedTx.commitTxStr === 'string'
           ? JSON.parse(parsedTx.commitTxStr)
@@ -240,7 +240,7 @@ const RaffleDetail = ({ wallet }) => {
         txidString = commitTx.inputs[0].transactionId;
       }
   
-      console.log("Transaction sent, txid:", txidString);
+      console.log("Extracted TXID:", txidString);
   
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
         txid: txidString,
@@ -268,12 +268,13 @@ const RaffleDetail = ({ wallet }) => {
       console.error(e);
       setEntryError("Transaction Cancelled");
     } finally {
+      // Wait a bit before refreshing to ensure latest data is available
+      await new Promise(resolve => setTimeout(resolve, 500));
       setProcessing(false);
       setEntryAmount('');
       fetchRaffle();
     }
   };
-
 
   // Aggregate raffle entries by wallet.
   const aggregatedEntries = raffle && raffle.entries
