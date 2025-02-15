@@ -11,7 +11,6 @@ const Spinner = () => (
   <div className="spinner" style={{ display: 'inline-block', marginLeft: '0.5rem' }} />
 );
 
-// Updated TokenLogoBig component with one-shot 3D spin
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
   const controls = useAnimation();
@@ -25,8 +24,8 @@ const TokenLogoBig = ({ ticker }) => {
   const handleHoverStart = () => {
     if (!animating) {
       setAnimating(true);
-      controls.start('hover').then(() => {
-        controls.start('initial');
+      controls.start("hover").then(() => {
+        controls.start("initial");
         setAnimating(false);
       });
     }
@@ -34,7 +33,7 @@ const TokenLogoBig = ({ ticker }) => {
 
   if (imgError) {
     return (
-      <motion.div
+      <motion.div 
         className="tokenLogoBig-fallback"
         animate={controls}
         initial="initial"
@@ -98,7 +97,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   }, []);
 
-  // Fetch raffle details (cache busting included).
+  // Fetch raffle details with cache busting.
   const fetchRaffle = useCallback(async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}?t=${new Date().getTime()}`);
@@ -181,7 +180,7 @@ const RaffleDetail = ({ wallet }) => {
   };
 
   const handleEnterRaffle = async () => {
-    // Clear any previous messages
+    // Clear previous messages
     setEntryError('');
     setEntrySuccess('');
     
@@ -226,8 +225,7 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Directly set the TXID from the wallet call.
-      // (Assuming Kasware returns the final TXID immediately as in the demo's SendKaspa.)
+      // Directly use the returned txid exactly as in the demo.
       setEntrySuccess(
         <>
           Entry Successful! TXID:{' '}
