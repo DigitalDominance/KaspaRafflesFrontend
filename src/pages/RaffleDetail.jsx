@@ -34,7 +34,7 @@ const TokenLogoBig = ({ ticker }) => {
 
   if (imgError) {
     return (
-      <motion.div
+      <motion.div 
         className="tokenLogoBig-fallback"
         animate={controls}
         initial="initial"
@@ -72,13 +72,12 @@ const RaffleDetail = ({ wallet }) => {
   const [entryAmount, setEntryAmount] = useState('');
   const [entryError, setEntryError] = useState('');
   const [entrySuccess, setEntrySuccess] = useState('');
+  // pendingTx indicates that the transaction has been submitted and we are waiting for the event
+  const [pendingTx, setPendingTx] = useState(false);
   const [entryPage, setEntryPage] = useState(1);
   const [connectedAddress, setConnectedAddress] = useState('');
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-  // This state indicates that we have submitted the transaction and are waiting for an event update.
-  const [pendingTx, setPendingTx] = useState(false);
 
   // Helper: Live countdown.
   const getTimeLeft = (endTime) => {
@@ -134,13 +133,13 @@ const RaffleDetail = ({ wallet }) => {
   }, [raffleId, apiUrl, fetchRaffle, getConnectedAddress]);
 
   // Listen for Kasware's transactionReplacementResponse event.
+  // When this event fires, we update the success message with the new TXID.
   useEffect(() => {
     const kasware = window.kasware;
     const handleTxReplacement = (res) => {
       console.log('transactionReplacementResponse event:', res);
       const newTxid = res.transactionId || res.replacedTransactionId;
-      if (newTxid) {
-        // Update the success message with the new TXID.
+      if (newTxid && pendingTx) {
         setEntrySuccess(
           <>
             Entry Successful! TXID:{' '}
@@ -161,7 +160,7 @@ const RaffleDetail = ({ wallet }) => {
     return () => {
       kasware.removeListener('transactionReplacementResponse', handleTxReplacement);
     };
-  }, []);
+  }, [pendingTx]);
 
   // Compute "My Entries" by filtering raffle entries by the connected address.
   const myEntries =
@@ -214,7 +213,7 @@ const RaffleDetail = ({ wallet }) => {
   };
 
   const handleEnterRaffle = async () => {
-    // Clear previous messages and set pending state
+    // Clear previous messages and reset pending flag
     setEntryError('');
     setEntrySuccess('');
     setPendingTx(false);
@@ -260,19 +259,18 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Instead of immediately extracting the TXID, we now set a pending state.
+      // Instead of immediately extracting TXID from the returned response,
+      // we now set the pending flag and let the event update the state.
       setPendingTx(true);
       setEntrySuccess(<>Entry Submitted! Waiting for confirmation <Spinner /></>);
+      console.log("Transaction submitted, awaiting transactionReplacementResponse event...");
   
-      // (Optionally, you could add a fallback extraction here after a timeout.)
-  
-      // The event listener (in useEffect) will update entrySuccess when the new TXID is available.
-      console.log("Transaction submitted, awaiting replacement event...");
+      // (Optional: You could add a fallback timeout here if the event never fires.)
     } catch (e) {
       console.error(e);
       setEntryError("Transaction Cancelled");
     } finally {
-      // Optionally wait a bit before refreshing.
+      // Optionally wait a bit before refreshing raffle data.
       await new Promise(resolve => setTimeout(resolve, 500));
       setProcessing(false);
       setEntryAmount('');
@@ -429,6 +427,7 @@ const RaffleDetail = ({ wallet }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
+      {/* Combined container for token logo and prize text */}
       <motion.div 
         className="raffle-title-container"
         whileHover={{ scale: 1.05 }}
