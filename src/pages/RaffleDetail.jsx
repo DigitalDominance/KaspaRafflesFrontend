@@ -225,8 +225,11 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Log the raw txid to verify the returned response
+      // Log the raw txid to verify the returned response.
       console.log("Raw txid from wallet:", txid);
+  
+      // Add a delay to let the transaction settle before extracting TXID.
+      await new Promise(resolve => setTimeout(resolve, 7500));
   
       let txidString = "";
       if (raffle.type === 'KAS') {
@@ -268,7 +271,7 @@ const RaffleDetail = ({ wallet }) => {
       console.error(e);
       setEntryError("Transaction Cancelled");
     } finally {
-      // Wait a bit before refreshing to ensure latest data is available
+      // Optionally wait a bit before refreshing to ensure latest data is available.
       await new Promise(resolve => setTimeout(resolve, 500));
       setProcessing(false);
       setEntryAmount('');
