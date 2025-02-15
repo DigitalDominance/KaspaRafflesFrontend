@@ -180,92 +180,105 @@ const RaffleDetail = ({ wallet }) => {
   };
 
   const handleEnterRaffle = async () => {
-    // Clear any previous messages
-    setEntryError('');
-    setEntrySuccess('');
-    
-    if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
-      setEntryError(`Minimum entry is ${raffle.creditConversion}`);
-      return;
-    }
-    const hasFunds = await checkEntryBalance();
-    if (!hasFunds) return;
+  // Clear any previous messages
+  setEntryError('');
+  setEntrySuccess('');
+  
+  if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
+    setEntryError(`Minimum entry is ${raffle.creditConversion}`);
+    return;
+  }
+  const hasFunds = await checkEntryBalance();
+  if (!hasFunds) return;
 
-    const currentAddress = await getConnectedAddress();
-    if (!currentAddress) {
-      setEntryError("Could not verify connected wallet address.");
-      return;
-    }
+  const currentAddress = await getConnectedAddress();
+  if (!currentAddress) {
+    setEntryError("Could not verify connected wallet address.");
+    return;
+  }
 
-    setProcessing(true);
-    try {
-      let txid;
-      if (raffle.type === 'KAS') {
-        txid = await window.kasware.sendKaspa(
-          raffle.wallet.receivingAddress,
-          parseFloat(entryAmount) * 1e8
-        );
-      } else if (raffle.type === 'KRC20') {
-        const transferJson = JSON.stringify({
-          p: "KRC-20",
-          op: "transfer",
-          tick: raffle.tokenTicker,
-          amt: (parseFloat(entryAmount) * 1e8).toString(),
-          to: raffle.wallet.receivingAddress,
-        });
-        txid = await window.kasware.signKRC20Transaction(
-          transferJson,
-          4,
-          raffle.wallet.receivingAddress
-        );
-      }
-      // If the transaction was cancelled or did not return a valid txid, display a styled error.
-      if (!txid) {
-        setEntryError("Transaction Failed");
-        setProcessing(false);
-        return;
-      }
-
-      // If txid is a string, parse it.
-      let parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
-      
-      // Extract the TXID from the first input's "transactionId" field.
-      const txidString = parsedTx.inputs[0].transactionId;
-      
-      console.log("Transaction sent, txid:", txidString);
-
-      const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
-        txid: txidString,
-        walletAddress: currentAddress,
-        amount: parseFloat(entryAmount)
+  setProcessing(true);
+  try {
+    let txid;
+    if (raffle.type === 'KAS') {
+      txid = await window.kasware.sendKaspa(
+        raffle.wallet.receivingAddress,
+        parseFloat(entryAmount) * 1e8
+      );
+    } else if (raffle.type === 'KRC20') {
+      const transferJson = JSON.stringify({
+        p: "KRC-20",
+        op: "transfer",
+        tick: raffle.tokenTicker,
+        amt: (parseFloat(entryAmount) * 1e8).toString(),
+        to: raffle.wallet.receivingAddress,
       });
-      if (resEntry.data.success) {
-        // Set success message (adjust styling as needed with CSS for .small-txid)
-        setEntrySuccess(
-          <>
-            Entry Successful! TXID:{" "}
-            <a
-              className="txid-link small-txid"
-              href={`https://kas.fyi/transaction/${txidString}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {txidString}
-            </a>
-          </>
-        );
-      } else {
-        setEntryError("Transaction Failed: Entry recording failed.");
-      }
-    } catch (e) {
-      console.error(e);
-      setEntryError("Transaction Cancelled");
-    } finally {
-      setProcessing(false);
-      setEntryAmount('');
-      fetchRaffle();
+      txid = await window.kasware.signKRC20Transaction(
+        transferJson,
+        4,
+        raffle.wallet.receivingAddress
+      );
     }
-  };
+    // If the transaction was cancelled or did not return a valid txid, display a styled error.
+    if (!txid) {
+      setEntryError("Transaction Failed");
+      setProcessing(false);
+      return;
+    }
+
+    let txidString = "";
+    if (raffle.type === 'KAS') {
+      // KAS transactions return full transaction JSON.
+      const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
+      txidString = parsedTx.inputs[0].transactionId;
+    } else if (raffle.type === 'KRC20') {
+      // KRC20 transactions might return just the txid string
+      // or an object with a "transactionId" field.
+      if (typeof txid === 'string') {
+        txidString = txid;
+      } else if (txid.transactionId) {
+        txidString = txid.transactionId;
+      } else {
+        // Fallback: assume the object itself is the txid.
+        txidString = txid;
+      }
+    }
+
+    console.log("Transaction sent, txid:", txidString);
+
+    const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
+      txid: txidString,
+      walletAddress: currentAddress,
+      amount: parseFloat(entryAmount)
+    });
+    if (resEntry.data.success) {
+      // Set success message (adjust styling as needed with CSS for .small-txid)
+      setEntrySuccess(
+        <>
+          Entry Successful! TXID:{" "}
+          <a
+            className="txid-link small-txid"
+            href={`https://kas.fyi/transaction/${txidString}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {txidString}
+          </a>
+        </>
+      );
+    } else {
+      setEntryError("Transaction Failed: Entry recording failed.");
+    }
+  } catch (e) {
+    console.error(e);
+    setEntryError("Transaction Cancelled");
+  } finally {
+    setProcessing(false);
+    setEntryAmount('');
+    fetchRaffle();
+  }
+};
+
 
   // Aggregate raffle entries by wallet.
   const aggregatedEntries = raffle && raffle.entries
