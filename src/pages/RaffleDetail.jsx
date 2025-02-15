@@ -7,12 +7,12 @@ import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaUsers } from 'react-icons/fa';
 import '../styles.css';
 
-// A simple spinner component for pending TXID state.
+// A simple spinner to show while waiting for the updated TXID
 const Spinner = () => (
   <div className="spinner" style={{ display: 'inline-block', marginLeft: '0.5rem' }} />
 );
 
-// --- TokenLogoBig remains unchanged ---
+// TokenLogoBig remains unchanged.
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
   const controls = useAnimation();
@@ -26,8 +26,8 @@ const TokenLogoBig = ({ ticker }) => {
   const handleHoverStart = () => {
     if (!animating) {
       setAnimating(true);
-      controls.start("hover").then(() => {
-        controls.start("initial");
+      controls.start('hover').then(() => {
+        controls.start('initial');
         setAnimating(false);
       });
     }
@@ -65,7 +65,6 @@ const TokenLogoBig = ({ ticker }) => {
   }
 };
 
-// --- RaffleDetail Component ---
 const RaffleDetail = ({ wallet }) => {
   const { raffleId } = useParams();
   const [raffle, setRaffle] = useState(null);
@@ -74,9 +73,10 @@ const RaffleDetail = ({ wallet }) => {
   const [entryAmount, setEntryAmount] = useState('');
   const [entryError, setEntryError] = useState('');
   const [entrySuccess, setEntrySuccess] = useState('');
+  // pendingTx indicates that a transaction has been submitted and we are awaiting its replacement event.
+  const [pendingTx, setPendingTx] = useState(false);
   const [entryPage, setEntryPage] = useState(1);
   const [connectedAddress, setConnectedAddress] = useState('');
-  const [pendingTx, setPendingTx] = useState(false);
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -101,7 +101,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   }, []);
 
-  // Fetch raffle details (with a cache-busting query parameter)
+  // Fetch raffle details (with cache busting)
   const fetchRaffle = useCallback(async () => {
     try {
       const res = await axios.get(`${apiUrl}/raffles/${raffleId}?t=${new Date().getTime()}`);
@@ -118,7 +118,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   }, [apiUrl, raffleId]);
 
-  // On mount, fetch raffle and connected address repeatedly.
+  // On mount, fetch raffle and update connected address repeatedly.
   useEffect(() => {
     fetchRaffle();
     const updateConnectedAddress = async () => {
@@ -133,12 +133,13 @@ const RaffleDetail = ({ wallet }) => {
     return () => clearInterval(interval);
   }, [raffleId, apiUrl, fetchRaffle, getConnectedAddress]);
 
-  // Listen for transaction replacement events from Kasware.
+  // Listen for transactionReplacementResponse events.
+  // This event will be fired (for example, when the user pushes an RBF transaction)
+  // and it will contain the updated TXID.
   useEffect(() => {
     const kasware = window.kasware;
-    const handleTxReplacement = (res) => {
+    const handler = (res) => {
       console.log('transactionReplacementResponse event:', res);
-      // Use either the transactionId or replacedTransactionId (as in the demo)
       const newTxid = res.transactionId || res.replacedTransactionId;
       if (newTxid && pendingTx) {
         setEntrySuccess(
@@ -157,9 +158,9 @@ const RaffleDetail = ({ wallet }) => {
         setPendingTx(false);
       }
     };
-    kasware.on('transactionReplacementResponse', handleTxReplacement);
+    kasware.on('transactionReplacementResponse', handler);
     return () => {
-      kasware.removeListener('transactionReplacementResponse', handleTxReplacement);
+      kasware.removeListener('transactionReplacementResponse', handler);
     };
   }, [pendingTx]);
 
@@ -171,7 +172,7 @@ const RaffleDetail = ({ wallet }) => {
           .reduce((sum, entry) => sum + entry.creditsAdded, 0)
       : 0;
 
-  // Check balance helper
+  // Check if sufficient balance exists.
   const checkEntryBalance = async () => {
     if (!entryAmount || !raffle) return false;
     if (raffle.type === 'KAS') {
@@ -214,8 +215,10 @@ const RaffleDetail = ({ wallet }) => {
   };
 
   const handleEnterRaffle = async () => {
+    // Clear previous messages and reset pending flag.
     setEntryError('');
     setEntrySuccess('');
+    setPendingTx(false);
     
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
       setEntryError(`Minimum entry is ${raffle.creditConversion}`);
@@ -234,14 +237,13 @@ const RaffleDetail = ({ wallet }) => {
     try {
       let txid;
       if (raffle.type === 'KAS') {
-        // For Kaspa, call sendKaspa as in the demo.
+        // Submit the Kaspa transaction exactly as in the demo.
         txid = await window.kasware.sendKaspa(
           raffle.wallet.receivingAddress,
           parseFloat(entryAmount) * 1e8,
           { priorityFee: 10000 }
         );
       } else if (raffle.type === 'KRC20') {
-        // For KRC20, call signKRC20Transaction as in the demo.
         const transferJson = JSON.stringify({
           p: "KRC-20",
           op: "transfer",
@@ -249,9 +251,9 @@ const RaffleDetail = ({ wallet }) => {
           amt: (parseFloat(entryAmount) * 1e8).toString(),
           to: raffle.wallet.receivingAddress,
         });
+        // Submit the KRC20 transaction as in the demo.
         txid = await window.kasware.signKRC20Transaction(
           transferJson,
-          // Use the proper TxType constant if available; here we use 4 to mimic the demo.
           4,
           raffle.wallet.receivingAddress,
           0.1
@@ -263,12 +265,12 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Instead of parsing the raw txid, we now rely on Kasware’s event (see useEffect above).
-      // For now, display a pending message:
+      // Instead of immediately extracting the TXID from the raw response,
+      // we rely on the transactionReplacementResponse event to update it.
       setPendingTx(true);
       setEntrySuccess(<>Entry Submitted! Waiting for confirmation <Spinner /></>);
   
-      // Also, immediately post the entry so that your backend is aware:
+      // Post the entry to the backend immediately (using the raw txid as fallback).
       await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
         txid: txid,
         walletAddress: currentAddress,
@@ -285,7 +287,7 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // Aggregate and sort entries.
+  // Aggregate raffle entries.
   const aggregatedEntries = raffle && raffle.entries
     ? Object.values(
         raffle.entries.reduce((acc, entry) => {
@@ -308,7 +310,6 @@ const RaffleDetail = ({ wallet }) => {
       </div>
     );
   }
-
   if (!raffle) {
     return (
       <div className="raffle-detail page-container">
@@ -317,7 +318,7 @@ const RaffleDetail = ({ wallet }) => {
     );
   }
 
-  // (Prize dispersal UI omitted for brevity; assume it is unchanged.)
+  // (Prize dispersal UI remains unchanged.)
   let prizeDispersalInfo = null;
   let completedContent = null;
   if (raffle.status === "completed") {
