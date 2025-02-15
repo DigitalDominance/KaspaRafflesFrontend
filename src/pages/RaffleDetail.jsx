@@ -74,11 +74,9 @@ const RaffleDetail = ({ wallet }) => {
   const [entrySuccess, setEntrySuccess] = useState('');
   const [entryPage, setEntryPage] = useState(1);
   const [connectedAddress, setConnectedAddress] = useState('');
+  const [extractingTx, setExtractingTx] = useState(false);
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-  // A state to indicate that we are extracting the TXID (to show a spinner, for example)
-  const [extractingTx, setExtractingTx] = useState(false);
 
   // Helper: Live countdown.
   const getTimeLeft = (endTime) => {
@@ -123,9 +121,7 @@ const RaffleDetail = ({ wallet }) => {
     fetchRaffle();
     const updateConnectedAddress = async () => {
       const addr = await getConnectedAddress();
-      if (addr) {
-        setConnectedAddress(addr);
-      }
+      if (addr) setConnectedAddress(addr);
     };
     updateConnectedAddress();
     const interval = setInterval(() => {
@@ -139,7 +135,6 @@ const RaffleDetail = ({ wallet }) => {
   useEffect(() => {
     const kasware = window.kasware;
     const handleTxReplacement = (res) => {
-      // When the event fires, update the success message with the new TXID.
       console.log("Transaction Replacement Event:", res);
       const newTxid = res.transactionId || res.replacedTransactionId;
       if (newTxid) {
@@ -158,7 +153,6 @@ const RaffleDetail = ({ wallet }) => {
         );
       }
     };
-
     kasware.on("transactionReplacementResponse", handleTxReplacement);
     return () => {
       kasware.removeListener("transactionReplacementResponse", handleTxReplacement);
@@ -215,6 +209,26 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
+  // A helper that returns a promise which resolves when the transactionReplacementResponse event fires.
+  const waitForReplacementEvent = () => {
+    return new Promise((resolve, reject) => {
+      const handler = (res) => {
+        const newTxid = res.transactionId || res.replacedTransactionId;
+        if (newTxid) {
+          console.log("Replacement event returned TXID:", newTxid);
+          window.kasware.removeListener("transactionReplacementResponse", handler);
+          resolve(newTxid);
+        }
+      };
+      window.kasware.on("transactionReplacementResponse", handler);
+      // Set a timeout in case the event never fires.
+      setTimeout(() => {
+        window.kasware.removeListener("transactionReplacementResponse", handler);
+        reject("Timeout waiting for replacement event");
+      }, 10000);
+    });
+  };
+
   const handleEnterRaffle = async () => {
     // Clear any previous messages
     setEntryError('');
@@ -261,55 +275,52 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Delay before extracting TXID so the transaction can settle.
+      // Delay before logging raw txid so the transaction can settle.
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Log the raw txid for debugging.
       console.log("Raw txid from wallet:", txid);
       
-      // Indicate that we are now extracting the TXID.
-      setExtractingTx(true);
-      
-      let txidString = "";
-      if (raffle.type === 'KAS') {
-        const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
-        txidString = parsedTx.inputs[0].transactionId;
-      } else if (raffle.type === 'KRC20') {
-        const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
-        const commitTx = typeof parsedTx.commitTxStr === 'string'
-          ? JSON.parse(parsedTx.commitTxStr)
-          : parsedTx.commitTxStr;
-        txidString = commitTx.inputs[0].transactionId;
+      // Now wait for the transactionReplacementResponse event.
+      let txidString;
+      try {
+        txidString = await waitForReplacementEvent();
+      } catch (e) {
+        console.error(e);
+        // If the event times out, fallback to immediate extraction.
+        if (raffle.type === 'KAS') {
+          const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
+          txidString = parsedTx.inputs[0].transactionId;
+        } else if (raffle.type === 'KRC20') {
+          const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
+          const commitTx = typeof parsedTx.commitTxStr === 'string'
+            ? JSON.parse(parsedTx.commitTxStr)
+            : parsedTx.commitTxStr;
+          txidString = commitTx.inputs[0].transactionId;
+        }
       }
   
-      console.log("Extracted TXID:", txidString);
-      setExtractingTx(false);
+      console.log("Final TXID to use:", txidString);
   
-      const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
+      setEntrySuccess(
+        <>
+          Entry Successful! TXID:{" "}
+          <a
+            className="txid-link small-txid"
+            href={`https://kas.fyi/transaction/${txidString}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {txidString}
+          </a>
+        </>
+      );
+  
+      await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
         txid: txidString,
         walletAddress: currentAddress,
         amount: parseFloat(entryAmount)
       });
-      if (resEntry.data.success) {
-        // Show a spinner if we are still extracting.
-        setEntrySuccess(
-          <>
-            Entry Successful! TXID:{" "}
-            {extractingTx ? <Spinner /> : (
-              <a
-                className="txid-link small-txid"
-                href={`https://kas.fyi/transaction/${txidString}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {txidString}
-              </a>
-            )}
-          </>
-        );
-      } else {
-        setEntryError("Transaction Failed: Entry recording failed.");
-      }
     } catch (e) {
       console.error(e);
       setEntryError("Transaction Cancelled");
