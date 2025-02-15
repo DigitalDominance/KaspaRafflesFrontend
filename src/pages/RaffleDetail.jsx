@@ -8,7 +8,7 @@ import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaUsers } from 'react-icons/fa';
 import '../styles.css';
 
 const Spinner = () => (
-  <div className="spinner" style={{ display: "inline-block", marginLeft: "0.5rem" }} />
+  <div className="spinner" style={{ display: 'inline-block', marginLeft: '0.5rem' }} />
 );
 
 // Updated TokenLogoBig component with one-shot 3D spin (cannot be interrupted)
@@ -19,14 +19,14 @@ const TokenLogoBig = ({ ticker }) => {
 
   const tokenVariants = {
     initial: { scale: 1, rotateY: 0 },
-    hover: { scale: 1.1, rotateY: 360 }
+    hover: { scale: 1.1, rotateY: 360 },
   };
 
   const handleHoverStart = () => {
     if (!animating) {
       setAnimating(true);
-      controls.start("hover").then(() => {
-        controls.start("initial");
+      controls.start('hover').then(() => {
+        controls.start('initial');
         setAnimating(false);
       });
     }
@@ -34,7 +34,7 @@ const TokenLogoBig = ({ ticker }) => {
 
   if (imgError) {
     return (
-      <motion.div 
+      <motion.div
         className="tokenLogoBig-fallback"
         animate={controls}
         initial="initial"
@@ -74,9 +74,11 @@ const RaffleDetail = ({ wallet }) => {
   const [entrySuccess, setEntrySuccess] = useState('');
   const [entryPage, setEntryPage] = useState(1);
   const [connectedAddress, setConnectedAddress] = useState('');
-  const [extractingTx, setExtractingTx] = useState(false);
   const entriesPerPage = 6;
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
+  // This state indicates that we have submitted the transaction and are waiting for an event update.
+  const [pendingTx, setPendingTx] = useState(false);
 
   // Helper: Live countdown.
   const getTimeLeft = (endTime) => {
@@ -135,12 +137,13 @@ const RaffleDetail = ({ wallet }) => {
   useEffect(() => {
     const kasware = window.kasware;
     const handleTxReplacement = (res) => {
-      console.log("Transaction Replacement Event:", res);
+      console.log('transactionReplacementResponse event:', res);
       const newTxid = res.transactionId || res.replacedTransactionId;
       if (newTxid) {
+        // Update the success message with the new TXID.
         setEntrySuccess(
           <>
-            Entry Successful! TXID:{" "}
+            Entry Successful! TXID:{' '}
             <a
               className="txid-link small-txid"
               href={`https://kas.fyi/transaction/${newTxid}`}
@@ -151,11 +154,12 @@ const RaffleDetail = ({ wallet }) => {
             </a>
           </>
         );
+        setPendingTx(false);
       }
     };
-    kasware.on("transactionReplacementResponse", handleTxReplacement);
+    kasware.on('transactionReplacementResponse', handleTxReplacement);
     return () => {
-      kasware.removeListener("transactionReplacementResponse", handleTxReplacement);
+      kasware.removeListener('transactionReplacementResponse', handleTxReplacement);
     };
   }, []);
 
@@ -209,30 +213,11 @@ const RaffleDetail = ({ wallet }) => {
     }
   };
 
-  // A helper that returns a promise which resolves when the transactionReplacementResponse event fires.
-  const waitForReplacementEvent = () => {
-    return new Promise((resolve, reject) => {
-      const handler = (res) => {
-        const newTxid = res.transactionId || res.replacedTransactionId;
-        if (newTxid) {
-          console.log("Replacement event returned TXID:", newTxid);
-          window.kasware.removeListener("transactionReplacementResponse", handler);
-          resolve(newTxid);
-        }
-      };
-      window.kasware.on("transactionReplacementResponse", handler);
-      // Set a timeout in case the event never fires.
-      setTimeout(() => {
-        window.kasware.removeListener("transactionReplacementResponse", handler);
-        reject("Timeout waiting for replacement event");
-      }, 10000);
-    });
-  };
-
   const handleEnterRaffle = async () => {
-    // Clear any previous messages
+    // Clear previous messages and set pending state
     setEntryError('');
     setEntrySuccess('');
+    setPendingTx(false);
     
     if (parseFloat(entryAmount) < parseFloat(raffle.creditConversion)) {
       setEntryError(`Minimum entry is ${raffle.creditConversion}`);
@@ -275,52 +260,14 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Delay before logging raw txid so the transaction can settle.
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Log the raw txid for debugging.
-      console.log("Raw txid from wallet:", txid);
-      
-      // Now wait for the transactionReplacementResponse event.
-      let txidString;
-      try {
-        txidString = await waitForReplacementEvent();
-      } catch (e) {
-        console.error(e);
-        // If the event times out, fallback to immediate extraction.
-        if (raffle.type === 'KAS') {
-          const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
-          txidString = parsedTx.inputs[0].transactionId;
-        } else if (raffle.type === 'KRC20') {
-          const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
-          const commitTx = typeof parsedTx.commitTxStr === 'string'
-            ? JSON.parse(parsedTx.commitTxStr)
-            : parsedTx.commitTxStr;
-          txidString = commitTx.inputs[0].transactionId;
-        }
-      }
+      // Instead of immediately extracting the TXID, we now set a pending state.
+      setPendingTx(true);
+      setEntrySuccess(<>Entry Submitted! Waiting for confirmation <Spinner /></>);
   
-      console.log("Final TXID to use:", txidString);
+      // (Optionally, you could add a fallback extraction here after a timeout.)
   
-      setEntrySuccess(
-        <>
-          Entry Successful! TXID:{" "}
-          <a
-            className="txid-link small-txid"
-            href={`https://kas.fyi/transaction/${txidString}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {txidString}
-          </a>
-        </>
-      );
-  
-      await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
-        txid: txidString,
-        walletAddress: currentAddress,
-        amount: parseFloat(entryAmount)
-      });
+      // The event listener (in useEffect) will update entrySuccess when the new TXID is available.
+      console.log("Transaction submitted, awaiting replacement event...");
     } catch (e) {
       console.error(e);
       setEntryError("Transaction Cancelled");
