@@ -225,11 +225,11 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
+      // Delay before logging raw txid so the transaction can settle.
+      await new Promise(resolve => setTimeout(resolve, 5000));
+  
       // Log the raw txid to verify the returned response.
       console.log("Raw txid from wallet:", txid);
-  
-      // Add a delay to let the transaction settle before extracting TXID.
-      await new Promise(resolve => setTimeout(resolve, 7500));
   
       let txidString = "";
       if (raffle.type === 'KAS') {
