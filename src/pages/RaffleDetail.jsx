@@ -7,6 +7,10 @@ import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { FaClock, FaCoins, FaUserAlt, FaTrophy, FaUsers } from 'react-icons/fa';
 import '../styles.css';
 
+const Spinner = () => (
+  <div className="spinner" style={{ display: "inline-block", marginLeft: "0.5rem" }} />
+);
+
 // Updated TokenLogoBig component with one-shot 3D spin (cannot be interrupted)
 const TokenLogoBig = ({ ticker }) => {
   const [imgError, setImgError] = useState(false);
@@ -65,10 +69,10 @@ const RaffleDetail = ({ wallet }) => {
   const [raffle, setRaffle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState(null);
   const [entryAmount, setEntryAmount] = useState('');
   const [entryError, setEntryError] = useState('');
   const [entrySuccess, setEntrySuccess] = useState('');
+  const [extractingTx, setExtractingTx] = useState(false);
   const [entryPage, setEntryPage] = useState(1);
   const [connectedAddress, setConnectedAddress] = useState('');
   const entriesPerPage = 6;
@@ -102,10 +106,10 @@ const RaffleDetail = ({ wallet }) => {
       if (res.data.success) {
         setRaffle(res.data.raffle);
       } else {
-        setError('Raffle not found');
+        setEntryError('Raffle not found');
       }
     } catch (err) {
-      setError('Error loading raffle details.');
+      setEntryError('Error loading raffle details.');
       console.error('Error fetching raffle details:', err);
     } finally {
       setLoading(false);
@@ -117,9 +121,7 @@ const RaffleDetail = ({ wallet }) => {
     fetchRaffle();
     const updateConnectedAddress = async () => {
       const addr = await getConnectedAddress();
-      if (addr) {
-        setConnectedAddress(addr);
-      }
+      if (addr) setConnectedAddress(addr);
     };
     updateConnectedAddress();
     const interval = setInterval(() => {
@@ -225,12 +227,15 @@ const RaffleDetail = ({ wallet }) => {
         return;
       }
   
-      // Delay before logging raw txid so the transaction can settle.
-      await new Promise(resolve => setTimeout(resolve, 5000));
-  
-      // Log the raw txid to verify the returned response.
+      // Delay before extracting TXID to allow transaction settlement.
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Now log the raw txid.
       console.log("Raw txid from wallet:", txid);
   
+      // Indicate we're now extracting the TXID.
+      setExtractingTx(true);
+      
       let txidString = "";
       if (raffle.type === 'KAS') {
         const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
@@ -244,6 +249,7 @@ const RaffleDetail = ({ wallet }) => {
       }
   
       console.log("Extracted TXID:", txidString);
+      setExtractingTx(false);
   
       const resEntry = await axios.post(`${apiUrl}/raffles/${raffle.raffleId}/enter`, {
         txid: txidString,
@@ -254,14 +260,18 @@ const RaffleDetail = ({ wallet }) => {
         setEntrySuccess(
           <>
             Entry Successful! TXID:{" "}
-            <a
-              className="txid-link small-txid"
-              href={`https://kas.fyi/transaction/${txidString}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {txidString}
-            </a>
+            {extractingTx ? (
+              <Spinner />
+            ) : (
+              <a
+                className="txid-link small-txid"
+                href={`https://kas.fyi/transaction/${txidString}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {txidString}
+              </a>
+            )}
           </>
         );
       } else {
@@ -322,7 +332,6 @@ const RaffleDetail = ({ wallet }) => {
     const winners = (raffle.winnersList && raffle.winnersList.length > 0)
       ? raffle.winnersList
       : (raffle.winner && raffle.winner !== "No Entries" ? [raffle.winner] : []);
-    // Group prize dispersal TXIDs by winner.
     const txidByWinner = {};
     if (raffle.prizeDispersalTxids && raffle.prizeDispersalTxids.length > 0) {
       raffle.prizeDispersalTxids.forEach(record => {
@@ -429,7 +438,6 @@ const RaffleDetail = ({ wallet }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Combined container for token logo and prize text */}
       <motion.div 
         className="raffle-title-container"
         whileHover={{ scale: 1.05 }}
