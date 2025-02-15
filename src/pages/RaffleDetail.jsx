@@ -231,15 +231,15 @@ const RaffleDetail = ({ wallet }) => {
         const parsedTx = typeof txid === 'string' ? JSON.parse(txid) : txid;
         txidString = parsedTx.inputs[0].transactionId;
       } else if (raffle.type === 'KRC20') {
-        // KRC20 transactions might return just the txid string
-        // or an object with a "transactionId" field.
-        if (typeof txid === 'string') {
-          txidString = txid;
-        } else if (txid.transactionId) {
-          txidString = txid.transactionId;
+        // For KRC20, we now extract the TXID from the commitTxStr.
+        if (txid && txid.commitTxStr) {
+          const commitTx = typeof txid.commitTxStr === 'string'
+            ? JSON.parse(txid.commitTxStr)
+            : txid.commitTxStr;
+          txidString = commitTx.inputs[0].transactionId;
         } else {
-          // Fallback: assume the object itself is the txid.
-          txidString = txid;
+          // Fallback if commitTxStr isn't present.
+          txidString = typeof txid === 'string' ? txid : txid.transactionId || '';
         }
       }
   
@@ -251,7 +251,7 @@ const RaffleDetail = ({ wallet }) => {
         amount: parseFloat(entryAmount)
       });
       if (resEntry.data.success) {
-        // Set success message (adjust styling as needed with CSS for .small-txid)
+        // Set success message with clickable hyperlink and small font for the TXID.
         setEntrySuccess(
           <>
             Entry Successful! TXID:{" "}
